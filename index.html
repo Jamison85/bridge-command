@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Bridge Command</title>
+  <meta name="description" content="A high-fidelity mobile-optimized Starship Bridge Simulator built with Three.js." />
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <main id="app">
+    <canvas id="bridge-canvas" aria-label="Starship bridge simulator"></canvas>
+
+    <section id="hud" aria-live="polite">
+      <div class="hud-top">
+        <div>
+          <p class="eyebrow">USS BRIDGE COMMAND</p>
+          <h1>Bridge Command</h1>
+        </div>
+
+        <button id="audio-toggle" class="hud-button" type="button">Enable Audio</button>
+      </div>
+
+      <div id="info-screen" class="info-screen">
+        <p class="eyebrow">Transparent Tactical Display</p>
+        <h2 id="screen-title">Systems Idle</h2>
+        <p id="screen-body">Touch a console control to bring the next screen online.</p>
+      </div>
+
+      <div class="hud-bottom">
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          Main Power Stable
+        </div>
+        <div class="status-pill">Mobile DPR Optimized</div>
+      </div>
+    </section>
+
+    <noscript>
+      <div class="noscript">This simulator requires JavaScript. Apparently the ship does not run on vibes alone.</div>
+    </noscript>
+  </main>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
