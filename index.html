@@ -7,43 +7,148 @@
   <meta name="description" content="A mobile-first Starship Bridge Simulator for piloting a retail shift." />
   <title>Store Bridge Simulator</title>
 
-  <link rel="stylesheet" href="./css/style.css?v=cinematic-m2-visibility" />
+  <link rel="stylesheet" href="./css/style.css?v=real-cockpit-2-1" />
 
   <style>
-    body.cinematic-build .transparent-display {
-      width: min(88vw, 520px);
-      max-height: min(48vh, 430px);
-      margin-bottom: 92px;
-      padding: 14px;
+    body.cinematic-build::before,
+    body.cinematic-build::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    body.cinematic-build::before {
       background:
-        linear-gradient(135deg, rgba(103, 232, 249, 0.08), transparent 42%),
-        linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(2, 6, 23, 0.24));
-      backdrop-filter: blur(8px);
+        radial-gradient(ellipse at center, transparent 42%, rgba(0, 0, 0, 0.34) 78%, rgba(0, 0, 0, 0.72) 100%),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.5), transparent 13%, transparent 87%, rgba(0, 0, 0, 0.5));
+      mix-blend-mode: multiply;
+    }
+
+    body.cinematic-build::after {
+      border: min(4.8vw, 28px) solid rgba(1, 7, 15, 0.54);
       box-shadow:
-        0 12px 50px rgba(0, 0, 0, 0.36),
-        inset 0 0 24px rgba(103, 232, 249, 0.05),
-        0 0 22px rgba(103, 232, 249, 0.14);
+        inset 0 0 46px rgba(0, 0, 0, 0.7),
+        inset 0 0 120px rgba(8, 18, 34, 0.56);
+    }
+
+    body.cinematic-build #hud-overlay {
+      z-index: 6;
+    }
+
+    body.cinematic-build .hud-header {
+      align-items: flex-start;
+      transform: scale(0.92);
+      transform-origin: top left;
+      opacity: 0.88;
+    }
+
+    body.cinematic-build .hud-header h1 {
+      font-size: clamp(1.02rem, 4vw, 1.45rem);
+      opacity: 0.8;
+    }
+
+    body.cinematic-build .status-pill {
+      transform: scale(0.92);
+      transform-origin: top right;
+      background: rgba(2, 6, 23, 0.46);
+      box-shadow: 0 0 18px rgba(103, 232, 249, 0.12);
+    }
+
+    body.cinematic-build .transparent-display {
+      position: fixed;
+      left: max(14px, env(safe-area-inset-left));
+      top: calc(max(92px, env(safe-area-inset-top) + 74px));
+      width: min(45vw, 245px);
+      min-width: 190px;
+      max-height: 162px;
+      margin: 0;
+      padding: 10px 11px;
+      border-radius: 18px;
+      border-color: rgba(103, 232, 249, 0.2);
+      background:
+        linear-gradient(135deg, rgba(103, 232, 249, 0.055), transparent 48%),
+        linear-gradient(180deg, rgba(10, 18, 32, 0.36), rgba(2, 6, 23, 0.2));
+      backdrop-filter: blur(5px);
+      box-shadow:
+        0 10px 34px rgba(0, 0, 0, 0.28),
+        inset 0 0 18px rgba(103, 232, 249, 0.035),
+        0 0 16px rgba(103, 232, 249, 0.08);
+    }
+
+    body.detail-mode .transparent-display {
+      width: min(74vw, 430px);
+      max-height: min(48vh, 390px);
+      background:
+        linear-gradient(135deg, rgba(103, 232, 249, 0.08), transparent 44%),
+        linear-gradient(180deg, rgba(10, 18, 32, 0.52), rgba(2, 6, 23, 0.34));
+      backdrop-filter: blur(9px);
+    }
+
+    body.cinematic-build .display-label {
+      margin-bottom: 3px;
+      font-size: 0.55rem;
+      letter-spacing: 0.12em;
     }
 
     body.cinematic-build .transparent-display h2 {
-      font-size: clamp(1.05rem, 4vw, 1.45rem);
-      margin-bottom: 5px;
+      margin-bottom: 4px;
+      font-size: 0.92rem;
+      letter-spacing: -0.03em;
     }
 
     body.cinematic-build #display-copy {
-      max-height: 2.9em;
+      max-height: 3.05em;
       overflow: hidden;
       margin-bottom: 0;
-      font-size: 0.82rem;
+      color: rgba(199, 215, 230, 0.74);
+      font-size: 0.68rem;
+      line-height: 1.35;
+    }
+
+    body.detail-mode #display-copy {
+      max-height: 4.2em;
+      font-size: 0.76rem;
     }
 
     body.cinematic-build .metrics-row {
-      margin-top: 10px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+      margin-top: 8px;
+    }
+
+    body.cinematic-build .metric-card {
+      padding: 7px 6px;
+      border-radius: 12px;
+      background: rgba(2, 6, 23, 0.3);
+    }
+
+    body.cinematic-build .metric-card span {
+      margin-bottom: 2px;
+      font-size: 0.52rem;
+    }
+
+    body.cinematic-build .metric-card strong {
+      font-size: 0.68rem;
     }
 
     body.cinematic-build .pilot-panel {
-      max-height: min(18vh, 175px);
+      max-height: 0;
+      margin-top: 0;
+      padding-right: 0;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(-4px);
+      transition: max-height 260ms ease, opacity 180ms ease, margin-top 180ms ease, transform 180ms ease;
+    }
+
+    body.detail-mode .pilot-panel {
+      max-height: min(27vh, 240px);
       margin-top: 10px;
+      padding-right: 4px;
+      opacity: 1;
+      transform: translateY(0);
     }
 
     body.cinematic-build .pilot-card,
@@ -51,34 +156,82 @@
     body.cinematic-build .history-item,
     body.cinematic-build .progress-strip,
     body.cinematic-build .focus-lock {
-      background: rgba(2, 6, 23, 0.32);
+      background: rgba(2, 6, 23, 0.26);
+      border-color: rgba(103, 232, 249, 0.12);
     }
 
     body.cinematic-build .hud-header::after {
-      content: "CINEMATIC M2";
+      content: "COCKPIT 2.1";
       position: fixed;
       left: max(16px, env(safe-area-inset-left));
       bottom: calc(max(18px, env(safe-area-inset-bottom)) + 72px);
       z-index: 8;
       padding: 6px 9px;
-      border: 1px solid rgba(103, 232, 249, 0.22);
+      border: 1px solid rgba(103, 232, 249, 0.18);
       border-radius: 999px;
-      color: rgba(234, 246, 255, 0.82);
-      background: rgba(2, 6, 23, 0.34);
-      backdrop-filter: blur(8px);
-      font-size: 0.62rem;
+      color: rgba(234, 246, 255, 0.72);
+      background: rgba(2, 6, 23, 0.28);
+      backdrop-filter: blur(6px);
+      font-size: 0.58rem;
       font-weight: 900;
       letter-spacing: 0.12em;
     }
 
-    @media (max-height: 740px) {
+    body.cinematic-build .command-bar {
+      width: min(92vw, 600px);
+      padding: 10px;
+      border-radius: 28px 28px 20px 20px;
+      border-color: rgba(103, 232, 249, 0.14);
+      background:
+        linear-gradient(180deg, rgba(7, 16, 31, 0.68), rgba(2, 6, 14, 0.86)),
+        radial-gradient(circle at center top, rgba(103, 232, 249, 0.12), transparent 52%);
+      box-shadow:
+        0 -12px 36px rgba(0, 0, 0, 0.2),
+        0 14px 46px rgba(0, 0, 0, 0.48),
+        inset 0 1px 0 rgba(255, 255, 255, 0.07),
+        inset 0 0 30px rgba(103, 232, 249, 0.045);
+    }
+
+    body.cinematic-build .hud-button {
+      min-height: 46px;
+      border-radius: 18px;
+      color: rgba(234, 246, 255, 0.78);
+      background:
+        linear-gradient(180deg, rgba(15, 23, 42, 0.78), rgba(2, 6, 23, 0.96));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.07),
+        inset 0 -12px 22px rgba(37, 99, 235, 0.06),
+        0 0 14px rgba(0, 0, 0, 0.28);
+    }
+
+    body.cinematic-build .hud-button.primary {
+      color: #07111f;
+      background: linear-gradient(180deg, rgba(103, 232, 249, 0.88), rgba(96, 165, 250, 0.78));
+      box-shadow:
+        0 0 18px rgba(103, 232, 249, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.32);
+    }
+
+    @media (max-width: 430px) {
       body.cinematic-build .transparent-display {
-        max-height: 42vh;
-        margin-bottom: 78px;
+        width: min(48vw, 230px);
+        min-width: 180px;
+        top: 94px;
       }
 
-      body.cinematic-build .pilot-panel {
-        max-height: 14vh;
+      body.detail-mode .transparent-display {
+        width: min(86vw, 390px);
+      }
+    }
+
+    @media (max-height: 740px) {
+      body.cinematic-build .transparent-display {
+        top: 82px;
+        max-height: 142px;
+      }
+
+      body.detail-mode .pilot-panel {
+        max-height: 21vh;
       }
     }
   </style>
@@ -92,7 +245,7 @@
     }
   </script>
 </head>
-<body class="cinematic-build">
+<body class="cinematic-build cockpit-first">
   <main id="app-shell">
     <canvas id="bridge-canvas" aria-label="Interactive starship bridge simulator"></canvas>
 
@@ -112,11 +265,11 @@
       <section class="transparent-display" id="info-display">
         <div class="display-scanline" aria-hidden="true"></div>
 
-        <p class="display-label">ACTIVE SCREEN</p>
+        <p class="display-label">ASSISTANT OVERLAY</p>
         <h2 id="display-title">Shift Command</h2>
 
         <p id="display-copy">
-          Cinematic bridge build active. Tap a console control or push the throttle.
+          Cockpit-first composition active. The main action now lives on the in-world hologram.
         </p>
 
         <div class="metrics-row" aria-label="Bridge metrics">
@@ -150,10 +303,10 @@
 
     <section id="boot-message" aria-label="Simulator startup panel">
       <div class="boot-card">
-        <p class="eyebrow">CINEMATIC M2 BUILD</p>
-        <h2>Bridge Refit Online</h2>
+        <p class="eyebrow">COCKPIT 2.1 BUILD</p>
+        <h2>Seated Bridge View Online</h2>
         <p>
-          This build forces the new cockpit scene, hologram display, cinematic lighting, and cache-busted scripts. If it still looks old, the browser is serving stale files like a tiny goblin with a clipboard.
+          The 3D bridge is now the main view. The DOM is only a compact assistant overlay, because apparently giant rectangles are not how starships work.
         </p>
         <button id="begin-button" type="button">Enter Bridge</button>
       </div>
@@ -166,6 +319,6 @@
     </div>
   </noscript>
 
-  <script type="module" src="./js/main.js?v=cinematic-m2-visibility"></script>
+  <script type="module" src="./js/main.js?v=real-cockpit-2-1"></script>
 </body>
 </html>
