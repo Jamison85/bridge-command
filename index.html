@@ -7,7 +7,81 @@
   <meta name="description" content="A mobile-first Starship Bridge Simulator for piloting a retail shift." />
   <title>Store Bridge Simulator</title>
 
-  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/style.css?v=cinematic-m2-visibility" />
+
+  <style>
+    body.cinematic-build .transparent-display {
+      width: min(88vw, 520px);
+      max-height: min(48vh, 430px);
+      margin-bottom: 92px;
+      padding: 14px;
+      background:
+        linear-gradient(135deg, rgba(103, 232, 249, 0.08), transparent 42%),
+        linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(2, 6, 23, 0.24));
+      backdrop-filter: blur(8px);
+      box-shadow:
+        0 12px 50px rgba(0, 0, 0, 0.36),
+        inset 0 0 24px rgba(103, 232, 249, 0.05),
+        0 0 22px rgba(103, 232, 249, 0.14);
+    }
+
+    body.cinematic-build .transparent-display h2 {
+      font-size: clamp(1.05rem, 4vw, 1.45rem);
+      margin-bottom: 5px;
+    }
+
+    body.cinematic-build #display-copy {
+      max-height: 2.9em;
+      overflow: hidden;
+      margin-bottom: 0;
+      font-size: 0.82rem;
+    }
+
+    body.cinematic-build .metrics-row {
+      margin-top: 10px;
+    }
+
+    body.cinematic-build .pilot-panel {
+      max-height: min(18vh, 175px);
+      margin-top: 10px;
+    }
+
+    body.cinematic-build .pilot-card,
+    body.cinematic-build .task-row,
+    body.cinematic-build .history-item,
+    body.cinematic-build .progress-strip,
+    body.cinematic-build .focus-lock {
+      background: rgba(2, 6, 23, 0.32);
+    }
+
+    body.cinematic-build .hud-header::after {
+      content: "CINEMATIC M2";
+      position: fixed;
+      left: max(16px, env(safe-area-inset-left));
+      bottom: calc(max(18px, env(safe-area-inset-bottom)) + 72px);
+      z-index: 8;
+      padding: 6px 9px;
+      border: 1px solid rgba(103, 232, 249, 0.22);
+      border-radius: 999px;
+      color: rgba(234, 246, 255, 0.82);
+      background: rgba(2, 6, 23, 0.34);
+      backdrop-filter: blur(8px);
+      font-size: 0.62rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+    }
+
+    @media (max-height: 740px) {
+      body.cinematic-build .transparent-display {
+        max-height: 42vh;
+        margin-bottom: 78px;
+      }
+
+      body.cinematic-build .pilot-panel {
+        max-height: 14vh;
+      }
+    }
+  </style>
 
   <script type="importmap">
     {
@@ -18,7 +92,7 @@
     }
   </script>
 </head>
-<body>
+<body class="cinematic-build">
   <main id="app-shell">
     <canvas id="bridge-canvas" aria-label="Interactive starship bridge simulator"></canvas>
 
@@ -42,7 +116,7 @@
         <h2 id="display-title">Shift Command</h2>
 
         <p id="display-copy">
-          Tap a console control or push the throttle. Warp threshold activates when the lever passes 82%.
+          Cinematic bridge build active. Tap a console control or push the throttle.
         </p>
 
         <div class="metrics-row" aria-label="Bridge metrics">
@@ -76,12 +150,12 @@
 
     <section id="boot-message" aria-label="Simulator startup panel">
       <div class="boot-card">
-        <p class="eyebrow">SIMULATOR READY</p>
-        <h2>Store Bridge Online</h2>
+        <p class="eyebrow">CINEMATIC M2 BUILD</p>
+        <h2>Bridge Refit Online</h2>
         <p>
-          Touch controls are active. Store task guidance, reports, notes, and voice capture are ready. Tiny miracle, really.
+          This build forces the new cockpit scene, hologram display, cinematic lighting, and cache-busted scripts. If it still looks old, the browser is serving stale files like a tiny goblin with a clipboard.
         </p>
-        <button id="begin-button" type="button">Begin Shift</button>
+        <button id="begin-button" type="button">Enter Bridge</button>
       </div>
     </section>
   </main>
@@ -92,6 +166,6 @@
     </div>
   </noscript>
 
-  <script type="module" src="./js/main.js"></script>
+  <script type="module" src="./js/main.js?v=cinematic-m2-visibility"></script>
 </body>
 </html>
