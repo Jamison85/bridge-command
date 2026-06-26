@@ -22,6 +22,21 @@ A high-performance, mobile-first Starship Bridge Simulator for piloting a retail
 - Voice note capture with speech recognition fallback
 - History screen for saved reports, notes, voice notes, and completed tasks
 
+## Milestone 2: Cinematic Bridge Realism Pass
+
+This milestone moves the app from a simple sci-fi prototype toward a true seated cockpit experience.
+
+Added:
+
+- `bridgeScene.js` for the physical cockpit environment
+- `materials.js` for reusable procedural sci-fi materials
+- `lighting.js` for cinematic cockpit lighting
+- `cockpitScreens.js` for animated in-world holographic displays
+- Rebuilt tactile controls with larger physical buttons, labels, toggles, indicators, and a central throttle cluster
+- Better seated camera composition
+- Cockpit light response during throttle and warp
+- Holographic in-world Store Pilot display synced with the DOM workflow panel
+
 ## Directory structure
 
 ```txt
@@ -31,6 +46,10 @@ A high-performance, mobile-first Starship Bridge Simulator for piloting a retail
 │   └── style.css
 ├── js/
 │   ├── main.js
+│   ├── bridgeScene.js
+│   ├── materials.js
+│   ├── lighting.js
+│   ├── cockpitScreens.js
 │   ├── controls.js
 │   ├── storePilot.js
 │   └── audio.js
