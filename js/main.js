@@ -4,6 +4,7 @@ import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { createBridgeControls } from "./controls.js";
 import { createAudioController } from "./audio.js";
+import { createStorePilot } from "./storePilot.js";
 
 const CONFIG = {
   pixelRatioCap: 1.75,
@@ -25,6 +26,7 @@ const ui = {
   throttleReadout: document.querySelector("#throttle-readout"),
   modeReadout: document.querySelector("#mode-readout"),
   focusReadout: document.querySelector("#focus-readout"),
+  pilotPanel: document.querySelector("#pilot-panel"),
   hudButtons: document.querySelectorAll(".hud-button")
 };
 
@@ -33,7 +35,8 @@ const state = {
   height: window.innerHeight,
   clock: new THREE.Clock(),
   throttle: 0,
-  warpActive: false
+  warpActive: false,
+  activeCommand: "next"
 };
 
 let renderer;
@@ -41,6 +44,7 @@ let scene;
 let camera;
 let composer;
 let bridgeControls;
+let storePilot;
 let audio;
 let starfield;
 let warpLines;
@@ -64,6 +68,12 @@ function init() {
 
     audio = createAudioController();
 
+    storePilot = createStorePilot({
+      panel: ui.pilotPanel,
+      onDisplay: applyDisplayContent,
+      onStatus: updateStatus
+    });
+
     bridgeControls = createBridgeControls({
       scene,
       canvas,
@@ -79,6 +89,8 @@ function init() {
 
     bindUIEvents();
     bindResizeEvent();
+    storePilot.render("next");
+    applyDisplayContent(storePilot.getScreenContent("next"));
     animate();
   } catch (error) {
     console.error("Bridge simulator failed to initialize:", error);
@@ -220,12 +232,7 @@ function bindUIEvents() {
   ui.beginButton?.addEventListener("click", async () => {
     await audio.unlock();
     ui.bootMessage?.classList.add("hidden");
-    setDisplayContent(
-      "Shift Command",
-      "Bridge controls online. Drag the throttle or tap a console button.",
-      "Standby",
-      "Stable"
-    );
+    openCommand("next");
   });
 
   ui.hudButtons.forEach((button) => {
@@ -234,7 +241,7 @@ function bindUIEvents() {
       audio.playClick();
       const command = button.dataset.command;
       bridgeControls?.pulseCommand(command);
-      handleCommand(command);
+      openCommand(command);
     });
   });
 }
@@ -247,17 +254,24 @@ function bindResizeEvent() {
 async function handleConsoleCommand(command) {
   await audio.unlock();
   audio.playClick();
-  handleCommand(command);
+  openCommand(command);
 }
 
 async function handleLeverGrab() {
   await audio.unlock();
-  setDisplayContent(
-    "Throttle Control",
-    "Drag upward to increase engine output. Push beyond 82% to engage warp streaks.",
-    "Manual",
-    "High"
-  );
+  applyDisplayContent({
+    title: "Throttle Control",
+    copy: "Drag upward to increase engine output. Push beyond 82% to engage warp streaks.",
+    mode: "Manual",
+    focus: "High"
+  });
+}
+
+function openCommand(command) {
+  state.activeCommand = command;
+  const content = storePilot.getScreenContent(command);
+  applyDisplayContent(content);
+  storePilot.render(command);
 }
 
 function handleThrottleChange(value) {
@@ -266,67 +280,21 @@ function handleThrottleChange(value) {
   ui.throttleReadout.textContent = `${Math.round(value * 100)}%`;
 }
 
-function handleCommand(command) {
-  const content = {
-    tasks: {
-      title: "Task Console",
-      copy: "Next best action queue ready. This will eventually show your live shift priorities.",
-      mode: "Tasks",
-      focus: "Guided"
-    },
-    report: {
-      title: "Incident Report",
-      copy: "Report channel armed. Outages, staffing issues, delays, and manager notifications will live here.",
-      mode: "Report",
-      focus: "Document"
-    },
-    history: {
-      title: "Shift History",
-      copy: "Past shift logs and store patterns will appear here. Humanity may yet learn from yesterday.",
-      mode: "History",
-      focus: "Review"
-    },
-    voice: {
-      title: "Voice Command",
-      copy: "Voice input placeholder ready. Audio is already awake, which is more than can be said for most morning shifts.",
-      mode: "Voice",
-      focus: "Speak"
-    },
-    open: {
-      title: "Opening Systems",
-      copy: "Morning launch checklist placeholder. Books, counts, LTO, cooler, and first walk will connect here.",
-      mode: "Open",
-      focus: "Launch"
-    },
-    focus: {
-      title: "Focus Lock",
-      copy: "Noise reduction mode selected. One job at a time, because the human brain is not a 12-core processor.",
-      mode: "Focus",
-      focus: "Locked"
-    },
-    notes: {
-      title: "Captain's Log",
-      copy: "Notes area placeholder. Perfect for explaining why the store did not magically fix itself during an outage.",
-      mode: "Notes",
-      focus: "Log"
-    },
-    next: {
-      title: "Next Action",
-      copy: "Next-step engine placeholder. This will become the big 'tell me what to do now' control.",
-      mode: "Next",
-      focus: "Decide"
-    }
-  };
-
-  const selected = content[command] ?? content.tasks;
-  setDisplayContent(selected.title, selected.copy, selected.mode, selected.focus);
-}
-
-function setDisplayContent(title, copy, mode, focus) {
+function applyDisplayContent({ title, copy, mode, focus }) {
   ui.displayTitle.textContent = title;
   ui.displayCopy.textContent = copy;
   ui.modeReadout.textContent = mode;
   ui.focusReadout.textContent = focus;
+}
+
+function updateStatus(message) {
+  if (!message) return;
+  ui.systemStatusText.textContent = message;
+
+  window.clearTimeout(updateStatus.timeoutId);
+  updateStatus.timeoutId = window.setTimeout(() => {
+    ui.systemStatusText.textContent = state.warpActive ? "Warp Engaged" : "Systems Ready";
+  }, 1500);
 }
 
 function triggerWarp() {
@@ -335,12 +303,12 @@ function triggerWarp() {
   ui.systemStatusText.textContent = "Warp Engaged";
   audio.playWarp();
 
-  setDisplayContent(
-    "Warp Threshold",
-    "Store bridge at full burn. Particle streak animation engaged. Try not to fly the pizza warmer into Saturn.",
-    "Warp",
-    "Maximum"
-  );
+  applyDisplayContent({
+    title: "Warp Threshold",
+    copy: "Store bridge at full burn. Particle streak animation engaged. Try not to fly the pizza warmer into Saturn.",
+    mode: "Warp",
+    focus: "Maximum"
+  });
 }
 
 function disengageWarp() {
@@ -348,12 +316,8 @@ function disengageWarp() {
   document.body.classList.remove("warping");
   ui.systemStatusText.textContent = "Systems Ready";
 
-  setDisplayContent(
-    "Throttle Control",
-    "Warp disengaged. Reduce speed, breathe, and pretend the store did not just become a space opera.",
-    "Manual",
-    "Stable"
-  );
+  const content = storePilot.getScreenContent(state.activeCommand);
+  applyDisplayContent(content);
 }
 
 function onResize() {
@@ -377,7 +341,7 @@ function animate() {
 
   const throttle = bridgeControls.update(delta);
   updateStarfield(delta, elapsed, throttle);
-  updateWarp(delta, elapsed, throttle);
+  updateWarp(delta, elapsed);
   updateCameraMotion(elapsed, throttle);
 
   composer.render();
