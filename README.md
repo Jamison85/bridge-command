@@ -14,6 +14,13 @@ A high-performance, mobile-first Starship Bridge Simulator for piloting a retail
 - Glassmorphism HUD overlay
 - Generated placeholder Web Audio effects
 - Static GitHub Pages friendly architecture
+- Real store-manager workflow panel
+- Next Action engine for shift priorities
+- Task completion tracking with local storage
+- Incident / delay report generator
+- Captain's Log notes
+- Voice note capture with speech recognition fallback
+- History screen for saved reports, notes, voice notes, and completed tasks
 
 ## Directory structure
 
@@ -25,6 +32,7 @@ A high-performance, mobile-first Starship Bridge Simulator for piloting a retail
 ├── js/
 │   ├── main.js
 │   ├── controls.js
+│   ├── storePilot.js
 │   └── audio.js
 └── assets/
     ├── README.md
@@ -33,6 +41,28 @@ A high-performance, mobile-first Starship Bridge Simulator for piloting a retail
     └── textures/
         └── README.md
 ```
+
+## Store workflow modules
+
+The `js/storePilot.js` module contains the retail workflow brain:
+
+- Morning opening priorities
+- SmartSafe / bookwork flow
+- Smart Counts
+- LTO screenshot reminder
+- Daily walk
+- Coffee / fountain supplies
+- BIB checks
+- Food warmers
+- Open-air cooler rotation
+- Restrooms
+- Shift notes
+- Monday store order
+- Tuesday cigarette audits and backstock
+- Wednesday truck prep and truck triage
+- Sunday outs
+
+The app scores tasks by due time, shift, day of week, weekly routines, and urgency. It saves completed tasks and logs locally on the device.
 
 ## Run locally
 
