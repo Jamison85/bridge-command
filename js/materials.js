@@ -11,103 +11,103 @@ export function createBridgeMaterials() {
   panelNoise.repeat.set(6, 6);
 
   const hullDark = new THREE.MeshStandardMaterial({
-    color: 0x07101f,
-    metalness: 0.72,
-    roughness: 0.34,
+    color: 0x030913,
+    metalness: 0.76,
+    roughness: 0.48,
     map: panelNoise,
-    emissive: 0x020814,
-    emissiveIntensity: 0.14
+    emissive: 0x01040a,
+    emissiveIntensity: 0.05
   });
 
   const hullMid = new THREE.MeshStandardMaterial({
-    color: 0x0f1f34,
-    metalness: 0.64,
-    roughness: 0.38,
+    color: 0x08162a,
+    metalness: 0.7,
+    roughness: 0.44,
     map: panelNoise,
-    emissive: 0x03101f,
-    emissiveIntensity: 0.12
+    emissive: 0x010916,
+    emissiveIntensity: 0.06
   });
 
   const hullWarm = new THREE.MeshStandardMaterial({
-    color: 0x142235,
-    metalness: 0.52,
-    roughness: 0.42,
+    color: 0x0d1828,
+    metalness: 0.58,
+    roughness: 0.5,
     map: panelNoise,
-    emissive: 0x07111f,
-    emissiveIntensity: 0.1
+    emissive: 0x030712,
+    emissiveIntensity: 0.05
   });
 
   const consoleTop = new THREE.MeshStandardMaterial({
-    color: 0x10263d,
-    metalness: 0.68,
-    roughness: 0.26,
+    color: 0x0b1a2e,
+    metalness: 0.72,
+    roughness: 0.38,
     map: panelNoise,
-    emissive: 0x051a2d,
-    emissiveIntensity: 0.2
+    emissive: 0x03101e,
+    emissiveIntensity: 0.1
   });
 
   const consoleInset = new THREE.MeshStandardMaterial({
-    color: 0x050b16,
-    metalness: 0.42,
-    roughness: 0.48,
-    emissive: 0x061426,
-    emissiveIntensity: 0.2
+    color: 0x020711,
+    metalness: 0.46,
+    roughness: 0.58,
+    emissive: 0x020913,
+    emissiveIntensity: 0.09
   });
 
   const cyanGlow = new THREE.MeshStandardMaterial({
-    color: 0x67e8f9,
-    emissive: 0x67e8f9,
-    emissiveIntensity: 1.35,
-    roughness: 0.2,
-    metalness: 0.15
+    color: 0x5cc4dd,
+    emissive: 0x5cc4dd,
+    emissiveIntensity: 0.64,
+    roughness: 0.3,
+    metalness: 0.18
   });
 
   const blueGlow = new THREE.MeshStandardMaterial({
-    color: 0x60a5fa,
-    emissive: 0x60a5fa,
-    emissiveIntensity: 1.15,
-    roughness: 0.22,
-    metalness: 0.16
+    color: 0x4b7ecf,
+    emissive: 0x4b7ecf,
+    emissiveIntensity: 0.54,
+    roughness: 0.32,
+    metalness: 0.18
   });
 
   const amberGlow = new THREE.MeshStandardMaterial({
-    color: 0xfacc15,
-    emissive: 0xfacc15,
-    emissiveIntensity: 1.05,
-    roughness: 0.25,
-    metalness: 0.12
+    color: 0xd99f2a,
+    emissive: 0xd99f2a,
+    emissiveIntensity: 0.55,
+    roughness: 0.3,
+    metalness: 0.15
   });
 
   const redGlow = new THREE.MeshStandardMaterial({
-    color: 0xfb7185,
-    emissive: 0xfb7185,
-    emissiveIntensity: 1.05,
-    roughness: 0.24,
-    metalness: 0.12
+    color: 0xc45a6a,
+    emissive: 0xc45a6a,
+    emissiveIntensity: 0.46,
+    roughness: 0.32,
+    metalness: 0.15
   });
 
   const glass = new THREE.MeshPhysicalMaterial({
-    color: 0x8ee9ff,
-    emissive: 0x16394f,
-    emissiveIntensity: 0.22,
-    metalness: 0.05,
-    roughness: 0.08,
-    transmission: 0.28,
+    color: 0x72d2e3,
+    emissive: 0x082033,
+    emissiveIntensity: 0.1,
+    metalness: 0.04,
+    roughness: 0.12,
+    transmission: 0.2,
     transparent: true,
-    opacity: 0.34,
+    opacity: 0.22,
     depthWrite: false,
     side: THREE.DoubleSide
   });
 
   const windowGlass = new THREE.MeshPhysicalMaterial({
-    color: 0x091627,
-    emissive: 0x010712,
-    emissiveIntensity: 0.3,
+    color: 0x030914,
+    emissive: 0x000409,
+    emissiveIntensity: 0.12,
     metalness: 0.0,
-    roughness: 0.02,
-    transmission: 0.18,
+    roughness: 0.06,
+    transmission: 0.1,
     transparent: true,
-    opacity: 0.26,
+    opacity: 0.18,
     depthWrite: false
   });
 
@@ -126,13 +126,13 @@ export function createBridgeMaterials() {
   };
 }
 
-export function createGlowMaterial(color, intensity = 1) {
+export function createGlowMaterial(color, intensity = 0.72) {
   return new THREE.MeshStandardMaterial({
     color,
     emissive: color,
     emissiveIntensity: intensity,
-    roughness: 0.22,
-    metalness: 0.12
+    roughness: 0.3,
+    metalness: 0.15
   });
 }
 
@@ -145,17 +145,17 @@ function createPanelNoiseTexture() {
   const image = context.createImageData(canvas.width, canvas.height);
 
   for (let i = 0; i < image.data.length; i += 4) {
-    const value = 18 + Math.random() * 36;
+    const value = 8 + Math.random() * 24;
     image.data[i] = value;
-    image.data[i + 1] = value + 4;
-    image.data[i + 2] = value + 11;
+    image.data[i + 1] = value + 3;
+    image.data[i + 2] = value + 9;
     image.data[i + 3] = 255;
   }
 
   context.putImageData(image, 0, 0);
 
-  context.globalAlpha = 0.18;
-  context.strokeStyle = "#7dd3fc";
+  context.globalAlpha = 0.1;
+  context.strokeStyle = "#4ba9c4";
   context.lineWidth = 1;
 
   for (let x = 0; x < canvas.width; x += 32) {
