@@ -3,16 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#02050b" />
+  <meta name="theme-color" content="#05070d" />
   <title>Store Bridge Simulator</title>
-  <link rel="stylesheet" href="./css/style.css?v=art-cockpit-1" />
-  <link rel="stylesheet" href="./css/cockpit-art.css?v=art-cockpit-1" />
-  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+
+  <link rel="stylesheet" href="./css/style.css?v=art-shell-3-1" />
+  <link rel="stylesheet" href="./css/art-shell.css?v=art-shell-3-1" />
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
 </head>
 <body class="cinematic-build cockpit-first">
   <main id="app-shell">
     <canvas id="bridge-canvas" aria-label="Interactive starship bridge simulator"></canvas>
-    <img class="cockpit-matte" src="./assets/cockpit-matte.svg?v=art-cockpit-1" alt="" aria-hidden="true" />
+
+    <div class="bridge-art-shell" aria-hidden="true"></div>
+    <div class="bridge-art-label" aria-hidden="true">ART SHELL 3.1</div>
 
     <section id="hud-overlay" aria-label="Store pilot heads-up display">
       <header class="hud-header">
@@ -30,7 +41,7 @@
         <div class="display-scanline" aria-hidden="true"></div>
         <p class="display-label">ASSISTANT OVERLAY</p>
         <h2 id="display-title">Shift Command</h2>
-        <p id="display-copy">Designed cockpit art layer active. Store Pilot logic stays intact.</p>
+        <p id="display-copy">Art-directed cockpit shell active. Store Pilot stays embedded and readable.</p>
         <div class="metrics-row">
           <div class="metric-card"><span>Throttle</span><strong id="throttle-readout">0%</strong></div>
           <div class="metric-card"><span>Mode</span><strong id="mode-readout">Standby</strong></div>
@@ -50,15 +61,15 @@
 
     <section id="boot-message">
       <div class="boot-card">
-        <p class="eyebrow">ART COCKPIT BUILD</p>
-        <h2>Designed Bridge Layer Online</h2>
-        <p>The app now uses a designed cockpit matte as the main visual foundation, with the 3D scene reduced to subtle ambient motion behind it.</p>
+        <p class="eyebrow">ART SHELL 3.1 BUILD</p>
+        <h2>Premium Cockpit Shell Online</h2>
+        <p>The app now uses a deliberate illustrated cockpit layer instead of relying on procedural rectangles to fake realism.</p>
         <button id="begin-button" type="button">Enter Bridge</button>
       </div>
     </section>
   </main>
 
   <noscript><div class="noscript-message">This bridge requires JavaScript.</div></noscript>
-  <script type="module" src="./js/main.js?v=art-cockpit-1"></script>
+  <script type="module" src="./js/main.js?v=art-shell-3-1"></script>
 </body>
 </html>
