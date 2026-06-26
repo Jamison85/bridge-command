@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="spaceGlow" cx="50%" cy="27%" r="58%">
+      <stop offset="0" stop-color="#14364a" stop-opacity="0.72"/>
+      <stop offset="0.42" stop-color="#07111f" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#02040a" stop-opacity="1"/>
+    </radialGradient>
+    <linearGradient id="metal" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#142235"/>
+      <stop offset="0.52" stop-color="#08111f"/>
+      <stop offset="1" stop-color="#02050c"/>
+    </linearGradient>
+    <linearGradient id="darkPanel" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#0b1728"/>
+      <stop offset="1" stop-color="#02050b"/>
+    </linearGradient>
+    <linearGradient id="console" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#132236"/>
+      <stop offset="0.45" stop-color="#07101d"/>
+      <stop offset="1" stop-color="#010309"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#4fc3da" stop-opacity="0.12"/>
+      <stop offset="0.5" stop-color="#10283b" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#06111d" stop-opacity="0.1"/>
+    </linearGradient>
+    <filter id="cyanGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="amberGlow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <pattern id="panelLines" width="72" height="72" patternUnits="userSpaceOnUse">
+      <path d="M72 0H0V72" fill="none" stroke="#6bcbe0" stroke-opacity="0.035" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1080" height="1920" fill="#02040a"/>
+  <rect width="1080" height="1920" fill="url(#spaceGlow)"/>
+  <g opacity="0.62">
+    <circle cx="180" cy="210" r="1.5" fill="#d9f6ff"/>
+    <circle cx="315" cy="340" r="1.1" fill="#93c5fd"/>
+    <circle cx="742" cy="250" r="1.4" fill="#eaf6ff"/>
+    <circle cx="886" cy="410" r="1" fill="#93c5fd"/>
+    <circle cx="618" cy="154" r="1.2" fill="#d9f6ff"/>
+    <circle cx="470" cy="430" r="1" fill="#eaf6ff"/>
+  </g>
+
+  <g id="upper-shell">
+    <path d="M64 0H1016L944 442H136L64 0Z" fill="#02050b" opacity="0.78"/>
+    <path d="M132 150H948L878 505H202L132 150Z" fill="url(#metal)" opacity="0.78"/>
+    <path d="M194 204H886L824 548H256L194 204Z" fill="#02050b" opacity="0.85"/>
+    <path d="M254 240H826L770 558H310L254 240Z" fill="url(#glass)" stroke="#4fc3da" stroke-opacity="0.16" stroke-width="3"/>
+    <path d="M534 224H548V594H534Z" fill="#010309" opacity="0.88"/>
+    <path d="M304 565H776" stroke="#4fc3da" stroke-opacity="0.32" stroke-width="3" filter="url(#cyanGlow)"/>
+    <path d="M318 252H762" stroke="#4fc3da" stroke-opacity="0.13" stroke-width="2"/>
+  </g>
+
+  <g id="side-walls">
+    <path d="M0 412L166 312L236 1250L0 1530Z" fill="url(#darkPanel)"/>
+    <path d="M1080 412L914 312L844 1250L1080 1530Z" fill="url(#darkPanel)"/>
+    <path d="M70 470L186 430L218 1040L92 1150Z" fill="#050b15" stroke="#4fc3da" stroke-opacity="0.08"/>
+    <path d="M1010 470L894 430L862 1040L988 1150Z" fill="#050b15" stroke="#4fc3da" stroke-opacity="0.08"/>
+    <g opacity="0.36">
+      <path d="M134 528L198 514" stroke="#4fc3da" stroke-width="3"/>
+      <path d="M126 622L205 610" stroke="#d59a2c" stroke-width="2"/>
+      <path d="M118 716L212 708" stroke="#4fc3da" stroke-width="2"/>
+      <path d="M946 528L882 514" stroke="#4fc3da" stroke-width="3"/>
+      <path d="M954 622L875 610" stroke="#d59a2c" stroke-width="2"/>
+      <path d="M962 716L868 708" stroke="#4fc3da" stroke-width="2"/>
+    </g>
+  </g>
+
+  <g id="hologram-slot">
+    <rect x="248" y="590" width="584" height="268" rx="24" fill="#06111d" fill-opacity="0.42" stroke="#4fc3da" stroke-opacity="0.26" stroke-width="3"/>
+    <rect x="286" y="632" width="508" height="184" rx="18" fill="#3bb8d0" fill-opacity="0.045" stroke="#4fc3da" stroke-opacity="0.11"/>
+    <path d="M254 724H826" stroke="#4fc3da" stroke-opacity="0.28" stroke-width="3" filter="url(#cyanGlow)"/>
+    <path d="M330 612H750" stroke="#4fc3da" stroke-opacity="0.15" stroke-width="2"/>
+    <path d="M388 830H692" stroke="#d59a2c" stroke-opacity="0.34" stroke-width="2" filter="url(#amberGlow)"/>
+  </g>
+
+  <g id="side-consoles">
+    <path d="M122 790L302 830L286 990L92 930Z" fill="url(#console)" stroke="#4fc3da" stroke-opacity="0.1"/>
+    <path d="M958 790L778 830L794 990L988 930Z" fill="url(#console)" stroke="#4fc3da" stroke-opacity="0.1"/>
+    <rect x="154" y="842" width="86" height="16" rx="8" fill="#4fc3da" fill-opacity="0.22"/>
+    <rect x="840" y="842" width="86" height="16" rx="8" fill="#d59a2c" fill-opacity="0.24"/>
+  </g>
+
+  <g id="foreground-console">
+    <path d="M82 1042H998L1080 1592H0L82 1042Z" fill="url(#console)"/>
+    <path d="M140 1098H940L986 1500H94L140 1098Z" fill="#040913" stroke="#4fc3da" stroke-opacity="0.09"/>
+    <path d="M212 1168H868" stroke="#4fc3da" stroke-opacity="0.26" stroke-width="4" filter="url(#cyanGlow)"/>
+    <path d="M398 1276H682" stroke="#d59a2c" stroke-opacity="0.44" stroke-width="4" filter="url(#amberGlow)"/>
+    <path d="M188 1412H892" stroke="#4fc3da" stroke-opacity="0.08" stroke-width="2"/>
+    <path d="M258 1044L310 938H770L822 1044Z" fill="#02050b" opacity="0.9"/>
+    <path d="M312 946H768" stroke="#4fc3da" stroke-opacity="0.2" stroke-width="3"/>
+  </g>
+
+  <g id="bottom-hardware">
+    <path d="M70 1578H1010C1034 1578 1054 1598 1054 1622V1742C1054 1766 1034 1786 1010 1786H70C46 1786 26 1766 26 1742V1622C26 1598 46 1578 70 1578Z" fill="#02050b" stroke="#4fc3da" stroke-opacity="0.08"/>
+    <path d="M104 1608H976" stroke="#4fc3da" stroke-opacity="0.07"/>
+  </g>
+
+  <rect width="1080" height="1920" fill="url(#panelLines)" opacity="0.38"/>
+  <rect width="1080" height="1920" fill="none" stroke="#000" stroke-opacity="0.42" stroke-width="54"/>
+  <radialGradient id="vignette" cx="50%" cy="52%" r="74%">
+    <stop offset="0.52" stop-color="#000" stop-opacity="0"/>
+    <stop offset="1" stop-color="#000" stop-opacity="0.82"/>
+  </radialGradient>
+  <rect width="1080" height="1920" fill="url(#vignette)"/>
+</svg>
