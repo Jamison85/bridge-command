@@ -1,8 +1,8 @@
-# Audio Assets
+# Audio placeholders
 
-Place CC0/Public Domain audio files here.
+The simulator currently generates fallback sounds in the browser through the Web Audio API.
 
-Expected filenames:
+Optional real files can be added here later using these names:
 
 - `bridge_ambience_loop.mp3`
 - `engine_pulse_loop.mp3`
@@ -13,4 +13,4 @@ Expected filenames:
 - `alert_soft_loop.mp3`
 - `warp_charge_01.wav`
 
-The app will still load if these are missing, but sound will not play for the missing files.
+If a file is missing, the app keeps running with generated placeholder audio instead of failing silently like a dramatic little toaster.
