@@ -4,10 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#050914" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <meta name="description" content="A mobile-first Starship Bridge Simulator for piloting a retail shift." />
   <title>Store Bridge Simulator</title>
 
-  <link rel="stylesheet" href="./css/style.css?v=real-cockpit-2-1" />
+  <link rel="stylesheet" href="./css/style.css?v=forced-refit-2-2-20260626" />
 
   <style>
     body.cinematic-build::before,
@@ -21,80 +24,76 @@
 
     body.cinematic-build::before {
       background:
-        radial-gradient(ellipse at center, transparent 42%, rgba(0, 0, 0, 0.34) 78%, rgba(0, 0, 0, 0.72) 100%),
-        linear-gradient(90deg, rgba(0, 0, 0, 0.5), transparent 13%, transparent 87%, rgba(0, 0, 0, 0.5));
+        radial-gradient(ellipse at center, transparent 32%, rgba(0, 0, 0, 0.4) 72%, rgba(0, 0, 0, 0.82) 100%),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.58), transparent 12%, transparent 88%, rgba(0, 0, 0, 0.58));
       mix-blend-mode: multiply;
     }
 
     body.cinematic-build::after {
-      border: min(4.8vw, 28px) solid rgba(1, 7, 15, 0.54);
+      border: min(5vw, 30px) solid rgba(1, 7, 15, 0.66);
       box-shadow:
-        inset 0 0 46px rgba(0, 0, 0, 0.7),
-        inset 0 0 120px rgba(8, 18, 34, 0.56);
+        inset 0 0 52px rgba(0, 0, 0, 0.76),
+        inset 0 0 120px rgba(7, 14, 26, 0.62);
     }
 
-    body.cinematic-build #hud-overlay {
-      z-index: 6;
-    }
+    #hud-overlay { z-index: 6; }
 
     body.cinematic-build .hud-header {
       align-items: flex-start;
-      transform: scale(0.92);
+      transform: scale(0.9);
       transform-origin: top left;
-      opacity: 0.88;
+      opacity: 0.82;
     }
 
     body.cinematic-build .hud-header h1 {
-      font-size: clamp(1.02rem, 4vw, 1.45rem);
-      opacity: 0.8;
+      font-size: clamp(0.96rem, 3.8vw, 1.36rem);
+      opacity: 0.72;
     }
 
     body.cinematic-build .status-pill {
-      transform: scale(0.92);
+      transform: scale(0.9);
       transform-origin: top right;
-      background: rgba(2, 6, 23, 0.46);
-      box-shadow: 0 0 18px rgba(103, 232, 249, 0.12);
+      background: rgba(2, 6, 18, 0.44);
+      box-shadow: 0 0 14px rgba(70, 173, 210, 0.08);
     }
 
     body.cinematic-build .transparent-display {
       position: fixed;
       left: max(14px, env(safe-area-inset-left));
-      top: calc(max(92px, env(safe-area-inset-top) + 74px));
-      width: min(45vw, 245px);
-      min-width: 190px;
-      max-height: 162px;
+      top: calc(max(88px, env(safe-area-inset-top) + 70px));
+      width: min(42vw, 224px);
+      min-width: 176px;
+      max-height: 150px;
       margin: 0;
-      padding: 10px 11px;
+      padding: 9px 10px;
       border-radius: 18px;
-      border-color: rgba(103, 232, 249, 0.2);
+      border-color: rgba(92, 196, 221, 0.18);
       background:
-        linear-gradient(135deg, rgba(103, 232, 249, 0.055), transparent 48%),
-        linear-gradient(180deg, rgba(10, 18, 32, 0.36), rgba(2, 6, 23, 0.2));
+        linear-gradient(135deg, rgba(70, 173, 210, 0.045), transparent 46%),
+        linear-gradient(180deg, rgba(8, 13, 23, 0.42), rgba(2, 6, 18, 0.24));
       backdrop-filter: blur(5px);
       box-shadow:
-        0 10px 34px rgba(0, 0, 0, 0.28),
-        inset 0 0 18px rgba(103, 232, 249, 0.035),
-        0 0 16px rgba(103, 232, 249, 0.08);
+        0 12px 30px rgba(0, 0, 0, 0.32),
+        inset 0 0 14px rgba(70, 173, 210, 0.04),
+        0 0 14px rgba(70, 173, 210, 0.07);
     }
 
     body.detail-mode .transparent-display {
-      width: min(74vw, 430px);
+      width: min(82vw, 420px);
       max-height: min(48vh, 390px);
-      background:
-        linear-gradient(135deg, rgba(103, 232, 249, 0.08), transparent 44%),
-        linear-gradient(180deg, rgba(10, 18, 32, 0.52), rgba(2, 6, 23, 0.34));
-      backdrop-filter: blur(9px);
+      background: linear-gradient(180deg, rgba(8, 13, 23, 0.56), rgba(2, 6, 18, 0.34));
+      backdrop-filter: blur(8px);
     }
 
     body.cinematic-build .display-label {
       margin-bottom: 3px;
-      font-size: 0.55rem;
-      letter-spacing: 0.12em;
+      font-size: 0.52rem;
+      letter-spacing: 0.13em;
     }
 
     body.cinematic-build .transparent-display h2 {
       margin-bottom: 4px;
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       letter-spacing: -0.03em;
     }
 
@@ -102,8 +101,8 @@
       max-height: 3.05em;
       overflow: hidden;
       margin-bottom: 0;
-      color: rgba(199, 215, 230, 0.74);
-      font-size: 0.68rem;
+      color: rgba(199, 215, 230, 0.68);
+      font-size: 0.66rem;
       line-height: 1.35;
     }
 
@@ -115,23 +114,17 @@
     body.cinematic-build .metrics-row {
       grid-template-columns: repeat(3, 1fr);
       gap: 5px;
-      margin-top: 8px;
+      margin-top: 7px;
     }
 
     body.cinematic-build .metric-card {
       padding: 7px 6px;
-      border-radius: 12px;
-      background: rgba(2, 6, 23, 0.3);
+      border-radius: 11px;
+      background: rgba(2, 6, 18, 0.34);
     }
 
-    body.cinematic-build .metric-card span {
-      margin-bottom: 2px;
-      font-size: 0.52rem;
-    }
-
-    body.cinematic-build .metric-card strong {
-      font-size: 0.68rem;
-    }
+    body.cinematic-build .metric-card span { margin-bottom: 2px; font-size: 0.5rem; }
+    body.cinematic-build .metric-card strong { font-size: 0.66rem; }
 
     body.cinematic-build .pilot-panel {
       max-height: 0;
@@ -151,26 +144,17 @@
       transform: translateY(0);
     }
 
-    body.cinematic-build .pilot-card,
-    body.cinematic-build .task-row,
-    body.cinematic-build .history-item,
-    body.cinematic-build .progress-strip,
-    body.cinematic-build .focus-lock {
-      background: rgba(2, 6, 23, 0.26);
-      border-color: rgba(103, 232, 249, 0.12);
-    }
-
     body.cinematic-build .hud-header::after {
-      content: "COCKPIT 2.1";
+      content: "COCKPIT 2.2 FORCED";
       position: fixed;
       left: max(16px, env(safe-area-inset-left));
-      bottom: calc(max(18px, env(safe-area-inset-bottom)) + 72px);
+      bottom: calc(max(16px, env(safe-area-inset-bottom)) + 74px);
       z-index: 8;
-      padding: 6px 9px;
-      border: 1px solid rgba(103, 232, 249, 0.18);
+      padding: 6px 10px;
+      border: 1px solid rgba(217, 159, 42, 0.28);
       border-radius: 999px;
-      color: rgba(234, 246, 255, 0.72);
-      background: rgba(2, 6, 23, 0.28);
+      color: rgba(255, 224, 154, 0.88);
+      background: rgba(2, 6, 18, 0.36);
       backdrop-filter: blur(6px);
       font-size: 0.58rem;
       font-weight: 900;
@@ -178,61 +162,44 @@
     }
 
     body.cinematic-build .command-bar {
-      width: min(92vw, 600px);
-      padding: 10px;
-      border-radius: 28px 28px 20px 20px;
-      border-color: rgba(103, 232, 249, 0.14);
+      width: min(90vw, 560px);
+      padding: 12px 12px 13px;
+      border-radius: 24px 24px 16px 16px;
+      border-color: rgba(92, 196, 221, 0.12);
       background:
-        linear-gradient(180deg, rgba(7, 16, 31, 0.68), rgba(2, 6, 14, 0.86)),
-        radial-gradient(circle at center top, rgba(103, 232, 249, 0.12), transparent 52%);
+        linear-gradient(180deg, rgba(8, 14, 26, 0.62), rgba(1, 4, 10, 0.92)),
+        radial-gradient(circle at center top, rgba(217, 159, 42, 0.08), transparent 56%);
       box-shadow:
-        0 -12px 36px rgba(0, 0, 0, 0.2),
-        0 14px 46px rgba(0, 0, 0, 0.48),
-        inset 0 1px 0 rgba(255, 255, 255, 0.07),
-        inset 0 0 30px rgba(103, 232, 249, 0.045);
+        0 -12px 32px rgba(0, 0, 0, 0.24),
+        0 16px 40px rgba(0, 0, 0, 0.52),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        inset 0 0 24px rgba(68, 149, 194, 0.035);
     }
 
     body.cinematic-build .hud-button {
-      min-height: 46px;
-      border-radius: 18px;
-      color: rgba(234, 246, 255, 0.78);
-      background:
-        linear-gradient(180deg, rgba(15, 23, 42, 0.78), rgba(2, 6, 23, 0.96));
+      min-height: 44px;
+      border-radius: 14px;
+      border: 1px solid rgba(105, 150, 185, 0.14);
+      color: rgba(224, 236, 246, 0.8);
+      background: linear-gradient(180deg, rgba(18, 25, 38, 0.82), rgba(3, 7, 17, 0.98));
       box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.07),
-        inset 0 -12px 22px rgba(37, 99, 235, 0.06),
-        0 0 14px rgba(0, 0, 0, 0.28);
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        inset 0 -16px 24px rgba(22, 66, 110, 0.08),
+        0 8px 18px rgba(0, 0, 0, 0.34);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 0.84rem;
     }
 
     body.cinematic-build .hud-button.primary {
       color: #07111f;
-      background: linear-gradient(180deg, rgba(103, 232, 249, 0.88), rgba(96, 165, 250, 0.78));
-      box-shadow:
-        0 0 18px rgba(103, 232, 249, 0.24),
-        inset 0 1px 0 rgba(255, 255, 255, 0.32);
+      background: linear-gradient(180deg, rgba(255, 224, 154, 0.88), rgba(217, 159, 42, 0.78));
+      box-shadow: 0 0 14px rgba(217, 159, 42, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.28);
     }
 
     @media (max-width: 430px) {
-      body.cinematic-build .transparent-display {
-        width: min(48vw, 230px);
-        min-width: 180px;
-        top: 94px;
-      }
-
-      body.detail-mode .transparent-display {
-        width: min(86vw, 390px);
-      }
-    }
-
-    @media (max-height: 740px) {
-      body.cinematic-build .transparent-display {
-        top: 82px;
-        max-height: 142px;
-      }
-
-      body.detail-mode .pilot-panel {
-        max-height: 21vh;
-      }
+      body.cinematic-build .transparent-display { width: min(46vw, 220px); min-width: 174px; }
+      body.detail-mode .transparent-display { width: min(86vw, 390px); }
     }
   </style>
 
@@ -255,7 +222,6 @@
           <p class="eyebrow">CASEY'S STORE PILOT</p>
           <h1>Bridge Command</h1>
         </div>
-
         <div class="status-pill" id="system-status">
           <span class="status-dot" aria-hidden="true"></span>
           <span id="system-status-text">Systems Ready</span>
@@ -264,31 +230,14 @@
 
       <section class="transparent-display" id="info-display">
         <div class="display-scanline" aria-hidden="true"></div>
-
         <p class="display-label">ASSISTANT OVERLAY</p>
         <h2 id="display-title">Shift Command</h2>
-
-        <p id="display-copy">
-          Cockpit-first composition active. The main action now lives on the in-world hologram.
-        </p>
-
+        <p id="display-copy">Forced 2.2 refit entrypoint active. Watch for the in-world REFIT 2.2 ACTIVE badge.</p>
         <div class="metrics-row" aria-label="Bridge metrics">
-          <div class="metric-card">
-            <span>Throttle</span>
-            <strong id="throttle-readout">0%</strong>
-          </div>
-
-          <div class="metric-card">
-            <span>Mode</span>
-            <strong id="mode-readout">Standby</strong>
-          </div>
-
-          <div class="metric-card">
-            <span>Focus</span>
-            <strong id="focus-readout">Stable</strong>
-          </div>
+          <div class="metric-card"><span>Throttle</span><strong id="throttle-readout">0%</strong></div>
+          <div class="metric-card"><span>Mode</span><strong id="mode-readout">Standby</strong></div>
+          <div class="metric-card"><span>Focus</span><strong id="focus-readout">Stable</strong></div>
         </div>
-
         <div id="pilot-panel" class="pilot-panel" aria-live="polite"></div>
       </section>
 
@@ -296,29 +245,23 @@
         <button class="hud-button" type="button" data-command="next">Next</button>
         <button class="hud-button" type="button" data-command="tasks">Tasks</button>
         <button class="hud-button" type="button" data-command="report">Report</button>
-        <button class="hud-button" type="button" data-command="history">History</button>
+        <button class="hud-button" type="button" data-command="history">Log</button>
         <button class="hud-button primary" type="button" data-command="voice">Voice</button>
       </nav>
     </section>
 
     <section id="boot-message" aria-label="Simulator startup panel">
       <div class="boot-card">
-        <p class="eyebrow">COCKPIT 2.1 BUILD</p>
-        <h2>Seated Bridge View Online</h2>
-        <p>
-          The 3D bridge is now the main view. The DOM is only a compact assistant overlay, because apparently giant rectangles are not how starships work.
-        </p>
+        <p class="eyebrow">COCKPIT 2.2 FORCED BUILD</p>
+        <h2>Physical Refit Entrypoint Online</h2>
+        <p>This page now forces the newest build path. If you do not see a 3D REFIT 2.2 ACTIVE badge after entering, the browser is still cached or GitHub Pages has not redeployed.</p>
         <button id="begin-button" type="button">Enter Bridge</button>
       </div>
     </section>
   </main>
 
-  <noscript>
-    <div class="noscript-message">
-      This bridge requires JavaScript. Even starships have minimum expectations.
-    </div>
-  </noscript>
+  <noscript><div class="noscript-message">This bridge requires JavaScript. Even starships have minimum expectations.</div></noscript>
 
-  <script type="module" src="./js/main.js?v=real-cockpit-2-1"></script>
+  <script type="module" src="./js/main.js?v=forced-refit-2-2-20260626"></script>
 </body>
 </html>
