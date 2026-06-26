@@ -55,22 +55,20 @@ function createPhysicalRefitLayer() {
   const dark = mat(0x030812, 0x010409, 0.05, 0.76, 0.5);
   const mid = mat(0x09192b, 0x020913, 0.07, 0.68, 0.44);
   const inset = mat(0x02060d, 0x01060c, 0.05, 0.42, 0.62);
-  const cyan = glow(0x5cc4dd, 0.42);
-  const blue = glow(0x4b7ecf, 0.36);
-  const amber = glow(0xd99f2a, 0.44);
-  const metal = mat(0xaeb9c2, 0x0a1825, 0.06, 0.62, 0.22);
-  const transparent = new THREE.MeshBasicMaterial({ color: 0x7bdaf0, transparent: true, opacity: 0.13, depthWrite: false, side: THREE.DoubleSide });
-
-  const animated = [];
+  const cyan = glow(0x5cc4dd, 0.38);
+  const blue = glow(0x4b7ecf, 0.32);
+  const amber = glow(0xd99f2a, 0.42);
+  const transparent = new THREE.MeshBasicMaterial({ color: 0x7bdaf0, transparent: true, opacity: 0.1, depthWrite: false, side: THREE.DoubleSide });
 
   box(group, 1.55, 1.8, 2.0, [-3.7, -0.3, 4.08], dark, [0, 0.28, 0]);
   box(group, 1.55, 1.8, 2.0, [3.7, -0.3, 4.08], dark, [0, -0.28, 0]);
   box(group, 8.0, 0.72, 1.15, [0, -0.62, 4.18], dark, [-0.08, 0, 0]);
   box(group, 3.1, 0.26, 0.74, [0, 0.06, 3.78], mid);
+  box(group, 1.55, 0.16, 0.46, [0, 0.22, 3.38], inset);
   strip(group, [0, -0.16, 3.5], [2.1, 0.028, 0.04], amber);
 
   for (const side of [-1, 1]) {
-    box(group, 0.18, 2.9, 3.2, [side * 4.95, 1.88, -2.0], dark, [0, side * -0.12, 0]);
+    box(group, 0.2, 3.0, 3.4, [side * 4.96, 1.88, -2.0], dark, [0, side * -0.12, 0]);
     box(group, 0.12, 0.7, 1.05, [side * 5.18, 1.2, -1.0], inset, [0, side * -0.12, 0]);
     box(group, 0.12, 0.7, 1.05, [side * 5.18, 2.0, -2.05], inset, [0, side * -0.12, 0]);
     box(group, 0.12, 0.7, 1.05, [side * 5.18, 2.8, -3.1], inset, [0, side * -0.12, 0]);
@@ -80,17 +78,7 @@ function createPhysicalRefitLayer() {
   const leftPane = pane([-2.25, 1.24, -0.26], [0, 0.38, 0], 0.72);
   const rightPane = pane([2.25, 1.24, -0.26], [0, -0.38, 0], 0.72);
   const topScan = strip(group, [0, 2.16, -0.38], [1.6, 0.018, 0.026], cyan);
-  animated.push(leftPane, rightPane, topScan);
-
-  const lever = new THREE.Group();
-  lever.position.set(0.58, -0.02, 2.92);
-  lever.rotation.x = -0.22;
-  group.add(lever);
-  box(lever, 0.62, 0.22, 0.52, [0, 0, 0], inset);
-  strip(lever, [0, 0.15, -0.18], [0.48, 0.018, 0.03], cyan);
-  box(lever, 0.1, 0.82, 0.1, [0.05, 0.46, 0], metal, [0, 0, -0.16]);
-  box(lever, 0.22, 0.36, 0.18, [0.17, 0.88, 0], metal, [0, 0, -0.16]);
-  box(lever, 0.28, 0.1, 0.28, [0.14, 1.08, 0], metal, [0, 0, -0.16]);
+  const lowerScan = strip(group, [0, 0.72, -0.42], [1.9, 0.014, 0.02], blue);
 
   function pane(pos, rot, scale) {
     const g = new THREE.Group();
@@ -111,7 +99,7 @@ function createPhysicalRefitLayer() {
     leftPane.position.y = 1.24 + lift;
     rightPane.position.y = 1.24 - lift;
     topScan.position.x = Math.sin(elapsed * 1.6) * 0.18;
-    lever.rotation.z = THREE.MathUtils.lerp(0.22, -0.42, throttle);
+    lowerScan.position.x = Math.sin(elapsed * 1.2) * -0.14;
     group.position.x = warpActive ? Math.sin(elapsed * 14) * 0.006 : 0;
   }
 
