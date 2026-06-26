@@ -1,0 +1,185 @@
+#bridge-canvas {
+  opacity: 0.18 !important;
+  filter: saturate(0.62) contrast(0.9) blur(0.2px);
+}
+
+.cockpit-matte {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
+}
+
+.cockpit-hard-reset {
+  display: none !important;
+}
+
+#app-shell::before,
+#app-shell::after,
+body.cinematic-build::before,
+body.cinematic-build::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+#app-shell::before {
+  z-index: 3;
+  background:
+    radial-gradient(ellipse at center, transparent 26%, rgba(0, 0, 0, 0.24) 62%, rgba(0, 0, 0, 0.58) 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.24), transparent 25%, transparent 66%, rgba(0, 0, 0, 0.46));
+}
+
+#app-shell::after {
+  z-index: 4;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.52), transparent 14%, transparent 86%, rgba(0, 0, 0, 0.52));
+}
+
+body.cinematic-build::before {
+  z-index: 5;
+  background: radial-gradient(ellipse at center, transparent 44%, rgba(0, 0, 0, 0.52) 100%);
+}
+
+body.cinematic-build::after {
+  z-index: 5;
+  border: min(4.2vw, 26px) solid rgba(1, 6, 13, 0.62);
+  box-shadow:
+    inset 0 0 64px rgba(0, 0, 0, 0.74),
+    inset 0 0 150px rgba(7, 14, 26, 0.52);
+}
+
+#hud-overlay {
+  z-index: 7;
+}
+
+.hud-header {
+  transform: scale(0.82);
+  transform-origin: top left;
+  opacity: 0.56;
+}
+
+.hud-header h1 {
+  font-size: clamp(0.86rem, 3.2vw, 1.12rem);
+  opacity: 0.52;
+}
+
+.status-pill {
+  transform: scale(0.82);
+  transform-origin: top right;
+  background: rgba(2, 6, 18, 0.24) !important;
+  box-shadow: 0 0 8px rgba(70, 173, 210, 0.035) !important;
+}
+
+.transparent-display {
+  position: fixed !important;
+  left: max(14px, env(safe-area-inset-left)) !important;
+  top: calc(max(82px, env(safe-area-inset-top) + 66px)) !important;
+  width: min(34vw, 184px) !important;
+  min-width: 150px !important;
+  max-height: 118px !important;
+  margin: 0 !important;
+  padding: 7px 8px !important;
+  border-radius: 15px !important;
+  border-color: rgba(92, 196, 221, 0.08) !important;
+  background:
+    linear-gradient(180deg, rgba(5, 10, 19, 0.16), rgba(2, 6, 18, 0.08)) !important;
+  backdrop-filter: blur(3px) !important;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.2),
+    inset 0 0 8px rgba(70, 173, 210, 0.014) !important;
+}
+
+.display-label {
+  font-size: 0.46rem !important;
+}
+
+.transparent-display h2 {
+  font-size: 0.78rem !important;
+  margin-bottom: 3px !important;
+}
+
+#display-copy {
+  max-height: 2.6em !important;
+  overflow: hidden !important;
+  color: rgba(199, 215, 230, 0.5) !important;
+  font-size: 0.58rem !important;
+  line-height: 1.3 !important;
+}
+
+.metrics-row {
+  gap: 4px !important;
+  margin-top: 6px !important;
+}
+
+.metric-card {
+  padding: 5px !important;
+  border-radius: 9px !important;
+  background: rgba(2, 6, 18, 0.2) !important;
+}
+
+.metric-card span {
+  font-size: 0.45rem !important;
+}
+
+.metric-card strong {
+  font-size: 0.58rem !important;
+}
+
+.pilot-panel {
+  max-height: 0;
+  margin-top: 0;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.detail-mode .pilot-panel {
+  max-height: min(27vh, 240px);
+  margin-top: 10px;
+  opacity: 1;
+}
+
+.hud-header::after {
+  content: "ART COCKPIT";
+  position: fixed;
+  left: max(16px, env(safe-area-inset-left));
+  bottom: calc(max(16px, env(safe-area-inset-bottom)) + 74px);
+  z-index: 8;
+  padding: 6px 10px;
+  border: 1px solid rgba(217, 159, 42, 0.16);
+  border-radius: 999px;
+  color: rgba(255, 224, 154, 0.68);
+  background: rgba(2, 6, 18, 0.24);
+  backdrop-filter: blur(6px);
+  font-size: 0.56rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.command-bar {
+  width: min(90vw, 560px) !important;
+  padding: 12px !important;
+  border-radius: 24px 24px 16px 16px !important;
+  border-color: rgba(92, 196, 221, 0.06) !important;
+  background:
+    linear-gradient(180deg, rgba(6, 12, 23, 0.42), rgba(1, 4, 10, 0.9)) !important;
+  box-shadow:
+    0 -12px 30px rgba(0, 0, 0, 0.26),
+    0 16px 40px rgba(0, 0, 0, 0.54),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
+}
+
+.hud-button {
+  opacity: 0.8;
+}
+
+.hud-button.primary {
+  background: linear-gradient(180deg, rgba(255, 224, 154, 0.7), rgba(217, 159, 42, 0.58)) !important;
+  color: #07111f !important;
+  opacity: 0.9;
+}
