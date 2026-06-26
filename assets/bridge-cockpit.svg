@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="coreGlow" cx="50%" cy="42%" r="54%">
+      <stop offset="0" stop-color="#1c7890" stop-opacity="0.34"/>
+      <stop offset="0.34" stop-color="#061525" stop-opacity="0.54"/>
+      <stop offset="1" stop-color="#02050b" stop-opacity="1"/>
+    </radialGradient>
+    <linearGradient id="metal" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#0b1624"/>
+      <stop offset="0.48" stop-color="#040b14"/>
+      <stop offset="1" stop-color="#010309"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#102033"/>
+      <stop offset="0.45" stop-color="#07111d"/>
+      <stop offset="1" stop-color="#02060d"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#154254" stop-opacity="0.58"/>
+      <stop offset="0.52" stop-color="#071625" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#01050b" stop-opacity="0.72"/>
+    </linearGradient>
+    <filter id="softGlow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="9" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="hardShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#000" flood-opacity="0.78"/>
+    </filter>
+    <pattern id="microLines" width="42" height="42" patternUnits="userSpaceOnUse">
+      <path d="M42 0H0v42" fill="none" stroke="#5bc4d8" stroke-opacity="0.035" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1080" height="1920" fill="#010309"/>
+  <rect width="1080" height="1920" fill="url(#coreGlow)"/>
+  <rect width="1080" height="1920" fill="url(#microLines)" opacity="0.9"/>
+
+  <!-- outer cockpit darkness -->
+  <path d="M0 0h1080v1920H0zM78 170c128-84 796-84 924 0v1414c-108 102-816 102-924 0z" fill="#000" fill-opacity="0.42" fill-rule="evenodd"/>
+  <path d="M40 240C170 128 910 128 1040 240v1110c-70 70-180 104-306 124H346c-126-20-236-54-306-124z" fill="none" stroke="#113042" stroke-opacity="0.5" stroke-width="3"/>
+
+  <!-- overhead arch -->
+  <g filter="url(#hardShadow)">
+    <path d="M110 330c118-120 742-120 860 0l-62 96c-120-74-616-74-736 0z" fill="url(#metal)"/>
+    <path d="M178 405c108-58 616-58 724 0" fill="none" stroke="#5bc4d8" stroke-opacity="0.18" stroke-width="4"/>
+    <path d="M248 448h584" stroke="#d89a2c" stroke-opacity="0.18" stroke-width="3"/>
+  </g>
+
+  <!-- forward window -->
+  <g filter="url(#hardShadow)">
+    <path d="M160 520h760l56 84v442l-70 72H174l-70-72V604z" fill="#01050b"/>
+    <path d="M188 558h704l38 58v396l-48 50H198l-48-50V616z" fill="url(#glass)" stroke="#5bc4d8" stroke-opacity="0.25" stroke-width="4"/>
+    <path d="M540 558v504" stroke="#010309" stroke-opacity="0.86" stroke-width="22"/>
+    <path d="M188 690h704" stroke="#5bc4d8" stroke-opacity="0.16" stroke-width="3"/>
+    <path d="M188 958h704" stroke="#5bc4d8" stroke-opacity="0.2" stroke-width="3"/>
+    <path d="M252 1010h576" stroke="#5bc4d8" stroke-opacity="0.48" stroke-width="4" filter="url(#softGlow)"/>
+    <circle cx="540" cy="750" r="112" fill="#2bbbd0" opacity="0.06" filter="url(#softGlow)"/>
+  </g>
+
+  <!-- side cockpit walls -->
+  <g filter="url(#hardShadow)">
+    <path d="M0 525l154 78v488L0 1220z" fill="url(#metal)"/>
+    <path d="M1080 525l-154 78v488l154 129z" fill="url(#metal)"/>
+    <path d="M92 650l72 28v312l-72 38z" fill="url(#panel)" stroke="#5bc4d8" stroke-opacity="0.12"/>
+    <path d="M988 650l-72 28v312l72 38z" fill="url(#panel)" stroke="#5bc4d8" stroke-opacity="0.12"/>
+    <path d="M128 735h52M128 810h52M128 885h52M900 735h52M900 810h52M900 885h52" stroke="#d89a2c" stroke-opacity="0.22" stroke-width="3"/>
+    <circle cx="144" cy="945" r="6" fill="#d89a2c" opacity="0.62" filter="url(#softGlow)"/>
+    <circle cx="936" cy="945" r="6" fill="#d89a2c" opacity="0.62" filter="url(#softGlow)"/>
+  </g>
+
+  <!-- projected display area, deliberately subtle -->
+  <g opacity="0.78">
+    <rect x="304" y="760" width="472" height="172" rx="16" fill="#0a3140" fill-opacity="0.16" stroke="#5bc4d8" stroke-opacity="0.22" stroke-width="3"/>
+    <path d="M330 808h420M330 858h420M330 906h420" stroke="#5bc4d8" stroke-opacity="0.08" stroke-width="2"/>
+    <path d="M378 746h324" stroke="#5bc4d8" stroke-opacity="0.35" stroke-width="3"/>
+    <path d="M442 736h196" stroke="#d89a2c" stroke-opacity="0.18" stroke-width="2"/>
+  </g>
+
+  <!-- foreground console -->
+  <g filter="url(#hardShadow)">
+    <path d="M110 1162h860l72 286H38z" fill="url(#metal)"/>
+    <path d="M154 1210h772l34 118H120z" fill="url(#panel)" stroke="#5bc4d8" stroke-opacity="0.12" stroke-width="2"/>
+    <path d="M220 1268h640" stroke="#5bc4d8" stroke-opacity="0.45" stroke-width="5" filter="url(#softGlow)"/>
+    <path d="M406 1360h268" stroke="#d89a2c" stroke-opacity="0.58" stroke-width="5" filter="url(#softGlow)"/>
+    <path d="M78 1506h924l38 220H40z" fill="#01040a" fill-opacity="0.86"/>
+    <path d="M120 1544h840" stroke="#183548" stroke-opacity="0.7" stroke-width="3"/>
+  </g>
+
+  <!-- embedded controls silhouette -->
+  <g opacity="0.72">
+    <rect x="160" y="1466" width="760" height="86" rx="34" fill="#020711" stroke="#5bc4d8" stroke-opacity="0.1"/>
+    <rect x="212" y="1490" width="92" height="36" rx="12" fill="#07111d" stroke="#5bc4d8" stroke-opacity="0.12"/>
+    <rect x="350" y="1490" width="92" height="36" rx="12" fill="#07111d" stroke="#5bc4d8" stroke-opacity="0.12"/>
+    <rect x="494" y="1490" width="92" height="36" rx="12" fill="#07111d" stroke="#5bc4d8" stroke-opacity="0.12"/>
+    <rect x="638" y="1490" width="92" height="36" rx="12" fill="#07111d" stroke="#5bc4d8" stroke-opacity="0.12"/>
+    <rect x="776" y="1490" width="92" height="36" rx="12" fill="#3f2d11" stroke="#d89a2c" stroke-opacity="0.2"/>
+  </g>
+
+  <rect width="1080" height="1920" fill="none" stroke="#000" stroke-opacity="0.62" stroke-width="90"/>
+</svg>
