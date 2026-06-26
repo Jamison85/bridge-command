@@ -5,14 +5,17 @@ import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js"
 import { createBridgeControls } from "./controls.js";
 import { createAudioController } from "./audio.js";
 import { createStorePilot } from "./storePilot.js";
+import { createBridgeEnvironment } from "./bridgeScene.js";
+import { createCinematicLighting } from "./lighting.js";
+import { createCockpitScreens } from "./cockpitScreens.js";
 
 const CONFIG = {
-  pixelRatioCap: 1.75,
-  bloomStrength: 0.95,
-  bloomRadius: 0.72,
-  bloomThreshold: 0.18,
-  starCount: 1300,
-  warpLineCount: 140
+  pixelRatioCap: 1.65,
+  bloomStrength: 1.18,
+  bloomRadius: 0.76,
+  bloomThreshold: 0.14,
+  starCount: 1100,
+  warpLineCount: 160
 };
 
 const canvas = document.querySelector("#bridge-canvas");
@@ -43,6 +46,9 @@ let renderer;
 let scene;
 let camera;
 let composer;
+let bridgeEnvironment;
+let cinematicLighting;
+let cockpitScreens;
 let bridgeControls;
 let storePilot;
 let audio;
@@ -62,9 +68,11 @@ function init() {
     setupCamera();
     setupPostProcessing();
 
-    createLights();
+    bridgeEnvironment = createBridgeEnvironment(scene);
+    cinematicLighting = createCinematicLighting(scene);
     createStarfield();
     createWarpStreaks();
+    cockpitScreens = createCockpitScreens(scene);
 
     audio = createAudioController();
 
@@ -109,18 +117,20 @@ function setupRenderer() {
   renderer.setSize(state.width, state.height);
   renderer.setPixelRatio(getSafePixelRatio());
   renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.08;
 }
 
 function setupScene() {
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x030711);
-  scene.fog = new THREE.FogExp2(0x030711, 0.025);
+  scene.background = new THREE.Color(0x020612);
+  scene.fog = new THREE.FogExp2(0x030711, 0.028);
 }
 
 function setupCamera() {
-  camera = new THREE.PerspectiveCamera(58, state.width / state.height, 0.1, 320);
-  camera.position.set(0, 2.15, 7.8);
-  camera.lookAt(0, 0.8, 0);
+  camera = new THREE.PerspectiveCamera(62, state.width / state.height, 0.1, 320);
+  camera.position.set(0, 1.38, 6.35);
+  camera.lookAt(0, 1.16, -0.05);
 }
 
 function setupPostProcessing() {
@@ -140,23 +150,6 @@ function setupPostProcessing() {
   composer.addPass(bloomPass);
 }
 
-function createLights() {
-  const ambient = new THREE.AmbientLight(0x5f8aff, 0.85);
-  scene.add(ambient);
-
-  const key = new THREE.DirectionalLight(0xaeefff, 2.4);
-  key.position.set(-4, 7, 5);
-  scene.add(key);
-
-  const consoleGlow = new THREE.PointLight(0x49eaff, 4.6, 14);
-  consoleGlow.position.set(0, 0.35, 2.3);
-  scene.add(consoleGlow);
-
-  const warningGlow = new THREE.PointLight(0xffcc55, 0.9, 9);
-  warningGlow.position.set(2.2, 0.25, 2.5);
-  scene.add(warningGlow);
-}
-
 function createStarfield() {
   const geometry = new THREE.BufferGeometry();
   const positions = new Float32Array(CONFIG.starCount * 3);
@@ -165,13 +158,13 @@ function createStarfield() {
   for (let i = 0; i < CONFIG.starCount; i += 1) {
     const index = i * 3;
 
-    positions[index] = THREE.MathUtils.randFloatSpread(160);
-    positions[index + 1] = THREE.MathUtils.randFloatSpread(80) + 8;
-    positions[index + 2] = THREE.MathUtils.randFloat(-190, -16);
+    positions[index] = THREE.MathUtils.randFloatSpread(120);
+    positions[index + 1] = THREE.MathUtils.randFloatSpread(64) + 9;
+    positions[index + 2] = THREE.MathUtils.randFloat(-210, -18);
 
-    const brightness = THREE.MathUtils.randFloat(0.45, 1);
-    colors[index] = brightness * 0.55;
-    colors[index + 1] = brightness * 0.82;
+    const brightness = THREE.MathUtils.randFloat(0.42, 1);
+    colors[index] = brightness * 0.58;
+    colors[index + 1] = brightness * 0.84;
     colors[index + 2] = brightness;
   }
 
@@ -196,10 +189,10 @@ function createWarpStreaks() {
 
   for (let i = 0; i < CONFIG.warpLineCount; i += 1) {
     const index = i * 6;
-    const x = THREE.MathUtils.randFloatSpread(90);
-    const y = THREE.MathUtils.randFloatSpread(52);
-    const z = THREE.MathUtils.randFloat(-155, -22);
-    const length = THREE.MathUtils.randFloat(1.4, 5.8);
+    const x = THREE.MathUtils.randFloatSpread(88);
+    const y = THREE.MathUtils.randFloatSpread(46) + 6;
+    const z = THREE.MathUtils.randFloat(-165, -24);
+    const length = THREE.MathUtils.randFloat(1.6, 6.2);
 
     positions[index] = x;
     positions[index + 1] = y;
@@ -209,7 +202,7 @@ function createWarpStreaks() {
     positions[index + 4] = y;
     positions[index + 5] = z + length;
 
-    speeds.push(THREE.MathUtils.randFloat(22, 60));
+    speeds.push(THREE.MathUtils.randFloat(24, 64));
   }
 
   const geometry = new THREE.BufferGeometry();
@@ -261,7 +254,7 @@ async function handleLeverGrab() {
   await audio.unlock();
   applyDisplayContent({
     title: "Throttle Control",
-    copy: "Drag upward to increase engine output. Push beyond 82% to engage warp streaks.",
+    copy: "Drag upward to increase engine output. Push beyond 82% to engage warp streaks and cockpit light surge.",
     mode: "Manual",
     focus: "High"
   });
@@ -285,6 +278,8 @@ function applyDisplayContent({ title, copy, mode, focus }) {
   ui.displayCopy.textContent = copy;
   ui.modeReadout.textContent = mode;
   ui.focusReadout.textContent = focus;
+
+  cockpitScreens?.updateContent({ title, copy, mode, focus });
 }
 
 function updateStatus(message) {
@@ -305,7 +300,7 @@ function triggerWarp() {
 
   applyDisplayContent({
     title: "Warp Threshold",
-    copy: "Store bridge at full burn. Particle streak animation engaged. Try not to fly the pizza warmer into Saturn.",
+    copy: "Cockpit lighting surge engaged. Store bridge at full burn. Try not to launch the pizza warmer into Saturn.",
     mode: "Warp",
     focus: "Maximum"
   });
@@ -340,8 +335,13 @@ function animate() {
   const elapsed = state.clock.elapsedTime;
 
   const throttle = bridgeControls.update(delta);
+  const visualState = { throttle, warpActive: state.warpActive };
+
   updateStarfield(delta, elapsed, throttle);
   updateWarp(delta, elapsed);
+  bridgeEnvironment.update(delta, elapsed, visualState);
+  cinematicLighting.update(delta, elapsed, visualState);
+  cockpitScreens.update(delta, elapsed, visualState);
   updateCameraMotion(elapsed, throttle);
 
   composer.render();
@@ -352,15 +352,15 @@ function updateStarfield(delta, elapsed, throttle) {
   if (!starfield) return;
 
   const positions = starfield.geometry.attributes.position.array;
-  const speed = THREE.MathUtils.lerp(2.8, 32, throttle);
+  const speed = THREE.MathUtils.lerp(2.6, 34, throttle);
 
   for (let i = 0; i < positions.length; i += 3) {
     positions[i + 2] += speed * delta;
 
-    if (positions[i + 2] > 9) {
-      positions[i] = THREE.MathUtils.randFloatSpread(160);
-      positions[i + 1] = THREE.MathUtils.randFloatSpread(80) + 8;
-      positions[i + 2] = THREE.MathUtils.randFloat(-190, -140);
+    if (positions[i + 2] > 7) {
+      positions[i] = THREE.MathUtils.randFloatSpread(120);
+      positions[i + 1] = THREE.MathUtils.randFloatSpread(64) + 9;
+      positions[i + 2] = THREE.MathUtils.randFloat(-210, -150);
     }
   }
 
@@ -376,22 +376,22 @@ function updateWarp(delta, elapsed) {
   const positions = geometry.attributes.position.array;
   const speeds = geometry.userData.speeds;
 
-  const targetOpacity = state.warpActive ? 0.82 : 0;
+  const targetOpacity = state.warpActive ? 0.88 : 0;
   material.opacity = THREE.MathUtils.lerp(material.opacity, targetOpacity, 0.08);
 
   if (material.opacity < 0.01) return;
 
   for (let i = 0; i < speeds.length; i += 1) {
     const index = i * 6;
-    const speed = speeds[i] * (state.warpActive ? 3.4 : 0.7);
+    const speed = speeds[i] * (state.warpActive ? 3.6 : 0.7);
 
     positions[index + 2] += speed * delta;
     positions[index + 5] += speed * delta;
 
     if (positions[index + 2] > 14) {
-      const x = THREE.MathUtils.randFloatSpread(90);
-      const y = THREE.MathUtils.randFloatSpread(52);
-      const z = THREE.MathUtils.randFloat(-170, -120);
+      const x = THREE.MathUtils.randFloatSpread(88);
+      const y = THREE.MathUtils.randFloatSpread(46) + 6;
+      const z = THREE.MathUtils.randFloat(-180, -120);
       const length = THREE.MathUtils.randFloat(5, 16);
 
       positions[index] = x;
@@ -409,12 +409,13 @@ function updateWarp(delta, elapsed) {
 }
 
 function updateCameraMotion(elapsed, throttle) {
-  const throttleShake = throttle * 0.022;
+  const throttleShake = throttle * 0.018;
   const warpShake = state.warpActive ? 0.026 : 0;
 
-  camera.position.x = Math.sin(elapsed * 1.8) * (0.012 + throttleShake);
-  camera.position.y = 2.15 + Math.sin(elapsed * 2.2) * (0.008 + warpShake);
-  camera.lookAt(0, 0.78, 0);
+  camera.position.x = Math.sin(elapsed * 1.45) * (0.01 + throttleShake);
+  camera.position.y = 1.38 + Math.sin(elapsed * 1.95) * (0.008 + warpShake);
+  camera.position.z = 6.35 + Math.sin(elapsed * 0.7) * 0.025 - throttle * 0.08;
+  camera.lookAt(0, 1.14 + throttle * 0.04, -0.08);
 }
 
 function getSafePixelRatio() {
