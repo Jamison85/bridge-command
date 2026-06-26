@@ -1,8 +1,10 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js";
+import { AudioEngine } from "./audio.js";
+import { BridgeControls } from "./controls.js";
 
 /**
  * BRIDGE COMMAND CONFIG
- * Change values here instead of digging through the code like a gremlin in engineering.
+ * This stays here so the app can be tuned without spelunking through the whole codebase.
  */
 const CONFIG = {
   renderer: {
@@ -60,185 +62,6 @@ const audioToggle = document.querySelector("#audio-toggle");
 const screenTitle = document.querySelector("#screen-title");
 const screenBody = document.querySelector("#screen-body");
 
-const state = {
-  controls: [],
-  levers: [],
-  elapsed: 0
-};
-
-class AudioEngine {
-  constructor(config) {
-    this.config = config;
-    this.context = null;
-    this.buffers = new Map();
-    this.loopSources = new Map();
-    this.masterGain = null;
-    this.ready = false;
-  }
-
-  async init() {
-    if (this.ready) return;
-
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    this.context = new AudioContextClass();
-    this.masterGain = this.context.createGain();
-    this.masterGain.gain.value = this.config.masterVolume;
-    this.masterGain.connect(this.context.destination);
-
-    await Promise.allSettled(
-      Object.entries(this.config.paths).map(async ([name, path]) => {
-        try {
-          const response = await fetch(path);
-
-          if (!response.ok) {
-            console.info(`External audio missing, using generated fallback: ${path}`);
-            return;
-          }
-
-          const arrayBuffer = await response.arrayBuffer();
-          const buffer = await this.context.decodeAudioData(arrayBuffer);
-          this.buffers.set(name, buffer);
-        } catch (error) {
-          console.info(`External audio unavailable, using generated fallback: ${path}`, error);
-        }
-      })
-    );
-
-    if (this.config.useGeneratedFallback) {
-      this.installGeneratedFallbacks();
-    }
-
-    this.ready = true;
-  }
-
-  installGeneratedFallbacks() {
-    Object.keys(this.config.paths).forEach((name) => {
-      if (!this.buffers.has(name)) {
-        this.buffers.set(name, this.createGeneratedBuffer(name));
-      }
-    });
-  }
-
-  createGeneratedBuffer(name) {
-    const sampleRate = this.context.sampleRate;
-    const durationMap = {
-      bridgeAmbience: 4,
-      enginePulse: 4,
-      buttonConfirm: 0.18,
-      panelBeep: 0.18,
-      leverClunk: 0.36,
-      scanPing: 0.72,
-      softAlert: 2,
-      warpCharge: 1.25
-    };
-
-    const duration = durationMap[name] ?? 0.3;
-    const length = Math.max(1, Math.floor(sampleRate * duration));
-    const buffer = this.context.createBuffer(1, length, sampleRate);
-    const data = buffer.getChannelData(0);
-
-    const sine = (frequency, time) => Math.sin(Math.PI * 2 * frequency * time);
-    const noise = () => Math.random() * 2 - 1;
-    const clamp = (value) => Math.max(-1, Math.min(1, value));
-
-    for (let i = 0; i < length; i += 1) {
-      const t = i / sampleRate;
-      const x = t / duration;
-      let sample = 0;
-
-      if (name === "bridgeAmbience") {
-        const shimmer = 0.016 * sine(620, t) + 0.01 * sine(1240, t);
-        const hum = 0.09 * sine(55, t) + 0.045 * sine(110, t) + 0.02 * sine(220, t);
-        sample = (hum + shimmer + noise() * 0.025) * (0.75 + 0.08 * sine(0.5, t));
-      }
-
-      if (name === "enginePulse") {
-        const pulse = 0.5 + 0.5 * sine(1.5, t);
-        const hum = 0.13 * sine(42, t) + 0.07 * sine(84, t) + 0.035 * sine(168, t);
-        sample = (hum + noise() * 0.018) * (0.55 + 0.35 * pulse);
-      }
-
-      if (name === "buttonConfirm") {
-        const env = Math.exp(-t * 13);
-        sample = (0.55 * sine(740, t) + 0.35 * sine(990, t)) * env;
-      }
-
-      if (name === "panelBeep") {
-        const env = Math.exp(-t * 14);
-        const frequency = t < duration / 2 ? 880 : 660;
-        sample = 0.7 * sine(frequency, t) * env;
-      }
-
-      if (name === "leverClunk") {
-        const click = noise() * Math.exp(-t * 30) * 0.64;
-        const low = 0.45 * sine(120, t) * Math.exp(-t * 7);
-        const thud = 0.35 * sine(62, t) * Math.exp(-t * 10);
-        sample = click + low + thud;
-      }
-
-      if (name === "scanPing") {
-        const env = Math.exp(-t * 3.2);
-        const frequency = 520 + 420 * x;
-        sample = (0.55 * sine(frequency, t) + 0.25 * sine(frequency * 2.01, t)) * env;
-      }
-
-      if (name === "softAlert") {
-        const phase = t % 1;
-        const beepEnv = phase < 0.45 ? Math.exp(-phase * 9) : 0;
-        sample = 0.28 * sine(440, t) * beepEnv + 0.16 * sine(660, t) * beepEnv + 0.03 * sine(90, t);
-      }
-
-      if (name === "warpCharge") {
-        const frequency = 90 + 1050 * x ** 1.7;
-        const attack = Math.min(1, x * 2.5);
-        const release = x < 0.87 ? 1 : Math.max(0, 1 - (x - 0.87) / 0.13);
-        const env = attack * release;
-        sample = (0.4 * sine(frequency, t) + 0.18 * sine(frequency * 1.5, t) + noise() * 0.04) * env;
-      }
-
-      data[i] = clamp(sample * 0.85);
-    }
-
-    return buffer;
-  }
-
-  async resume() {
-    if (!this.context) {
-      await this.init();
-    }
-
-    if (this.context.state === "suspended") {
-      await this.context.resume();
-    }
-  }
-
-  playOneShot(name, volume = 1) {
-    if (!this.ready || !this.buffers.has(name)) return;
-
-    const source = this.context.createBufferSource();
-    const gain = this.context.createGain();
-    source.buffer = this.buffers.get(name);
-    gain.gain.value = volume;
-    source.connect(gain);
-    gain.connect(this.masterGain);
-    source.start();
-  }
-
-  playLoop(name, volume = 0.45) {
-    if (!this.ready || !this.buffers.has(name) || this.loopSources.has(name)) return;
-
-    const source = this.context.createBufferSource();
-    const gain = this.context.createGain();
-    source.buffer = this.buffers.get(name);
-    source.loop = true;
-    gain.gain.value = volume;
-    source.connect(gain);
-    gain.connect(this.masterGain);
-    source.start();
-    this.loopSources.set(name, { source, gain });
-  }
-}
-
 class RenderLoop {
   constructor({ renderer, scene, camera, update }) {
     this.renderer = renderer;
@@ -256,8 +79,10 @@ class RenderLoop {
       this.resizeIfNeeded();
       const delta = this.clock.getDelta();
       const elapsed = this.clock.elapsedTime;
+
       this.update(delta, elapsed);
       this.renderer.render(this.scene, this.camera);
+
       requestAnimationFrame(tick);
     };
 
@@ -274,14 +99,17 @@ class RenderLoop {
     this.width = width;
     this.height = height;
     this.dpr = nextDpr;
+
     this.renderer.setPixelRatio(this.dpr);
     this.renderer.setSize(width, height, false);
+
     this.camera.aspect = width / Math.max(height, 1);
     this.camera.updateProjectionMatrix();
   }
 }
 
 const audio = new AudioEngine(CONFIG.audio);
+
 const renderer = new THREE.WebGLRenderer({
   canvas,
   antialias: CONFIG.renderer.antialias,
@@ -306,8 +134,15 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.copy(CONFIG.camera.position);
 camera.lookAt(CONFIG.camera.lookAt);
 
-const raycaster = new THREE.Raycaster();
-const pointer = new THREE.Vector2();
+const bridgeControls = new BridgeControls({
+  scene,
+  camera,
+  canvas,
+  config: CONFIG,
+  audio,
+  screenTitle,
+  screenBody
+});
 
 initScene();
 initEvents();
@@ -318,9 +153,24 @@ function initScene() {
   createLights();
   createBridgeShell();
   createStarfield();
-  createMainConsole();
-  createSideConsoles();
   createHologramScreen();
+  bridgeControls.create();
+}
+
+function initEvents() {
+  bridgeControls.bindEvents();
+
+  audioToggle.addEventListener("click", async () => {
+    audioToggle.textContent = "Starting Audio...";
+
+    await audio.resume();
+
+    audio.playLoop("bridgeAmbience", 0.28);
+    audio.playLoop("enginePulse", 0.22);
+    audio.playOneShot("buttonConfirm", 0.75);
+
+    audioToggle.textContent = "Audio Online";
+  });
 }
 
 function createLights() {
@@ -340,8 +190,17 @@ function createLights() {
 }
 
 function createBridgeShell() {
-  const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x080d16, metalness: 0.45, roughness: 0.58 });
-  const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x0d1422, metalness: 0.35, roughness: 0.72 });
+  const floorMaterial = new THREE.MeshStandardMaterial({
+    color: 0x080d16,
+    metalness: 0.45,
+    roughness: 0.58
+  });
+
+  const wallMaterial = new THREE.MeshStandardMaterial({
+    color: 0x0d1422,
+    metalness: 0.35,
+    roughness: 0.72
+  });
 
   const floor = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, 0.22, 48), floorMaterial);
   floor.position.y = -0.15;
@@ -411,117 +270,6 @@ function createStarfield() {
   scene.add(stars);
 }
 
-function createMainConsole() {
-  const group = new THREE.Group();
-  group.position.set(0, 0.72, 2.25);
-  group.rotation.x = -0.18;
-
-  const baseMaterial = new THREE.MeshStandardMaterial({ color: CONFIG.colors.consoleDark, metalness: 0.58, roughness: 0.42 });
-  const trimMaterial = new THREE.MeshStandardMaterial({
-    color: CONFIG.colors.consoleTrim,
-    emissive: CONFIG.colors.consoleTrim,
-    emissiveIntensity: 0.55,
-    metalness: 0.2,
-    roughness: 0.38
-  });
-
-  const base = new THREE.Mesh(new THREE.BoxGeometry(5.9, 0.55, 2.1), baseMaterial);
-  group.add(base);
-
-  const trim = new THREE.Mesh(new THREE.BoxGeometry(5.95, 0.06, 2.16), trimMaterial);
-  trim.position.y = 0.3;
-  group.add(trim);
-
-  [
-    {
-      label: "NAV",
-      color: CONFIG.colors.buttonBlue,
-      position: [-2.1, 0.38, -0.55],
-      screenTitle: "Navigation Online",
-      screenBody: "Astrogation path loaded. Suggested heading: forward, because backwards is generally considered poor piloting."
-    },
-    {
-      label: "SCAN",
-      color: CONFIG.colors.buttonGreen,
-      position: [-0.7, 0.38, -0.55],
-      sound: "scanPing",
-      screenTitle: "Long-Range Scan",
-      screenBody: "Sensor sweep complete. Three anomalies detected, two probably harmless, one being dramatic for attention."
-    },
-    {
-      label: "COMMS",
-      color: CONFIG.colors.buttonAmber,
-      position: [0.7, 0.38, -0.55],
-      screenTitle: "Communications Array",
-      screenBody: "Encrypted channel open. Diplomacy mode available, against all historical evidence."
-    },
-    {
-      label: "ALERT",
-      color: CONFIG.colors.buttonRed,
-      position: [2.1, 0.38, -0.55],
-      sound: "panelBeep",
-      screenTitle: "Alert Status",
-      screenBody: "Soft alert armed. Nothing is exploding yet, which is honestly refreshing."
-    }
-  ].forEach((data) => {
-    const button = createButton(data);
-    group.add(button);
-    state.controls.push(button);
-  });
-
-  const warpLever = createLever({
-    label: "WARP",
-    position: [-1.3, 0.42, 0.55],
-    screenTitle: "Warp Drive Charging",
-    screenBody: "Matter-antimatter balance nominal. Big lever moved. Very satisfying. Engineers pretend this is science.",
-    sound: "warpCharge"
-  });
-
-  const shieldLever = createLever({
-    label: "SHIELD",
-    position: [1.3, 0.42, 0.55],
-    screenTitle: "Deflector Shields",
-    screenBody: "Shield emitters synchronized. Hull confidence increased by 42%. That is not a real metric, but it feels official.",
-    sound: "leverClunk"
-  });
-
-  group.add(warpLever, shieldLever);
-  state.levers.push(warpLever, shieldLever);
-  state.controls.push(warpLever, shieldLever);
-
-  scene.add(group);
-}
-
-function createSideConsoles() {
-  const material = new THREE.MeshStandardMaterial({ color: CONFIG.colors.consoleMid, metalness: 0.52, roughness: 0.5 });
-
-  const left = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.45, 2.6), material);
-  left.position.set(-4.15, 0.64, 1.05);
-  left.rotation.y = -0.42;
-  scene.add(left);
-
-  const right = left.clone();
-  right.position.x = 4.15;
-  right.rotation.y = 0.42;
-  scene.add(right);
-
-  createConsoleLightStrip(-4.15, 1.02, 0.2, -0.42);
-  createConsoleLightStrip(4.15, 1.02, 0.2, 0.42);
-}
-
-function createConsoleLightStrip(x, y, z, rotationY) {
-  const material = new THREE.MeshStandardMaterial({
-    color: CONFIG.colors.consoleTrim,
-    emissive: CONFIG.colors.consoleTrim,
-    emissiveIntensity: 1.2
-  });
-
-  const strip = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.04, 0.07), material);
-  strip.position.set(x, y, z);
-  strip.rotation.y = rotationY;
-  scene.add(strip);
-}
-
 function createHologramScreen() {
   const material = new THREE.MeshStandardMaterial({
     color: CONFIG.colors.hologram,
@@ -560,123 +308,9 @@ function createHologramScreen() {
   scene.add(top, bottom, left, right);
 }
 
-function createButton({ label, color, position, screenTitle, screenBody, sound = "buttonConfirm" }) {
-  const group = new THREE.Group();
-  group.position.set(...position);
-
-  const baseMaterial = new THREE.MeshStandardMaterial({ color: 0x111827, metalness: 0.4, roughness: 0.45 });
-  const capMaterial = new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.65, metalness: 0.2, roughness: 0.32 });
-
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.44, 0.16, 32), baseMaterial);
-  base.rotation.x = Math.PI / 2;
-
-  const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.34, 0.18, 32), capMaterial);
-  cap.rotation.x = Math.PI / 2;
-  cap.position.y = 0.11;
-
-  group.add(base, cap);
-  group.userData = { type: "button", label, sound, screenTitle, screenBody, cap, baseY: cap.position.y, pressTimer: 0 };
-
-  return group;
-}
-
-function createLever({ label, position, screenTitle, screenBody, sound = "leverClunk" }) {
-  const group = new THREE.Group();
-  group.position.set(...position);
-
-  const baseMaterial = new THREE.MeshStandardMaterial({ color: CONFIG.colors.leverBase, metalness: 0.65, roughness: 0.34 });
-  const handleMaterial = new THREE.MeshStandardMaterial({
-    color: CONFIG.colors.buttonAmber,
-    emissive: CONFIG.colors.buttonAmber,
-    emissiveIntensity: 0.35,
-    metalness: 0.32,
-    roughness: 0.4
-  });
-
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.46, 0.16, 32), baseMaterial);
-  base.rotation.x = Math.PI / 2;
-
-  const pivot = new THREE.Group();
-  pivot.position.y = 0.1;
-
-  const stem = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.75, 0.13), handleMaterial);
-  stem.position.y = 0.38;
-
-  const knob = new THREE.Mesh(new THREE.SphereGeometry(0.19, 24, 16), handleMaterial);
-  knob.position.y = 0.8;
-
-  pivot.add(stem, knob);
-  group.add(base, pivot);
-  group.userData = { type: "lever", label, sound, screenTitle, screenBody, pivot, thrown: false, targetRotation: 0 };
-
-  return group;
-}
-
-function initEvents() {
-  canvas.addEventListener("pointerdown", handlePointerDown, { passive: true });
-
-  audioToggle.addEventListener("click", async () => {
-    audioToggle.textContent = "Starting Audio...";
-    await audio.resume();
-    audio.playLoop("bridgeAmbience", 0.28);
-    audio.playLoop("enginePulse", 0.22);
-    audio.playOneShot("buttonConfirm", 0.75);
-    audioToggle.textContent = "Audio Online";
-  });
-}
-
-function handlePointerDown(event) {
-  const rect = canvas.getBoundingClientRect();
-  pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-  pointer.y = -(((event.clientY - rect.top) / rect.height) * 2 - 1);
-  raycaster.setFromCamera(pointer, camera);
-
-  const meshes = [];
-  state.controls.forEach((control) => {
-    control.traverse((child) => {
-      if (child.isMesh) meshes.push(child);
-    });
-  });
-
-  const hits = raycaster.intersectObjects(meshes, false);
-  if (!hits.length) return;
-
-  const control = findParentControl(hits[0].object);
-  if (control) activateControl(control);
-}
-
-function findParentControl(object) {
-  let current = object;
-
-  while (current) {
-    if (current.userData?.type === "button" || current.userData?.type === "lever") return current;
-    current = current.parent;
-  }
-
-  return null;
-}
-
-function activateControl(control) {
-  const data = control.userData;
-
-  screenTitle.textContent = data.screenTitle;
-  screenBody.textContent = data.screenBody;
-  audio.playOneShot(data.sound, 0.85);
-
-  if (data.type === "button") {
-    data.pressTimer = 0.18;
-  }
-
-  if (data.type === "lever") {
-    data.thrown = !data.thrown;
-    data.targetRotation = data.thrown ? -CONFIG.interaction.leverThrowAngle : CONFIG.interaction.leverThrowAngle * 0.25;
-  }
-}
-
 function update(delta, elapsed) {
-  state.elapsed = elapsed;
   updateStars(delta);
-  updateControls(delta);
+  bridgeControls.update(delta);
   updateCameraBreathing(elapsed);
   updateHologramPulse(elapsed);
 }
@@ -690,25 +324,6 @@ function updateStars(delta) {
   if (stars.position.z > 5) {
     stars.position.z = 0;
   }
-}
-
-function updateControls(delta) {
-  state.controls.forEach((control) => {
-    const data = control.userData;
-
-    if (data.type === "button") {
-      if (data.pressTimer > 0) {
-        data.pressTimer -= delta;
-        data.cap.position.y = data.baseY - CONFIG.interaction.buttonPressDepth;
-      } else {
-        data.cap.position.y = THREE.MathUtils.lerp(data.cap.position.y, data.baseY, 0.22);
-      }
-    }
-
-    if (data.type === "lever") {
-      data.pivot.rotation.x = THREE.MathUtils.lerp(data.pivot.rotation.x, data.targetRotation, 0.12);
-    }
-  });
 }
 
 function updateCameraBreathing(elapsed) {
