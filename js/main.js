@@ -1,344 +1,476 @@
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js";
-import { AudioEngine } from "./audio.js";
-import { BridgeControls } from "./controls.js";
+import * as THREE from "three";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+import { createBridgeControls } from "./controls.js";
+import { createAudioController } from "./audio.js";
 
-/**
- * BRIDGE COMMAND CONFIG
- * This stays here so the app can be tuned without spelunking through the whole codebase.
- */
 const CONFIG = {
-  renderer: {
-    maxDpr: 2,
-    antialias: true,
-    powerPreference: "high-performance",
-    clearColor: 0x05070d
-  },
-  camera: {
-    fov: 58,
-    near: 0.1,
-    far: 120,
-    position: new THREE.Vector3(0, 2.15, 7.2),
-    lookAt: new THREE.Vector3(0, 1.15, 0)
-  },
-  lights: {
-    ambientIntensity: 0.72,
-    consoleGlowIntensity: 1.8,
-    overheadIntensity: 2.4,
-    hologramIntensity: 1.25
-  },
-  colors: {
-    consoleDark: 0x101827,
-    consoleMid: 0x1c2b42,
-    consoleTrim: 0x4bb8ff,
-    buttonBlue: 0x4bb8ff,
-    buttonAmber: 0xffb85c,
-    buttonGreen: 0x66ffbb,
-    buttonRed: 0xff5c7a,
-    hologram: 0x72d6ff,
-    leverBase: 0x2d3d55
-  },
-  audio: {
-    masterVolume: 0.72,
-    useGeneratedFallback: true,
-    paths: {
-      bridgeAmbience: "./assets/audio/bridge_ambience_loop.mp3",
-      enginePulse: "./assets/audio/engine_pulse_loop.mp3",
-      buttonConfirm: "./assets/audio/button_confirm_01.wav",
-      panelBeep: "./assets/audio/panel_beep_01.wav",
-      leverClunk: "./assets/audio/lever_clunk_01.wav",
-      scanPing: "./assets/audio/scan_ping_01.wav",
-      softAlert: "./assets/audio/alert_soft_loop.mp3",
-      warpCharge: "./assets/audio/warp_charge_01.wav"
-    }
-  },
-  interaction: {
-    buttonPressDepth: 0.08,
-    leverThrowAngle: Math.PI * 0.32
-  }
+  pixelRatioCap: 1.75,
+  bloomStrength: 0.95,
+  bloomRadius: 0.72,
+  bloomThreshold: 0.18,
+  starCount: 1300,
+  warpLineCount: 140
 };
 
 const canvas = document.querySelector("#bridge-canvas");
-const audioToggle = document.querySelector("#audio-toggle");
-const screenTitle = document.querySelector("#screen-title");
-const screenBody = document.querySelector("#screen-body");
 
-class RenderLoop {
-  constructor({ renderer, scene, camera, update }) {
-    this.renderer = renderer;
-    this.scene = scene;
-    this.camera = camera;
-    this.update = update;
-    this.clock = new THREE.Clock();
-    this.width = 0;
-    this.height = 0;
-    this.dpr = 1;
-  }
+const ui = {
+  bootMessage: document.querySelector("#boot-message"),
+  beginButton: document.querySelector("#begin-button"),
+  systemStatusText: document.querySelector("#system-status-text"),
+  displayTitle: document.querySelector("#display-title"),
+  displayCopy: document.querySelector("#display-copy"),
+  throttleReadout: document.querySelector("#throttle-readout"),
+  modeReadout: document.querySelector("#mode-readout"),
+  focusReadout: document.querySelector("#focus-readout"),
+  hudButtons: document.querySelectorAll(".hud-button")
+};
 
-  start() {
-    const tick = () => {
-      this.resizeIfNeeded();
-      const delta = this.clock.getDelta();
-      const elapsed = this.clock.elapsedTime;
+const state = {
+  width: window.innerWidth,
+  height: window.innerHeight,
+  clock: new THREE.Clock(),
+  throttle: 0,
+  warpActive: false
+};
 
-      this.update(delta, elapsed);
-      this.renderer.render(this.scene, this.camera);
+let renderer;
+let scene;
+let camera;
+let composer;
+let bridgeControls;
+let audio;
+let starfield;
+let warpLines;
 
-      requestAnimationFrame(tick);
-    };
+init();
 
-    tick();
-  }
+function init() {
+  try {
+    if (!canvas) {
+      throw new Error("Bridge canvas was not found.");
+    }
 
-  resizeIfNeeded() {
-    const width = Math.floor(canvas.clientWidth);
-    const height = Math.floor(canvas.clientHeight);
-    const nextDpr = Math.min(window.devicePixelRatio || 1, CONFIG.renderer.maxDpr);
+    setupRenderer();
+    setupScene();
+    setupCamera();
+    setupPostProcessing();
 
-    if (width === this.width && height === this.height && nextDpr === this.dpr) return;
+    createLights();
+    createStarfield();
+    createWarpStreaks();
 
-    this.width = width;
-    this.height = height;
-    this.dpr = nextDpr;
+    audio = createAudioController();
 
-    this.renderer.setPixelRatio(this.dpr);
-    this.renderer.setSize(width, height, false);
+    bridgeControls = createBridgeControls({
+      scene,
+      canvas,
+      camera,
+      callbacks: {
+        onCommand: handleConsoleCommand,
+        onLeverGrab: handleLeverGrab,
+        onThrottleChange: handleThrottleChange,
+        onWarpEngage: triggerWarp,
+        onWarpDisengage: disengageWarp
+      }
+    });
 
-    this.camera.aspect = width / Math.max(height, 1);
-    this.camera.updateProjectionMatrix();
+    bindUIEvents();
+    bindResizeEvent();
+    animate();
+  } catch (error) {
+    console.error("Bridge simulator failed to initialize:", error);
+    showFatalError();
   }
 }
 
-const audio = new AudioEngine(CONFIG.audio);
-
-const renderer = new THREE.WebGLRenderer({
-  canvas,
-  antialias: CONFIG.renderer.antialias,
-  powerPreference: CONFIG.renderer.powerPreference,
-  alpha: false
-});
-
-renderer.setClearColor(CONFIG.renderer.clearColor, 1);
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.shadowMap.enabled = false;
-
-const scene = new THREE.Scene();
-scene.fog = new THREE.Fog(0x05070d, 16, 70);
-
-const camera = new THREE.PerspectiveCamera(
-  CONFIG.camera.fov,
-  window.innerWidth / window.innerHeight,
-  CONFIG.camera.near,
-  CONFIG.camera.far
-);
-
-camera.position.copy(CONFIG.camera.position);
-camera.lookAt(CONFIG.camera.lookAt);
-
-const bridgeControls = new BridgeControls({
-  scene,
-  camera,
-  canvas,
-  config: CONFIG,
-  audio,
-  screenTitle,
-  screenBody
-});
-
-initScene();
-initEvents();
-
-new RenderLoop({ renderer, scene, camera, update }).start();
-
-function initScene() {
-  createLights();
-  createBridgeShell();
-  createStarfield();
-  createHologramScreen();
-  bridgeControls.create();
-}
-
-function initEvents() {
-  bridgeControls.bindEvents();
-
-  audioToggle.addEventListener("click", async () => {
-    audioToggle.textContent = "Starting Audio...";
-
-    await audio.resume();
-
-    audio.playLoop("bridgeAmbience", 0.28);
-    audio.playLoop("enginePulse", 0.22);
-    audio.playOneShot("buttonConfirm", 0.75);
-
-    audioToggle.textContent = "Audio Online";
+function setupRenderer() {
+  renderer = new THREE.WebGLRenderer({
+    canvas,
+    antialias: false,
+    alpha: false,
+    powerPreference: "high-performance"
   });
+
+  renderer.setSize(state.width, state.height);
+  renderer.setPixelRatio(getSafePixelRatio());
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+}
+
+function setupScene() {
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x030711);
+  scene.fog = new THREE.FogExp2(0x030711, 0.025);
+}
+
+function setupCamera() {
+  camera = new THREE.PerspectiveCamera(58, state.width / state.height, 0.1, 320);
+  camera.position.set(0, 2.15, 7.8);
+  camera.lookAt(0, 0.8, 0);
+}
+
+function setupPostProcessing() {
+  composer = new EffectComposer(renderer);
+  composer.setPixelRatio(getSafePixelRatio());
+  composer.setSize(state.width, state.height);
+
+  const renderPass = new RenderPass(scene, camera);
+  const bloomPass = new UnrealBloomPass(
+    new THREE.Vector2(state.width, state.height),
+    CONFIG.bloomStrength,
+    CONFIG.bloomRadius,
+    CONFIG.bloomThreshold
+  );
+
+  composer.addPass(renderPass);
+  composer.addPass(bloomPass);
 }
 
 function createLights() {
-  scene.add(new THREE.HemisphereLight(0x9dccff, 0x0b1020, CONFIG.lights.ambientIntensity));
+  const ambient = new THREE.AmbientLight(0x5f8aff, 0.85);
+  scene.add(ambient);
 
-  const overhead = new THREE.PointLight(0x8fd6ff, CONFIG.lights.overheadIntensity, 14);
-  overhead.position.set(0, 4.8, 3.4);
-  scene.add(overhead);
+  const key = new THREE.DirectionalLight(0xaeefff, 2.4);
+  key.position.set(-4, 7, 5);
+  scene.add(key);
 
-  const consoleGlow = new THREE.PointLight(CONFIG.colors.consoleTrim, CONFIG.lights.consoleGlowIntensity, 8);
-  consoleGlow.position.set(0, 1.2, 2.5);
+  const consoleGlow = new THREE.PointLight(0x49eaff, 4.6, 14);
+  consoleGlow.position.set(0, 0.35, 2.3);
   scene.add(consoleGlow);
 
-  const hologramGlow = new THREE.PointLight(CONFIG.colors.hologram, CONFIG.lights.hologramIntensity, 7);
-  hologramGlow.position.set(0, 2.45, -1.8);
-  scene.add(hologramGlow);
-}
-
-function createBridgeShell() {
-  const floorMaterial = new THREE.MeshStandardMaterial({
-    color: 0x080d16,
-    metalness: 0.45,
-    roughness: 0.58
-  });
-
-  const wallMaterial = new THREE.MeshStandardMaterial({
-    color: 0x0d1422,
-    metalness: 0.35,
-    roughness: 0.72
-  });
-
-  const floor = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, 0.22, 48), floorMaterial);
-  floor.position.y = -0.15;
-  scene.add(floor);
-
-  const rearWall = new THREE.Mesh(new THREE.BoxGeometry(14, 5, 0.35), wallMaterial);
-  rearWall.position.set(0, 2.15, -5.4);
-  scene.add(rearWall);
-
-  const ceiling = new THREE.Mesh(new THREE.BoxGeometry(13.6, 0.25, 9.5), wallMaterial);
-  ceiling.position.set(0, 4.8, -0.9);
-  scene.add(ceiling);
-
-  createWindowFrame();
-}
-
-function createWindowFrame() {
-  const frameMaterial = new THREE.MeshStandardMaterial({
-    color: 0x17263d,
-    metalness: 0.72,
-    roughness: 0.38,
-    emissive: 0x07111f,
-    emissiveIntensity: 0.45
-  });
-
-  const outer = new THREE.Group();
-  outer.position.set(0, 2.45, -5.18);
-
-  const top = new THREE.Mesh(new THREE.BoxGeometry(8.2, 0.22, 0.22), frameMaterial);
-  top.position.y = 1.25;
-
-  const bottom = top.clone();
-  bottom.position.y = -1.25;
-
-  const left = new THREE.Mesh(new THREE.BoxGeometry(0.22, 2.7, 0.22), frameMaterial);
-  left.position.x = -4.1;
-
-  const right = left.clone();
-  right.position.x = 4.1;
-
-  outer.add(top, bottom, left, right);
-  scene.add(outer);
+  const warningGlow = new THREE.PointLight(0xffcc55, 0.9, 9);
+  warningGlow.position.set(2.2, 0.25, 2.5);
+  scene.add(warningGlow);
 }
 
 function createStarfield() {
-  const starCount = isMobile() ? 420 : 700;
-  const positions = new Float32Array(starCount * 3);
+  const geometry = new THREE.BufferGeometry();
+  const positions = new Float32Array(CONFIG.starCount * 3);
+  const colors = new Float32Array(CONFIG.starCount * 3);
 
-  for (let i = 0; i < starCount; i += 1) {
+  for (let i = 0; i < CONFIG.starCount; i += 1) {
     const index = i * 3;
-    positions[index] = THREE.MathUtils.randFloatSpread(42);
-    positions[index + 1] = THREE.MathUtils.randFloat(-2, 18);
-    positions[index + 2] = THREE.MathUtils.randFloat(-48, -8);
+
+    positions[index] = THREE.MathUtils.randFloatSpread(160);
+    positions[index + 1] = THREE.MathUtils.randFloatSpread(80) + 8;
+    positions[index + 2] = THREE.MathUtils.randFloat(-190, -16);
+
+    const brightness = THREE.MathUtils.randFloat(0.45, 1);
+    colors[index] = brightness * 0.55;
+    colors[index + 1] = brightness * 0.82;
+    colors[index + 2] = brightness;
+  }
+
+  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+
+  const material = new THREE.PointsMaterial({
+    size: 0.075,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.95,
+    depthWrite: false
+  });
+
+  starfield = new THREE.Points(geometry, material);
+  scene.add(starfield);
+}
+
+function createWarpStreaks() {
+  const positions = new Float32Array(CONFIG.warpLineCount * 2 * 3);
+  const speeds = [];
+
+  for (let i = 0; i < CONFIG.warpLineCount; i += 1) {
+    const index = i * 6;
+    const x = THREE.MathUtils.randFloatSpread(90);
+    const y = THREE.MathUtils.randFloatSpread(52);
+    const z = THREE.MathUtils.randFloat(-155, -22);
+    const length = THREE.MathUtils.randFloat(1.4, 5.8);
+
+    positions[index] = x;
+    positions[index + 1] = y;
+    positions[index + 2] = z;
+
+    positions[index + 3] = x;
+    positions[index + 4] = y;
+    positions[index + 5] = z + length;
+
+    speeds.push(THREE.MathUtils.randFloat(22, 60));
   }
 
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  geometry.userData.speeds = speeds;
 
-  const material = new THREE.PointsMaterial({
-    color: 0xdff7ff,
-    size: 0.055,
-    sizeAttenuation: true
-  });
-
-  const stars = new THREE.Points(geometry, material);
-  stars.name = "starfield";
-  scene.add(stars);
-}
-
-function createHologramScreen() {
-  const material = new THREE.MeshStandardMaterial({
-    color: CONFIG.colors.hologram,
+  const material = new THREE.LineBasicMaterial({
+    color: 0x9af7ff,
     transparent: true,
-    opacity: 0.18,
-    emissive: CONFIG.colors.hologram,
-    emissiveIntensity: 0.85,
-    side: THREE.DoubleSide,
+    opacity: 0,
+    blending: THREE.AdditiveBlending,
     depthWrite: false
   });
 
-  const screen = new THREE.Mesh(new THREE.PlaneGeometry(3.5, 1.65), material);
-  screen.name = "hologram-screen";
-  screen.position.set(0, 2.22, -2.2);
-  screen.rotation.x = -0.08;
-  scene.add(screen);
+  warpLines = new THREE.LineSegments(geometry, material);
+  scene.add(warpLines);
+}
 
-  const borderMaterial = new THREE.MeshStandardMaterial({
-    color: CONFIG.colors.hologram,
-    emissive: CONFIG.colors.hologram,
-    emissiveIntensity: 1.3
+function bindUIEvents() {
+  ui.beginButton?.addEventListener("click", async () => {
+    await audio.unlock();
+    ui.bootMessage?.classList.add("hidden");
+    setDisplayContent(
+      "Shift Command",
+      "Bridge controls online. Drag the throttle or tap a console button.",
+      "Standby",
+      "Stable"
+    );
   });
 
-  const top = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.025, 0.025), borderMaterial);
-  top.position.set(0, 3.06, -2.19);
-
-  const bottom = top.clone();
-  bottom.position.y = 1.38;
-
-  const left = new THREE.Mesh(new THREE.BoxGeometry(0.025, 1.65, 0.025), borderMaterial);
-  left.position.set(-1.8, 2.22, -2.19);
-
-  const right = left.clone();
-  right.position.x = 1.8;
-
-  scene.add(top, bottom, left, right);
+  ui.hudButtons.forEach((button) => {
+    button.addEventListener("click", async () => {
+      await audio.unlock();
+      audio.playClick();
+      const command = button.dataset.command;
+      bridgeControls?.pulseCommand(command);
+      handleCommand(command);
+    });
+  });
 }
 
-function update(delta, elapsed) {
-  updateStars(delta);
-  bridgeControls.update(delta);
-  updateCameraBreathing(elapsed);
-  updateHologramPulse(elapsed);
+function bindResizeEvent() {
+  window.addEventListener("resize", onResize, { passive: true });
+  window.addEventListener("orientationchange", onResize, { passive: true });
 }
 
-function updateStars(delta) {
-  const stars = scene.getObjectByName("starfield");
-  if (!stars) return;
+async function handleConsoleCommand(command) {
+  await audio.unlock();
+  audio.playClick();
+  handleCommand(command);
+}
 
-  stars.position.z += delta * 0.38;
+async function handleLeverGrab() {
+  await audio.unlock();
+  setDisplayContent(
+    "Throttle Control",
+    "Drag upward to increase engine output. Push beyond 82% to engage warp streaks.",
+    "Manual",
+    "High"
+  );
+}
 
-  if (stars.position.z > 5) {
-    stars.position.z = 0;
+function handleThrottleChange(value) {
+  state.throttle = value;
+  audio.setThrottle(value);
+  ui.throttleReadout.textContent = `${Math.round(value * 100)}%`;
+}
+
+function handleCommand(command) {
+  const content = {
+    tasks: {
+      title: "Task Console",
+      copy: "Next best action queue ready. This will eventually show your live shift priorities.",
+      mode: "Tasks",
+      focus: "Guided"
+    },
+    report: {
+      title: "Incident Report",
+      copy: "Report channel armed. Outages, staffing issues, delays, and manager notifications will live here.",
+      mode: "Report",
+      focus: "Document"
+    },
+    history: {
+      title: "Shift History",
+      copy: "Past shift logs and store patterns will appear here. Humanity may yet learn from yesterday.",
+      mode: "History",
+      focus: "Review"
+    },
+    voice: {
+      title: "Voice Command",
+      copy: "Voice input placeholder ready. Audio is already awake, which is more than can be said for most morning shifts.",
+      mode: "Voice",
+      focus: "Speak"
+    },
+    open: {
+      title: "Opening Systems",
+      copy: "Morning launch checklist placeholder. Books, counts, LTO, cooler, and first walk will connect here.",
+      mode: "Open",
+      focus: "Launch"
+    },
+    focus: {
+      title: "Focus Lock",
+      copy: "Noise reduction mode selected. One job at a time, because the human brain is not a 12-core processor.",
+      mode: "Focus",
+      focus: "Locked"
+    },
+    notes: {
+      title: "Captain's Log",
+      copy: "Notes area placeholder. Perfect for explaining why the store did not magically fix itself during an outage.",
+      mode: "Notes",
+      focus: "Log"
+    },
+    next: {
+      title: "Next Action",
+      copy: "Next-step engine placeholder. This will become the big 'tell me what to do now' control.",
+      mode: "Next",
+      focus: "Decide"
+    }
+  };
+
+  const selected = content[command] ?? content.tasks;
+  setDisplayContent(selected.title, selected.copy, selected.mode, selected.focus);
+}
+
+function setDisplayContent(title, copy, mode, focus) {
+  ui.displayTitle.textContent = title;
+  ui.displayCopy.textContent = copy;
+  ui.modeReadout.textContent = mode;
+  ui.focusReadout.textContent = focus;
+}
+
+function triggerWarp() {
+  state.warpActive = true;
+  document.body.classList.add("warping");
+  ui.systemStatusText.textContent = "Warp Engaged";
+  audio.playWarp();
+
+  setDisplayContent(
+    "Warp Threshold",
+    "Store bridge at full burn. Particle streak animation engaged. Try not to fly the pizza warmer into Saturn.",
+    "Warp",
+    "Maximum"
+  );
+}
+
+function disengageWarp() {
+  state.warpActive = false;
+  document.body.classList.remove("warping");
+  ui.systemStatusText.textContent = "Systems Ready";
+
+  setDisplayContent(
+    "Throttle Control",
+    "Warp disengaged. Reduce speed, breathe, and pretend the store did not just become a space opera.",
+    "Manual",
+    "Stable"
+  );
+}
+
+function onResize() {
+  state.width = window.innerWidth;
+  state.height = window.innerHeight;
+
+  camera.aspect = state.width / state.height;
+  camera.updateProjectionMatrix();
+
+  const pixelRatio = getSafePixelRatio();
+  renderer.setSize(state.width, state.height);
+  renderer.setPixelRatio(pixelRatio);
+
+  composer.setSize(state.width, state.height);
+  composer.setPixelRatio(pixelRatio);
+}
+
+function animate() {
+  const delta = Math.min(state.clock.getDelta(), 0.033);
+  const elapsed = state.clock.elapsedTime;
+
+  const throttle = bridgeControls.update(delta);
+  updateStarfield(delta, elapsed, throttle);
+  updateWarp(delta, elapsed, throttle);
+  updateCameraMotion(elapsed, throttle);
+
+  composer.render();
+  requestAnimationFrame(animate);
+}
+
+function updateStarfield(delta, elapsed, throttle) {
+  if (!starfield) return;
+
+  const positions = starfield.geometry.attributes.position.array;
+  const speed = THREE.MathUtils.lerp(2.8, 32, throttle);
+
+  for (let i = 0; i < positions.length; i += 3) {
+    positions[i + 2] += speed * delta;
+
+    if (positions[i + 2] > 9) {
+      positions[i] = THREE.MathUtils.randFloatSpread(160);
+      positions[i + 1] = THREE.MathUtils.randFloatSpread(80) + 8;
+      positions[i + 2] = THREE.MathUtils.randFloat(-190, -140);
+    }
   }
+
+  starfield.rotation.z = Math.sin(elapsed * 0.08) * 0.008;
+  starfield.geometry.attributes.position.needsUpdate = true;
 }
 
-function updateCameraBreathing(elapsed) {
-  camera.position.y = CONFIG.camera.position.y + Math.sin(elapsed * 0.6) * 0.018;
-  camera.position.x = CONFIG.camera.position.x + Math.sin(elapsed * 0.34) * 0.012;
-  camera.lookAt(CONFIG.camera.lookAt);
+function updateWarp(delta, elapsed) {
+  if (!warpLines) return;
+
+  const material = warpLines.material;
+  const geometry = warpLines.geometry;
+  const positions = geometry.attributes.position.array;
+  const speeds = geometry.userData.speeds;
+
+  const targetOpacity = state.warpActive ? 0.82 : 0;
+  material.opacity = THREE.MathUtils.lerp(material.opacity, targetOpacity, 0.08);
+
+  if (material.opacity < 0.01) return;
+
+  for (let i = 0; i < speeds.length; i += 1) {
+    const index = i * 6;
+    const speed = speeds[i] * (state.warpActive ? 3.4 : 0.7);
+
+    positions[index + 2] += speed * delta;
+    positions[index + 5] += speed * delta;
+
+    if (positions[index + 2] > 14) {
+      const x = THREE.MathUtils.randFloatSpread(90);
+      const y = THREE.MathUtils.randFloatSpread(52);
+      const z = THREE.MathUtils.randFloat(-170, -120);
+      const length = THREE.MathUtils.randFloat(5, 16);
+
+      positions[index] = x;
+      positions[index + 1] = y;
+      positions[index + 2] = z;
+
+      positions[index + 3] = x;
+      positions[index + 4] = y;
+      positions[index + 5] = z + length;
+    }
+  }
+
+  warpLines.rotation.z = Math.sin(elapsed * 0.6) * 0.018;
+  geometry.attributes.position.needsUpdate = true;
 }
 
-function updateHologramPulse(elapsed) {
-  const hologram = scene.getObjectByName("hologram-screen");
-  if (!hologram) return;
+function updateCameraMotion(elapsed, throttle) {
+  const throttleShake = throttle * 0.022;
+  const warpShake = state.warpActive ? 0.026 : 0;
 
-  hologram.material.opacity = 0.16 + Math.sin(elapsed * 2.4) * 0.035;
+  camera.position.x = Math.sin(elapsed * 1.8) * (0.012 + throttleShake);
+  camera.position.y = 2.15 + Math.sin(elapsed * 2.2) * (0.008 + warpShake);
+  camera.lookAt(0, 0.78, 0);
 }
 
-function isMobile() {
-  return window.matchMedia("(max-width: 760px), (pointer: coarse)").matches;
+function getSafePixelRatio() {
+  return Math.min(window.devicePixelRatio || 1, CONFIG.pixelRatioCap);
+}
+
+function showFatalError() {
+  const errorBox = document.createElement("div");
+  errorBox.style.position = "fixed";
+  errorBox.style.inset = "16px";
+  errorBox.style.zIndex = "999";
+  errorBox.style.padding = "18px";
+  errorBox.style.border = "1px solid rgba(251, 113, 133, 0.6)";
+  errorBox.style.borderRadius = "18px";
+  errorBox.style.background = "rgba(15, 23, 42, 0.92)";
+  errorBox.style.color = "#eaf6ff";
+  errorBox.style.fontFamily = "system-ui, sans-serif";
+  errorBox.innerHTML = `
+    <strong>Bridge initialization failed.</strong>
+    <p>The simulator could not start. Check that the Three.js CDN imports are loading correctly.</p>
+  `;
+  document.body.appendChild(errorBox);
 }
