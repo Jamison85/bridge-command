@@ -1,10 +1,8 @@
-#app-shell {
-  background: #02050b;
-}
+#app-shell { background: #02040a; }
 
 #bridge-canvas {
-  opacity: 0.14 !important;
-  filter: saturate(0.35) contrast(1.08) blur(0.25px) !important;
+  opacity: 0.08 !important;
+  filter: saturate(0.45) contrast(0.92) blur(0.8px) !important;
 }
 
 .bridge-art-shell {
@@ -13,19 +11,17 @@
   z-index: 4;
   pointer-events: none;
   background:
-    linear-gradient(90deg, rgba(0, 0, 0, 0.72), transparent 18%, transparent 82%, rgba(0, 0, 0, 0.72)),
-    radial-gradient(ellipse at 50% 46%, transparent 32%, rgba(0, 0, 0, 0.34) 70%, rgba(0, 0, 0, 0.86) 100%),
-    url("../assets/bridge-cockpit.svg?v=art-shell-3-1") center / cover no-repeat;
+    radial-gradient(ellipse at 50% 44%, transparent 28%, rgba(0,0,0,.28) 62%, rgba(0,0,0,.74) 100%),
+    linear-gradient(180deg, rgba(0,0,0,.14), transparent 34%, rgba(0,0,0,.44)),
+    url("../assets/cockpit-premium.svg?v=art-shell-4-0") center / cover no-repeat;
 }
 
 .bridge-art-shell::after {
   content: "";
   position: absolute;
   inset: 0;
-  border: min(4.6vw, 28px) solid rgba(1, 4, 10, 0.72);
-  box-shadow:
-    inset 0 0 70px rgba(0, 0, 0, 0.78),
-    inset 0 0 140px rgba(9, 18, 30, 0.52);
+  border: min(4.8vw, 30px) solid rgba(1,4,10,.72);
+  box-shadow: inset 0 0 58px rgba(0,0,0,.72), inset 0 0 150px rgba(2,5,11,.58);
 }
 
 .bridge-art-label {
@@ -34,124 +30,54 @@
   bottom: calc(max(16px, env(safe-area-inset-bottom)) + 74px);
   z-index: 11;
   padding: 6px 10px;
-  border: 1px solid rgba(222, 166, 67, 0.14);
+  border: 1px solid rgba(222,166,67,.14);
   border-radius: 999px;
-  color: rgba(255, 224, 154, 0.64);
-  background: rgba(2, 6, 18, 0.22);
+  color: transparent;
+  background: rgba(2,6,18,.22);
   backdrop-filter: blur(5px);
-  font-size: 0.56rem;
+  font-size: 0;
   font-weight: 900;
-  letter-spacing: 0.12em;
+  letter-spacing: .12em;
 }
+.bridge-art-label::after { content: "PREMIUM ART"; color: rgba(255,224,154,.66); font-size: .56rem; }
 
-#hud-overlay {
-  z-index: 10 !important;
-}
-
-.hud-header {
-  transform: scale(0.82);
-  transform-origin: top left;
-  opacity: 0.56;
-}
-
-.hud-header h1 {
-  opacity: 0.7;
-}
-
-.status-pill {
-  transform: scale(0.82);
-  transform-origin: top right;
-  background: rgba(2, 6, 18, 0.22) !important;
-  box-shadow: none !important;
-}
+#hud-overlay { z-index: 10 !important; }
+.hud-header { transform: scale(.82); transform-origin: top left; opacity: .54; }
+.hud-header h1 { opacity: .7; }
+.status-pill { transform: scale(.82); transform-origin: top right; background: rgba(2,6,18,.24) !important; border-color: rgba(116,190,214,.08) !important; box-shadow: none !important; }
 
 .transparent-display {
   position: fixed !important;
-  left: max(14px, env(safe-area-inset-left)) !important;
-  top: calc(max(80px, env(safe-area-inset-top) + 64px)) !important;
-  width: min(34vw, 178px) !important;
-  min-width: 148px !important;
-  max-height: 116px !important;
+  left: 50% !important;
+  top: 33.5% !important;
+  transform: translateX(-50%) !important;
+  width: min(62vw, 430px) !important;
+  min-width: 260px !important;
+  max-height: 210px !important;
   margin: 0 !important;
-  padding: 7px 8px !important;
-  border-radius: 14px !important;
-  border-color: rgba(116, 190, 214, 0.08) !important;
-  background: linear-gradient(180deg, rgba(6, 10, 18, 0.16), rgba(2, 6, 18, 0.08)) !important;
-  backdrop-filter: blur(2.5px) !important;
-  box-shadow: none !important;
+  padding: 14px 16px !important;
+  border-radius: 18px !important;
+  border: 1px solid rgba(116,190,214,.16) !important;
+  background: linear-gradient(180deg, rgba(2,8,18,.42), rgba(2,6,14,.18)) !important;
+  backdrop-filter: blur(5px) saturate(1.06) !important;
+  box-shadow: 0 12px 44px rgba(0,0,0,.36), inset 0 0 22px rgba(79,195,218,.025) !important;
 }
+body.detail-mode .transparent-display { top: 27% !important; width: min(86vw,520px) !important; max-height: min(46vh,420px) !important; background: rgba(2,6,14,.58) !important; backdrop-filter: blur(9px) !important; }
+.display-label { font-size: .56rem !important; letter-spacing: .15em !important; color: rgba(150,220,235,.66) !important; }
+.transparent-display h2 { font-size: clamp(1rem,4vw,1.35rem) !important; margin-bottom: 5px !important; color: rgba(235,247,252,.86) !important; }
+#display-copy { max-height: 3.8em !important; color: rgba(205,222,234,.68) !important; font-size: .76rem !important; line-height: 1.36 !important; overflow: hidden !important; }
+.metrics-row { grid-template-columns: repeat(3,1fr) !important; gap: 8px !important; margin-top: 10px !important; }
+.metric-card { padding: 8px 9px !important; border-radius: 13px !important; background: rgba(2,6,14,.38) !important; border-color: rgba(79,195,218,.1) !important; }
+.metric-card span { font-size: .52rem !important; color: rgba(142,166,185,.72) !important; }
+.metric-card strong { font-size: .74rem !important; }
+.pilot-panel { max-height: 0; margin-top: 0; overflow: hidden; opacity: 0; }
+.detail-mode .pilot-panel { max-height: min(24vh,210px); margin-top: 10px; opacity: 1; }
 
-body.detail-mode .transparent-display {
-  width: min(86vw, 390px) !important;
-  max-height: min(48vh, 390px) !important;
-  background: linear-gradient(180deg, rgba(8, 13, 23, 0.56), rgba(2, 6, 18, 0.38)) !important;
-  backdrop-filter: blur(8px) !important;
-}
+.command-bar { z-index: 11; width: min(88vw,570px) !important; bottom: calc(max(16px, env(safe-area-inset-bottom)) + 6px) !important; padding: 12px 13px 14px !important; border-radius: 28px 28px 18px 18px !important; border: 1px solid rgba(79,195,218,.08) !important; background: linear-gradient(180deg, rgba(7,13,24,.5), rgba(1,4,10,.92)) !important; box-shadow: 0 -14px 36px rgba(0,0,0,.34), 0 18px 44px rgba(0,0,0,.62) !important; }
+.hud-button { min-height: 48px !important; border-radius: 17px !important; opacity: .82; text-transform: uppercase; letter-spacing: .045em; background: linear-gradient(180deg, rgba(13,20,34,.78), rgba(2,5,12,.96)) !important; border-color: rgba(79,195,218,.1) !important; }
+.hud-button.primary { opacity: .95; color: #09111c !important; background: linear-gradient(180deg, rgba(255,224,154,.78), rgba(213,154,44,.66)) !important; border-color: rgba(255,224,154,.22) !important; }
 
-.display-label {
-  font-size: 0.46rem !important;
-}
-
-.transparent-display h2 {
-  font-size: 0.78rem !important;
-  margin-bottom: 3px !important;
-}
-
-#display-copy {
-  max-height: 2.5em !important;
-  color: rgba(199, 215, 230, 0.48) !important;
-  font-size: 0.58rem !important;
-  line-height: 1.3 !important;
-  overflow: hidden !important;
-}
-
-.metrics-row {
-  gap: 4px !important;
-  margin-top: 6px !important;
-}
-
-.metric-card {
-  padding: 5px !important;
-  border-radius: 9px !important;
-  background: rgba(2, 6, 18, 0.18) !important;
-}
-
-.metric-card span {
-  font-size: 0.45rem !important;
-}
-
-.metric-card strong {
-  font-size: 0.58rem !important;
-}
-
-.pilot-panel {
-  max-height: 0;
-  margin-top: 0;
-  overflow: hidden;
-  opacity: 0;
-}
-
-.detail-mode .pilot-panel {
-  max-height: min(27vh, 240px);
-  margin-top: 10px;
-  opacity: 1;
-}
-
-.command-bar {
-  z-index: 11;
-  width: min(90vw, 560px) !important;
-  padding: 12px !important;
-  border-radius: 24px 24px 16px 16px !important;
-  border-color: rgba(116, 190, 214, 0.06) !important;
-  background: linear-gradient(180deg, rgba(6, 12, 23, 0.42), rgba(1, 4, 10, 0.9)) !important;
-  box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.26), 0 16px 40px rgba(0, 0, 0, 0.54) !important;
-}
-
-.hud-button {
-  opacity: 0.82;
-}
-
-.hud-button.primary {
-  background: linear-gradient(180deg, rgba(255, 224, 154, 0.72), rgba(217, 159, 42, 0.6)) !important;
-  color: #07111f !important;
+@media (max-height: 760px) {
+  .transparent-display { top: 31.5% !important; max-height: 178px !important; }
+  #display-copy { max-height: 2.7em !important; }
 }
