@@ -6,8 +6,9 @@ const CONTROL_DEFAULTS = {
 };
 
 /**
- * Creates the tactile dashboard: buttons, panels, rails, and draggable throttle.
- * All geometry is generated with Three.js primitives. No external models.
+ * Large tactile physical controls for the cockpit foreground.
+ * The store workflow stays digital, but the interaction should feel like
+ * grabbing a real starship console instead of poking a sad rectangle.
  */
 export function createBridgeControls({ scene, canvas, camera, callbacks = {}, options = {} }) {
   const config = { ...CONTROL_DEFAULTS, ...options };
@@ -25,247 +26,290 @@ export function createBridgeControls({ scene, canvas, camera, callbacks = {}, op
 
   const raycaster = new THREE.Raycaster();
   const interactiveObjects = [];
+  const commandObjects = new Map();
 
-  const dashboardGroup = new THREE.Group();
-  dashboardGroup.position.set(0, -0.95, 1.42);
-  dashboardGroup.rotation.x = -0.18;
-  scene.add(dashboardGroup);
+  const controlDeck = new THREE.Group();
+  controlDeck.name = "cinematic-tactile-controls";
+  controlDeck.position.set(0, -0.5, 2.26);
+  controlDeck.rotation.x = -0.24;
+  scene.add(controlDeck);
 
   let leverHandle;
   let leverKnob;
+  let throttleRailGlow;
 
-  createDashboardShell(dashboardGroup);
-  createCenterDisplay(dashboardGroup);
-  createButtonBanks(dashboardGroup, interactiveObjects);
-  createThrottleLever(dashboardGroup, interactiveObjects);
-  createSideRails(dashboardGroup);
+  const materials = createControlMaterials();
+
+  createPhysicalDeck();
+  createCommandButtons();
+  createThrottleCluster();
+  createToggleBanks();
+  createIndicatorLights();
 
   canvas.addEventListener("pointerdown", onPointerDown, { passive: false });
   canvas.addEventListener("pointermove", onPointerMove, { passive: false });
   canvas.addEventListener("pointerup", onPointerUp, { passive: true });
   canvas.addEventListener("pointercancel", onPointerUp, { passive: true });
 
-  function createDashboardShell(parent) {
-    const shellMaterial = new THREE.MeshStandardMaterial({
-      color: 0x07101f,
-      metalness: 0.72,
-      roughness: 0.34
-    });
-
-    const topMaterial = new THREE.MeshStandardMaterial({
-      color: 0x0f2338,
-      metalness: 0.58,
-      roughness: 0.29,
-      emissive: 0x061c2e,
-      emissiveIntensity: 0.18
-    });
-
-    const base = new THREE.Mesh(new THREE.BoxGeometry(7.6, 0.46, 3.05), shellMaterial);
-    base.position.set(0, -0.08, 0);
-    parent.add(base);
-
-    const upperPanel = new THREE.Mesh(new THREE.BoxGeometry(6.6, 0.16, 1.32), topMaterial);
-    upperPanel.position.set(0, 0.25, -0.58);
-    upperPanel.rotation.x = -0.06;
-    parent.add(upperPanel);
-
-    const lip = new THREE.Mesh(new THREE.BoxGeometry(7.9, 0.28, 0.24), shellMaterial);
-    lip.position.set(0, 0.28, 1.54);
-    parent.add(lip);
+  function createControlMaterials() {
+    return {
+      deck: new THREE.MeshStandardMaterial({
+        color: 0x081322,
+        metalness: 0.78,
+        roughness: 0.28,
+        emissive: 0x04101d,
+        emissiveIntensity: 0.18
+      }),
+      deckRaised: new THREE.MeshStandardMaterial({
+        color: 0x11263d,
+        metalness: 0.68,
+        roughness: 0.25,
+        emissive: 0x06192a,
+        emissiveIntensity: 0.2
+      }),
+      inset: new THREE.MeshStandardMaterial({
+        color: 0x030914,
+        metalness: 0.38,
+        roughness: 0.54,
+        emissive: 0x061426,
+        emissiveIntensity: 0.24
+      }),
+      cyan: createGlowMaterial(0x67e8f9, 1.1),
+      blue: createGlowMaterial(0x60a5fa, 1.0),
+      amber: createGlowMaterial(0xfacc15, 1.0),
+      red: createGlowMaterial(0xfb7185, 1.0),
+      green: createGlowMaterial(0x86efac, 1.0),
+      white: new THREE.MeshStandardMaterial({
+        color: 0xecfeff,
+        metalness: 0.52,
+        roughness: 0.16,
+        emissive: 0x67e8f9,
+        emissiveIntensity: 0.28
+      })
+    };
   }
 
-  function createCenterDisplay(parent) {
-    const frameMaterial = new THREE.MeshStandardMaterial({
-      color: 0x0b1729,
-      metalness: 0.55,
-      roughness: 0.32
+  function createGlowMaterial(color, intensity) {
+    return new THREE.MeshStandardMaterial({
+      color,
+      emissive: color,
+      emissiveIntensity: intensity,
+      roughness: 0.2,
+      metalness: 0.16
     });
-
-    const screenMaterial = new THREE.MeshStandardMaterial({
-      color: 0x07182b,
-      emissive: 0x19d3ff,
-      emissiveIntensity: 0.34,
-      metalness: 0.1,
-      roughness: 0.18,
-      transparent: true,
-      opacity: 0.82
-    });
-
-    const frame = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.12, 1.12), frameMaterial);
-    frame.position.set(0, 0.43, -0.63);
-    parent.add(frame);
-
-    const screen = new THREE.Mesh(new THREE.BoxGeometry(2.36, 0.055, 0.82), screenMaterial);
-    screen.position.set(0, 0.52, -0.62);
-    parent.add(screen);
-
-    const gridMaterial = new THREE.MeshBasicMaterial({
-      color: 0x67e8f9,
-      transparent: true,
-      opacity: 0.18
-    });
-
-    for (let i = -3; i <= 3; i += 1) {
-      const line = new THREE.Mesh(new THREE.BoxGeometry(0.015, 0.012, 0.76), gridMaterial);
-      line.position.set(i * 0.32, 0.56, -0.615);
-      parent.add(line);
-    }
-
-    for (let i = -1; i <= 1; i += 1) {
-      const line = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.012, 0.012), gridMaterial);
-      line.position.set(0, 0.565, -0.615 + i * 0.22);
-      parent.add(line);
-    }
   }
 
-  function createButtonBanks(parent, targets) {
+  function createPhysicalDeck() {
+    const lower = new THREE.Mesh(new THREE.BoxGeometry(7.45, 0.36, 1.65), materials.deck);
+    lower.position.set(0, 0, 0.24);
+    controlDeck.add(lower);
+
+    const centerPlate = new THREE.Mesh(new THREE.BoxGeometry(2.55, 0.16, 1.22), materials.deckRaised);
+    centerPlate.position.set(0, 0.26, 0.0);
+    controlDeck.add(centerPlate);
+
+    const leftPlate = new THREE.Mesh(new THREE.BoxGeometry(2.05, 0.15, 1.25), materials.deckRaised);
+    leftPlate.position.set(-2.55, 0.22, 0.0);
+    leftPlate.rotation.y = 0.18;
+    controlDeck.add(leftPlate);
+
+    const rightPlate = leftPlate.clone();
+    rightPlate.position.x = 2.55;
+    rightPlate.rotation.y = -0.18;
+    controlDeck.add(rightPlate);
+
+    const lowerLip = new THREE.Mesh(new THREE.BoxGeometry(7.75, 0.26, 0.22), materials.deck);
+    lowerLip.position.set(0, 0.05, 0.98);
+    controlDeck.add(lowerLip);
+
+    addGlowBar({ position: [0, 0.38, -0.68], scale: [2.2, 0.03, 0.04], material: materials.cyan });
+    addGlowBar({ position: [-2.55, 0.34, -0.65], rotationY: 0.18, scale: [1.42, 0.03, 0.04], material: materials.blue });
+    addGlowBar({ position: [2.55, 0.34, -0.65], rotationY: -0.18, scale: [1.42, 0.03, 0.04], material: materials.blue });
+  }
+
+  function createCommandButtons() {
     const buttons = [
-      { label: "Tasks", command: "tasks", x: -2.75, z: 0.45, color: 0x67e8f9 },
-      { label: "Report", command: "report", x: -1.85, z: 0.45, color: 0xfacc15 },
-      { label: "History", command: "history", x: -2.75, z: 1.05, color: 0xa78bfa },
-      { label: "Voice", command: "voice", x: -1.85, z: 1.05, color: 0x86efac },
-      { label: "Open", command: "open", x: 1.8, z: 0.45, color: 0x60a5fa },
-      { label: "Focus", command: "focus", x: 2.7, z: 0.45, color: 0x67e8f9 },
-      { label: "Notes", command: "notes", x: 1.8, z: 1.05, color: 0xfb7185 },
-      { label: "Next", command: "next", x: 2.7, z: 1.05, color: 0x86efac }
+      { label: "NEXT", command: "next", position: [-3.04, 0.42, 0.1], material: materials.green, size: 0.28 },
+      { label: "TASK", command: "tasks", position: [-2.3, 0.42, -0.18], material: materials.cyan, size: 0.24 },
+      { label: "RPT", command: "report", position: [-1.64, 0.42, 0.16], material: materials.amber, size: 0.24 },
+      { label: "LOG", command: "history", position: [-2.26, 0.42, 0.46], material: materials.blue, size: 0.22 },
+      { label: "VOICE", command: "voice", position: [3.04, 0.42, 0.1], material: materials.cyan, size: 0.28 },
+      { label: "OPEN", command: "open", position: [2.3, 0.42, -0.18], material: materials.blue, size: 0.24 },
+      { label: "FOCUS", command: "focus", position: [1.64, 0.42, 0.16], material: materials.green, size: 0.24 },
+      { label: "NOTE", command: "notes", position: [2.26, 0.42, 0.46], material: materials.red, size: 0.22 }
     ];
 
-    buttons.forEach((item) => {
-      const button = createConsoleButton(item);
-      parent.add(button);
-      targets.push(button.userData.cap);
-    });
+    buttons.forEach((button) => createButton(button));
   }
 
-  function createConsoleButton({ label, command, x, z, color }) {
+  function createButton({ label, command, position, material, size }) {
     const group = new THREE.Group();
+    group.position.set(...position);
+    group.rotation.y = position[0] < -0.9 ? 0.16 : position[0] > 0.9 ? -0.16 : 0;
+    controlDeck.add(group);
 
-    const base = new THREE.Mesh(
-      new THREE.BoxGeometry(0.58, 0.12, 0.44),
-      new THREE.MeshStandardMaterial({
-        color: 0x07101f,
-        metalness: 0.6,
-        roughness: 0.28
-      })
-    );
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(size * 1.16, size * 1.32, 0.13, 36), materials.inset);
+    base.rotation.x = Math.PI / 2;
+    group.add(base);
 
-    const cap = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.2, 0.24, 0.16, 36),
-      new THREE.MeshStandardMaterial({
-        color,
-        emissive: color,
-        emissiveIntensity: 0.45,
-        roughness: 0.22,
-        metalness: 0.18
-      })
-    );
-
+    const cap = new THREE.Mesh(new THREE.CylinderGeometry(size * 0.82, size * 0.98, 0.17, 40), material);
     cap.rotation.x = Math.PI / 2;
-    cap.position.y = 0.13;
+    cap.position.y = 0.1;
     cap.userData = {
       type: "button",
       command,
       label,
-      defaultY: cap.position.y
+      defaultY: cap.position.y,
+      material
     };
-
-    group.position.set(x, 0.35, z);
-    group.userData = {
-      type: "buttonGroup",
-      command,
-      label,
-      cap
-    };
-
-    group.add(base);
     group.add(cap);
 
-    return group;
+    const labelSprite = createLabelSprite(label, size > 0.25 ? 0.36 : 0.28);
+    labelSprite.position.set(0, 0.27, 0.36);
+    labelSprite.rotation.x = Math.PI / 2;
+    group.add(labelSprite);
+
+    interactiveObjects.push(cap);
+    commandObjects.set(command, cap);
   }
 
-  function createThrottleLever(parent, targets) {
-    const leverGroup = new THREE.Group();
-    leverGroup.position.set(0, 0.34, 1.03);
-    parent.add(leverGroup);
+  function createThrottleCluster() {
+    const cluster = new THREE.Group();
+    cluster.position.set(0, 0.42, 0.2);
+    controlDeck.add(cluster);
 
-    const baseMaterial = new THREE.MeshStandardMaterial({
-      color: 0x0a1628,
-      metalness: 0.72,
-      roughness: 0.26
-    });
+    const base = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.16, 0.88), materials.inset);
+    base.position.set(0, -0.03, 0.05);
+    cluster.add(base);
 
-    const glowMaterial = new THREE.MeshStandardMaterial({
-      color: 0x67e8f9,
-      emissive: 0x67e8f9,
-      emissiveIntensity: 0.55,
-      roughness: 0.18
-    });
+    const arc = new THREE.Mesh(new THREE.TorusGeometry(0.58, 0.018, 10, 88, Math.PI * 1.12), materials.cyan);
+    arc.position.set(0, 0.1, 0.02);
+    arc.rotation.set(Math.PI / 2, 0, Math.PI * 0.94);
+    cluster.add(arc);
+    throttleRailGlow = arc;
 
-    const base = new THREE.Mesh(new THREE.CylinderGeometry(0.48, 0.58, 0.16, 48), baseMaterial);
-    base.position.set(0, 0, 0);
-    base.rotation.x = Math.PI / 2;
-    leverGroup.add(base);
+    const railLeft = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.05, 0.78), materials.blue);
+    railLeft.position.set(-0.72, 0.12, 0.04);
+    cluster.add(railLeft);
 
-    const arc = new THREE.Mesh(new THREE.TorusGeometry(0.62, 0.018, 10, 72, Math.PI * 1.1), glowMaterial);
-    arc.position.set(0, 0.05, 0);
-    arc.rotation.set(Math.PI / 2, 0, Math.PI * 0.95);
-    leverGroup.add(arc);
+    const railRight = railLeft.clone();
+    railRight.position.x = 0.72;
+    cluster.add(railRight);
 
     leverHandle = new THREE.Group();
     leverHandle.rotation.z = getLeverRotationFromThrottle(0);
-    leverGroup.add(leverHandle);
+    cluster.add(leverHandle);
 
-    const stem = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.055, 0.07, 0.95, 24),
-      new THREE.MeshStandardMaterial({
-        color: 0xd9f8ff,
-        metalness: 0.86,
-        roughness: 0.2,
-        emissive: 0x14384b,
-        emissiveIntensity: 0.2
-      })
-    );
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.075, 0.98, 28), materials.white);
+    stem.position.set(0, 0.47, 0);
+    stem.rotation.z = 0.08;
+    leverHandle.add(stem);
 
-    stem.position.set(0, 0.45, 0);
-    stem.rotation.z = 0.16;
-
-    leverKnob = new THREE.Mesh(
-      new THREE.SphereGeometry(0.19, 32, 20),
-      new THREE.MeshStandardMaterial({
-        color: 0xf8fdff,
-        metalness: 0.3,
-        roughness: 0.16,
-        emissive: 0x67e8f9,
-        emissiveIntensity: 0.48
-      })
-    );
-
-    leverKnob.position.set(0.08, 0.91, 0);
+    leverKnob = new THREE.Mesh(new THREE.SphereGeometry(0.22, 32, 20), materials.white);
+    leverKnob.position.set(0.06, 0.98, 0);
     leverKnob.userData = {
       type: "lever",
       label: "Throttle"
     };
-
-    leverHandle.add(stem);
     leverHandle.add(leverKnob);
-    targets.push(leverKnob);
+
+    const labelSprite = createLabelSprite("THROTTLE", 0.44);
+    labelSprite.position.set(0, 0.22, 0.52);
+    labelSprite.rotation.x = Math.PI / 2;
+    cluster.add(labelSprite);
+
+    interactiveObjects.push(leverKnob);
   }
 
-  function createSideRails(parent) {
-    const railMaterial = new THREE.MeshStandardMaterial({
-      color: 0x10243a,
-      metalness: 0.8,
-      roughness: 0.28,
-      emissive: 0x071526,
-      emissiveIntensity: 0.15
+  function createToggleBanks() {
+    const banks = [
+      { x: -0.78, label: "AUX" },
+      { x: 0.78, label: "SYS" }
+    ];
+
+    banks.forEach((bank) => {
+      const label = createLabelSprite(bank.label, 0.22);
+      label.position.set(bank.x, 0.49, -0.42);
+      label.rotation.x = Math.PI / 2;
+      controlDeck.add(label);
+
+      for (let i = 0; i < 3; i += 1) {
+        const toggle = new THREE.Group();
+        toggle.position.set(bank.x - 0.22 + i * 0.22, 0.45, -0.2);
+        controlDeck.add(toggle);
+
+        const slot = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.05, 0.28), materials.inset);
+        toggle.add(slot);
+
+        const lever = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.18, 0.045), i % 2 ? materials.cyan : materials.amber);
+        lever.position.set(0, 0.12, 0.03);
+        lever.rotation.x = i % 2 ? -0.35 : 0.35;
+        toggle.add(lever);
+      }
+    });
+  }
+
+  function createIndicatorLights() {
+    for (let i = 0; i < 12; i += 1) {
+      const colorMaterial = i % 4 === 0 ? materials.red : i % 3 === 0 ? materials.amber : i % 2 === 0 ? materials.blue : materials.cyan;
+      const light = new THREE.Mesh(new THREE.SphereGeometry(0.055, 18, 12), colorMaterial);
+      light.position.set(-1.42 + i * 0.26, 0.45, -0.48);
+      light.userData.baseIntensity = colorMaterial.emissiveIntensity;
+      controlDeck.add(light);
+    }
+  }
+
+  function addGlowBar({ position, rotationY = 0, scale, material }) {
+    const bar = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material);
+    bar.position.set(...position);
+    bar.rotation.y = rotationY;
+    bar.scale.set(...scale);
+    controlDeck.add(bar);
+    return bar;
+  }
+
+  function createLabelSprite(text, width = 0.3) {
+    const canvas = document.createElement("canvas");
+    canvas.width = 256;
+    canvas.height = 96;
+    const ctx = canvas.getContext("2d");
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "rgba(6, 17, 31, 0.72)";
+    roundRect(ctx, 12, 22, 232, 52, 14);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(103, 232, 249, 0.42)";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.fillStyle = "rgba(234, 246, 255, 0.96)";
+    ctx.font = "900 28px system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, 128, 49);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+
+    const material = new THREE.SpriteMaterial({
+      map: texture,
+      transparent: true,
+      depthWrite: false
     });
 
-    [-3.6, 3.6].forEach((x) => {
-      const rail = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.26, 3.2), railMaterial);
-      rail.position.set(x, 0.28, 0.08);
-      rail.rotation.z = x < 0 ? -0.08 : 0.08;
-      parent.add(rail);
-    });
+    const sprite = new THREE.Sprite(material);
+    sprite.scale.set(width, width * 0.38, 1);
+    return sprite;
+  }
+
+  function roundRect(ctx, x, y, width, height, radius) {
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.arcTo(x + width, y, x + width, y + height, radius);
+    ctx.arcTo(x + width, y + height, x, y + height, radius);
+    ctx.arcTo(x, y + height, x, y, radius);
+    ctx.arcTo(x, y, x + width, y, radius);
+    ctx.closePath();
   }
 
   function onPointerDown(event) {
@@ -318,14 +362,17 @@ export function createBridgeControls({ scene, canvas, camera, callbacks = {}, op
   }
 
   function pressButton(button) {
-    button.position.y = button.userData.defaultY - 0.045;
+    button.position.y = button.userData.defaultY - 0.06;
+    button.material.emissiveIntensity = 1.85;
+
     window.setTimeout(() => {
       button.position.y = button.userData.defaultY;
-    }, 130);
+      button.material.emissiveIntensity = 1.05;
+    }, 140);
   }
 
   function getLeverRotationFromThrottle(throttle) {
-    return THREE.MathUtils.lerp(-0.58, 0.72, throttle);
+    return THREE.MathUtils.lerp(-0.62, 0.78, throttle);
   }
 
   function update(delta) {
@@ -339,6 +386,10 @@ export function createBridgeControls({ scene, canvas, camera, callbacks = {}, op
 
     if (leverHandle) {
       leverHandle.rotation.z = getLeverRotationFromThrottle(state.currentThrottle);
+    }
+
+    if (throttleRailGlow) {
+      throttleRailGlow.material.emissiveIntensity = 1.1 + state.currentThrottle * 1.25 + Math.sin(performance.now() * 0.006) * 0.12;
     }
 
     if (Math.abs(state.currentThrottle - state.previousThrottle) > 0.002) {
@@ -361,8 +412,8 @@ export function createBridgeControls({ scene, canvas, camera, callbacks = {}, op
   }
 
   function pulseCommand(command) {
-    const target = interactiveObjects.find((object) => object.userData.command === command);
-    if (!target || target.userData.type !== "button") return;
+    const target = commandObjects.get(command);
+    if (!target) return;
     pressButton(target);
   }
 
