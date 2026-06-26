@@ -1,83 +1,93 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#030712" />
-  <meta name="description" content="A mobile-optimized Starship Bridge Simulator built with Three.js for Samsung S-25 Ultra." />
-
-  <title>Bridge Command | Starship Bridge Simulator</title>
+  <meta name="theme-color" content="#050914" />
+  <meta name="description" content="A mobile-first Starship Bridge Simulator for piloting a retail shift." />
+  <title>Store Bridge Simulator</title>
 
   <link rel="stylesheet" href="./css/style.css" />
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
 </head>
 <body>
-  <main id="app" aria-label="Starship Bridge Simulator">
-    <canvas id="bridge-canvas" aria-label="Three.js starship bridge viewport"></canvas>
+  <main id="app-shell">
+    <canvas id="bridge-canvas" aria-label="Interactive starship bridge simulator"></canvas>
 
-    <section id="hud" aria-label="Bridge command HUD">
-      <div class="hud-panel hud-panel--primary">
-        <header class="hud-header">
-          <div>
-            <p class="eyebrow">Starship Bridge Simulator</p>
-            <h1>Bridge Command</h1>
+    <section id="hud-overlay" aria-label="Store pilot heads-up display">
+      <header class="hud-header">
+        <div>
+          <p class="eyebrow">CASEY'S STORE PILOT</p>
+          <h1>Bridge Command</h1>
+        </div>
+
+        <div class="status-pill" id="system-status">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="system-status-text">Systems Ready</span>
+        </div>
+      </header>
+
+      <section class="transparent-display" id="info-display">
+        <div class="display-scanline" aria-hidden="true"></div>
+
+        <p class="display-label">ACTIVE SCREEN</p>
+        <h2 id="display-title">Shift Command</h2>
+
+        <p id="display-copy">
+          Tap a console control or push the throttle. Warp threshold activates when the lever passes 82%.
+        </p>
+
+        <div class="metrics-row" aria-label="Bridge metrics">
+          <div class="metric-card">
+            <span>Throttle</span>
+            <strong id="throttle-readout">0%</strong>
           </div>
 
-          <div class="clock-card" aria-label="Current time">
-            <span class="clock-label">Ship Time</span>
-            <time id="clock" datetime="">--:--</time>
+          <div class="metric-card">
+            <span>Mode</span>
+            <strong id="mode-readout">Standby</strong>
           </div>
-        </header>
 
-        <div class="task-grid" aria-label="Task data">
-          <article class="task-card task-card--wide">
-            <span class="data-label">Active Task</span>
-            <strong>Command Deck Systems Check</strong>
-            <p>Confirm visual feed, scan drift, and stabilize navigation telemetry.</p>
-          </article>
-
-          <article class="task-card">
-            <span class="data-label">Priority</span>
-            <strong>Navigation</strong>
-            <p>Starfield lock engaged.</p>
-          </article>
-
-          <article class="task-card">
-            <span class="data-label">Status</span>
-            <strong id="render-status">Initializing</strong>
-            <p>Mobile render loop online.</p>
-          </article>
+          <div class="metric-card">
+            <span>Focus</span>
+            <strong id="focus-readout">Stable</strong>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <div class="hud-panel hud-panel--bottom" aria-label="Render telemetry">
-        <div class="telemetry-item">
-          <span>DPR</span>
-          <strong id="dpr-value">--</strong>
-        </div>
-
-        <div class="telemetry-item">
-          <span>FPS</span>
-          <strong id="fps-value">--</strong>
-        </div>
-
-        <div class="telemetry-item">
-          <span>Stars</span>
-          <strong id="star-count">--</strong>
-        </div>
-
-        <div class="telemetry-item">
-          <span>Scene</span>
-          <strong>Deep Space</strong>
-        </div>
-      </div>
+      <nav class="command-bar" aria-label="Bridge command shortcuts">
+        <button class="hud-button" type="button" data-command="tasks">Tasks</button>
+        <button class="hud-button" type="button" data-command="report">Report</button>
+        <button class="hud-button" type="button" data-command="history">History</button>
+        <button class="hud-button primary" type="button" data-command="voice">Voice</button>
+      </nav>
     </section>
 
-    <noscript>
-      <div class="noscript">
-        JavaScript is required to launch Bridge Command. The ship, tragically, refuses to run on confidence alone.
+    <section id="boot-message" aria-label="Simulator startup panel">
+      <div class="boot-card">
+        <p class="eyebrow">SIMULATOR READY</p>
+        <h2>Store Bridge Online</h2>
+        <p>
+          Touch controls are active. Audio uses generated placeholder effects for now, so we get sci-fi mood without hunting for files like goblins in a folder maze.
+        </p>
+        <button id="begin-button" type="button">Begin Shift</button>
       </div>
-    </noscript>
+    </section>
   </main>
+
+  <noscript>
+    <div class="noscript-message">
+      This bridge requires JavaScript. Even starships have minimum expectations.
+    </div>
+  </noscript>
 
   <script type="module" src="./js/main.js"></script>
 </body>
