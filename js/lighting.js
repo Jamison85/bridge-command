@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { createBridgeRefitExtras } from "./bridgeRefitExtras.js";
+import { createBridgeRefitExtras } from "./bridgeRefitExtras.js?v=cockpit-composition-2-5";
 
 export function createCinematicLighting(scene) {
   const group = new THREE.Group();
@@ -35,7 +35,6 @@ export function createCinematicLighting(scene) {
   function update(delta, elapsed, { throttle = 0, warpActive = false } = {}) {
     const pulse = 0.5 + Math.sin(elapsed * 2.1) * 0.5;
     const slowPulse = 0.5 + Math.sin(elapsed * 0.72) * 0.5;
-
     lights.console.intensity = 0.7 + throttle * 0.5 + pulse * 0.06;
     lights.left.intensity = 0.46 + slowPulse * 0.1 + throttle * 0.16;
     lights.right.intensity = 0.46 + (1 - slowPulse) * 0.1 + throttle * 0.16;
@@ -44,7 +43,6 @@ export function createCinematicLighting(scene) {
     lights.amberRight.intensity = 0.1 + (1 - pulse) * 0.04 + throttle * 0.06;
     lights.alert.intensity = THREE.MathUtils.lerp(lights.alert.intensity, warpActive ? 0.82 + pulse * 0.26 : 0.08 + throttle * 0.06, 1 - Math.exp(-delta * 6));
     lights.window.intensity = 0.66 + throttle * 0.2 + (warpActive ? pulse * 0.18 : 0);
-
     extras.update(delta, elapsed, throttle, warpActive);
   }
 
