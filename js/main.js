@@ -387,11 +387,64 @@ function renderLogScreen() {
   const notes = readJSON(STORAGE.notes, []);
   const reports = readJSON(STORAGE.reports, []);
   const items = [...reports.map((text) => ({ type: "Report", text })), ...notes.map((text) => ({ type: "Note", text }))].slice(-8).reverse();
-  if (!items.length) {
-    ui.screenContent.innerHTML = `<div class="empty-state"><strong>No log entries yet.</strong><p>Voice notes and saved reports will show here.</p></div>`;
-    return;
+  const handoff = buildHandoffMessage();
+
+  ui.screenContent.innerHTML = `
+    <article class="handoff-card">
+      <div class="screen-header">
+        <div>
+          <p class="eyebrow">END OF SHIFT</p>
+          <h3>Positive handoff</h3>
+        </div>
+        <span class="badge">Text ready</span>
+      </div>
+      <p class="helper-text">A polished wrap-up you can send to Loretta and/or Richard. Completed work comes first; follow-ups are framed as priorities identified.</p>
+      <div class="handoff-preview">${escapeHTML(handoff).replace(/\n/g, "<br>")}</div>
+      <div class="action-row">
+        <button class="primary-action" type="button" id="share-handoff">Text / Share</button>
+        <button class="secondary-action" type="button" id="copy-handoff">Copy</button>
+      </div>
+    </article>
+    ${items.length ? items.map((item) => `<article class="note-row"><span class="badge">${item.type}</span><p>${escapeHTML(item.text).replace(/\n/g, "<br>")}</p></article>`).join("") : `<div class="empty-state"><strong>No saved notes yet.</strong><p>Voice notes and saved reports will show here below the handoff.</p></div>`}`;
+
+  document.querySelector("#share-handoff")?.addEventListener("click", () => shareHandoffText(handoff));
+  document.querySelector("#copy-handoff")?.addEventListener("click", () => copyText(handoff));
+}
+
+function buildHandoffMessage() {
+  const tasks = getTasks();
+  const completedIds = new Set(getCompleted());
+  const completedTasks = tasks.filter((task) => completedIds.has(task.id));
+  const openTasks = tasks.filter((task) => !completedIds.has(task.id));
+  const completedLines = completedTasks.length
+    ? completedTasks.slice(0, 12).map((task) => `• ${task.title}`).join("\n")
+    : "• Started the shift priorities and kept the store moving while identifying what needed attention.";
+  const followUpLines = openTasks.length
+    ? openTasks.slice(0, 8).map((task) => `• ${task.title}`).join("\n")
+    : "• No major follow-ups from the planned list at this time.";
+
+  return `Good ${getDayPart()}, quick ${SHIFT_LABELS[currentShift].toLowerCase()} shift update from Jamison.\n\nI was able to complete ${completedTasks.length} of ${tasks.length} planned items for this shift, including:\n${completedLines}\n\nFollow-ups identified / still watching:\n${followUpLines}\n\nI prioritized the highest-impact customer-facing and operational items first and kept notes in Store Pilot as things came up. No reply needed unless you want anything handled differently.`;
+}
+
+function getDayPart() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "morning";
+  if (hour < 17) return "afternoon";
+  return "evening";
+}
+
+async function shareHandoffText(text) {
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: "Shift handoff", text });
+      setStatus("Share opened");
+      return;
+    } catch (error) {
+      if (error?.name === "AbortError") return;
+    }
   }
-  ui.screenContent.innerHTML = items.map((item) => `<article class="note-row"><span class="badge">${item.type}</span><p>${escapeHTML(item.text).replace(/\n/g, "<br>")}</p></article>`).join("");
+  window.location.href = `sms:?&body=${encodeURIComponent(text)}`;
+  setStatus("Opening messages");
 }
 
 function renderVoiceScreen() {
@@ -474,7 +527,20 @@ function saveItem(key, value) {
 
 async function copyGeneratedOutput() {
   if (!generatedReport) return;
-  await navigator.clipboard?.writeText(generatedReport);
+  await copyText(generatedReport);
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard?.writeText(text);
+  } catch {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    textarea.remove();
+  }
   setStatus("Copied");
 }
 
