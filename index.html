@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#f5f2ea" />
   <meta name="description" content="A calm mobile Store Pilot for running a retail shift." />
   <title>Store Pilot</title>
-  <link rel="stylesheet" href="./css/style.css?v=store-pilot-reset-4" />
+  <link rel="stylesheet" href="./css/style.css?v=shift-voice-5" />
 </head>
 <body>
   <main class="app-shell">
@@ -18,9 +18,18 @@
       <div class="status-pill" id="system-status">Ready</div>
     </header>
 
+    <section class="shift-card" aria-label="Shift selector">
+      <p class="eyebrow">SHIFT MODE</p>
+      <div class="shift-toggle" role="group" aria-label="Choose shift">
+        <button class="shift-button" type="button" data-shift="morning">Morning</button>
+        <button class="shift-button" type="button" data-shift="mid">Mid</button>
+        <button class="shift-button" type="button" data-shift="close">Close</button>
+      </div>
+    </section>
+
     <section class="hero-card" aria-live="polite">
       <div class="hero-meta">
-        <span id="shift-label">Opening</span>
+        <span id="shift-label">Morning</span>
         <span id="date-label">Today</span>
       </div>
       <p class="eyebrow">NEXT BEST ACTION</p>
@@ -52,6 +61,27 @@
       <div id="screen-content" class="screen-content"></div>
     </section>
 
+    <button class="voice-fab" id="voice-fab" type="button" aria-label="Add by voice">+ Voice</button>
+
+    <section class="voice-sheet" id="voice-sheet" aria-hidden="true">
+      <div class="voice-sheet-card">
+        <div class="screen-header">
+          <div>
+            <p class="eyebrow">QUICK CAPTURE</p>
+            <h2>Add with voice</h2>
+          </div>
+          <button class="text-button" id="close-voice-sheet" type="button">Close</button>
+        </div>
+        <p class="helper-text">Speak or type what needs done. It saves as a task for this shift unless you choose note.</p>
+        <textarea id="voice-capture-text" placeholder="Example: Add cooler doors need wiped down after the walk..."></textarea>
+        <div class="action-row">
+          <button class="primary-action" id="start-global-speech" type="button">Start Talking</button>
+          <button class="secondary-action" id="save-capture-task" type="button">Save Task</button>
+          <button class="secondary-action" id="save-capture-note" type="button">Save Note</button>
+        </div>
+      </div>
+    </section>
+
     <nav class="bottom-nav" aria-label="Store Pilot navigation">
       <button class="nav-button active" type="button" data-screen="next">Next</button>
       <button class="nav-button" type="button" data-screen="tasks">Tasks</button>
@@ -61,6 +91,6 @@
     </nav>
   </main>
 
-  <script type="module" src="./js/main.js?v=store-pilot-reset-4"></script>
+  <script type="module" src="./js/main.js?v=shift-voice-5"></script>
 </body>
 </html>
