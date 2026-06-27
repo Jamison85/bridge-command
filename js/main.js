@@ -1,309 +1,317 @@
-import * as THREE from "three";
-import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
-import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
-import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
-import { createBridgeControls } from "./controls.js?v=cockpit-composition-2-5";
-import { createAudioController } from "./audio.js";
-import { createStorePilot } from "./storePilot.js";
-import { createBridgeEnvironment } from "./bridgeScene.js";
-import { createCinematicLighting } from "./lighting.js?v=cockpit-composition-2-5";
-import { createCockpitScreens } from "./cockpitScreens.js?v=cockpit-composition-2-5";
-
-const CONFIG = {
-  pixelRatioCap: 1.45,
-  bloomStrength: 0.38,
-  bloomRadius: 0.34,
-  bloomThreshold: 0.42,
-  starCount: 900,
-  warpLineCount: 130
+const STORAGE = {
+  completed: "storePilot.completed.v4",
+  notes: "storePilot.notes.v4",
+  reports: "storePilot.reports.v4"
 };
 
-const DETAIL_COMMANDS = new Set(["tasks", "report", "history", "voice", "open", "focus", "notes"]);
-const canvas = document.querySelector("#bridge-canvas");
+const BASE_TASKS = [
+  { id: "bookwork", title: "Bookwork / SmartSafe match", area: "Opening", minutes: 18, priority: 1, detail: "Verify SmartSafe, deposits, lottery, and starting cash before the floor steals your soul." },
+  { id: "smart-counts", title: "Smart Counts", area: "Inventory", minutes: 14, priority: 2, detail: "Do Smart Counts early while your attention still has some dignity." },
+  { id: "lto", title: "LTO screenshot to Loretta", area: "Admin", minutes: 6, priority: 3, due: "10:00 AM", detail: "Send the daily LTO screenshot before Richard becomes a weather system." },
+  { id: "daily-walk", title: "Daily walk and obvious fires check", area: "Floor", minutes: 10, priority: 4, detail: "Front doors, restrooms, cooler, coffee, fountain, trash, wet floors, and anything customers can weaponize emotionally." },
+  { id: "coffee-fountain", title: "Coffee and fountain reset", area: "Guest", minutes: 12, priority: 5, detail: "Cups, lids, straws, coffee area, fountain area, and BIBs if something is dramatic." },
+  { id: "open-air", title: "Open-air cooler dates", area: "Fresh", minutes: 12, priority: 6, detail: "Check dates, face product, rotate anything trying to become archaeology." },
+  { id: "food-warmers", title: "Food warmers check", area: "Fresh", minutes: 8, priority: 7, detail: "Check quality, holding, labels, and presentation." },
+  { id: "restrooms", title: "Restroom rescue pass", area: "Guest", minutes: 9, priority: 8, detail: "Quick clean, supplies, trash, smell check. Glamorous leadership, naturally." },
+  { id: "shift-note", title: "Shift note / handoff", area: "Closeout", minutes: 7, priority: 9, detail: "Capture what happened, what moved, what got delayed, and who was notified." }
+];
+
+const WEEKLY_TASKS = {
+  0: [
+    { id: "outs", title: "Sunday outs check", area: "Weekly", minutes: 20, priority: 2, detail: "Get outs done today so Monday does not arrive wearing brass knuckles." }
+  ],
+  1: [
+    { id: "store-order", title: "Store order by 2 PM", area: "Weekly", minutes: 35, priority: 1, due: "2:00 PM", detail: "Main Monday deadline. Protect time for this." }
+  ],
+  2: [
+    { id: "cig-audit", title: "Cigarette audits", area: "Weekly", minutes: 120, priority: 1, detail: "Tuesday audit block. Do this separately and do not let the store eat the whole window." },
+    { id: "backstock", title: "Backstock and back room reset", area: "Weekly", minutes: 35, priority: 4, detail: "Put backstock out, clear obvious clutter, and make the back room less haunted." }
+  ],
+  3: [
+    { id: "truck-prep", title: "Truck prep and walkway clear", area: "Truck", minutes: 20, priority: 2, detail: "Carts/dollies ready, back walkway clear, receiving area sane." },
+    { id: "truck-triage", title: "Truck triage", area: "Truck", minutes: 35, priority: 3, detail: "Prioritize what affects customers first, then back room organization." }
+  ]
+};
 
 const ui = {
-  bootMessage: document.querySelector("#boot-message"),
-  beginButton: document.querySelector("#begin-button"),
-  systemStatusText: document.querySelector("#system-status-text"),
-  displayTitle: document.querySelector("#display-title"),
-  displayCopy: document.querySelector("#display-copy"),
-  throttleReadout: document.querySelector("#throttle-readout"),
-  modeReadout: document.querySelector("#mode-readout"),
-  focusReadout: document.querySelector("#focus-readout"),
-  pilotPanel: document.querySelector("#pilot-panel"),
-  hudButtons: document.querySelectorAll(".hud-button")
+  status: document.querySelector("#system-status"),
+  shiftLabel: document.querySelector("#shift-label"),
+  dateLabel: document.querySelector("#date-label"),
+  nextTitle: document.querySelector("#next-title"),
+  nextCopy: document.querySelector("#next-copy"),
+  completeNext: document.querySelector("#complete-next"),
+  openReport: document.querySelector("#open-report"),
+  progressText: document.querySelector("#progress-text"),
+  progressFill: document.querySelector("#progress-fill"),
+  progressSubtext: document.querySelector("#progress-subtext"),
+  screenEyebrow: document.querySelector("#screen-eyebrow"),
+  screenTitle: document.querySelector("#screen-title"),
+  screenContent: document.querySelector("#screen-content"),
+  copyOutput: document.querySelector("#copy-output"),
+  navButtons: document.querySelectorAll(".nav-button")
 };
 
-const state = { width: window.innerWidth, height: window.innerHeight, clock: new THREE.Clock(), throttle: 0, warpActive: false, activeCommand: "next" };
-let renderer, scene, camera, composer, bridgeEnvironment, cinematicLighting, cockpitScreens, bridgeControls, storePilot, audio, starfield, warpLines;
+let currentScreen = "next";
+let generatedReport = "";
 
 init();
 
 function init() {
-  try {
-    if (!canvas) throw new Error("Bridge canvas was not found.");
-    setupRenderer();
-    setupScene();
-    setupCamera();
-    setupPostProcessing();
-    bridgeEnvironment = createBridgeEnvironment(scene);
-    cinematicLighting = createCinematicLighting(scene);
-    createStarfield();
-    createWarpStreaks();
-    cockpitScreens = createCockpitScreens(scene);
-    audio = createAudioController();
-    storePilot = createStorePilot({ panel: ui.pilotPanel, onDisplay: applyDisplayContent, onStatus: updateStatus });
-    bridgeControls = createBridgeControls({
-      scene,
-      canvas,
-      camera,
-      callbacks: { onCommand: handleConsoleCommand, onLeverGrab: handleLeverGrab, onThrottleChange: handleThrottleChange, onWarpEngage: triggerWarp, onWarpDisengage: disengageWarp }
-    });
-    bindUIEvents();
-    bindResizeEvent();
-    storePilot.render("next");
-    setDetailMode(false);
-    applyDisplayContent(storePilot.getScreenContent("next"));
-    animate();
-  } catch (error) {
-    console.error("Bridge simulator failed to initialize:", error);
-    showFatalError();
+  ui.dateLabel.textContent = new Intl.DateTimeFormat(undefined, { weekday: "short", month: "short", day: "numeric" }).format(new Date());
+  ui.shiftLabel.textContent = getShiftLabel();
+  ui.navButtons.forEach((button) => button.addEventListener("click", () => openScreen(button.dataset.screen)));
+  ui.completeNext.addEventListener("click", () => completeTask(getNextTask()?.id));
+  ui.openReport.addEventListener("click", () => openScreen("report"));
+  ui.copyOutput.addEventListener("click", copyGeneratedOutput);
+  renderAll();
+}
+
+function getDateKey() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+}
+
+function getShiftLabel() {
+  const hour = new Date().getHours();
+  if (hour < 10) return "Opening";
+  if (hour < 16) return "Mid Shift";
+  return "Evening";
+}
+
+function getTasks() {
+  const day = new Date().getDay();
+  return [...BASE_TASKS, ...(WEEKLY_TASKS[day] || [])].sort((a, b) => a.priority - b.priority);
+}
+
+function readJSON(key, fallback) {
+  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
+}
+
+function writeJSON(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+function getCompleted() {
+  return readJSON(STORAGE.completed, {})[getDateKey()] || [];
+}
+
+function setCompleted(ids) {
+  const all = readJSON(STORAGE.completed, {});
+  all[getDateKey()] = [...new Set(ids)];
+  writeJSON(STORAGE.completed, all);
+}
+
+function getNextTask() {
+  const completed = new Set(getCompleted());
+  return getTasks().find((task) => !completed.has(task.id)) || null;
+}
+
+function completeTask(id) {
+  if (!id) return;
+  setCompleted([...getCompleted(), id]);
+  setStatus("Marked done");
+  renderAll();
+}
+
+function reopenTask(id) {
+  setCompleted(getCompleted().filter((taskId) => taskId !== id));
+  setStatus("Task reopened");
+  renderAll();
+}
+
+function renderAll() {
+  renderHero();
+  renderProgress();
+  renderScreen();
+  updateNav();
+}
+
+function renderHero() {
+  const task = getNextTask();
+  if (!task) {
+    ui.nextTitle.textContent = "Shift core complete";
+    ui.nextCopy.textContent = "The main list is handled. Add a log note or do a final walk before the universe invents another problem.";
+    ui.completeNext.disabled = true;
+    return;
   }
+  ui.completeNext.disabled = false;
+  ui.nextTitle.textContent = task.title;
+  ui.nextCopy.textContent = `${task.detail} ${task.due ? `Due: ${task.due}.` : ""}`;
 }
 
-function setupRenderer() {
-  renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: "high-performance" });
-  renderer.setSize(state.width, state.height);
-  renderer.setPixelRatio(getSafePixelRatio());
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.72;
+function renderProgress() {
+  const tasks = getTasks();
+  const completed = getCompleted();
+  const percent = tasks.length ? Math.round((completed.length / tasks.length) * 100) : 0;
+  ui.progressText.textContent = `${percent}%`;
+  ui.progressFill.style.width = `${percent}%`;
+  ui.progressSubtext.textContent = `${completed.length} of ${tasks.length} planned tasks complete.`;
 }
 
-function setupScene() {
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x010309);
-  scene.fog = new THREE.FogExp2(0x01040a, 0.04);
+function openScreen(screen) {
+  currentScreen = screen;
+  ui.copyOutput.hidden = true;
+  renderAll();
 }
 
-function setupCamera() {
-  camera = new THREE.PerspectiveCamera(68, state.width / state.height, 0.1, 320);
-  camera.position.set(0, 0.96, 7.95);
-  camera.lookAt(0, 1.02, -2.1);
+function updateNav() {
+  ui.navButtons.forEach((button) => button.classList.toggle("active", button.dataset.screen === currentScreen));
 }
 
-function setupPostProcessing() {
-  composer = new EffectComposer(renderer);
-  composer.setPixelRatio(getSafePixelRatio());
-  composer.setSize(state.width, state.height);
-  composer.addPass(new RenderPass(scene, camera));
-  composer.addPass(new UnrealBloomPass(new THREE.Vector2(state.width, state.height), CONFIG.bloomStrength, CONFIG.bloomRadius, CONFIG.bloomThreshold));
+function renderScreen() {
+  const labels = {
+    next: ["Command", "Next"],
+    tasks: ["Checklist", "Tasks"],
+    report: ["Incident", "Report"],
+    log: ["History", "Log"],
+    voice: ["Capture", "Voice"]
+  };
+  const [eyebrow, title] = labels[currentScreen] || labels.next;
+  ui.screenEyebrow.textContent = eyebrow;
+  ui.screenTitle.textContent = title;
+  ui.screenContent.innerHTML = "";
+  if (currentScreen === "next") renderNextScreen();
+  if (currentScreen === "tasks") renderTasksScreen();
+  if (currentScreen === "report") renderReportScreen();
+  if (currentScreen === "log") renderLogScreen();
+  if (currentScreen === "voice") renderVoiceScreen();
 }
 
-function createStarfield() {
-  const geometry = new THREE.BufferGeometry();
-  const positions = new Float32Array(CONFIG.starCount * 3);
-  const colors = new Float32Array(CONFIG.starCount * 3);
-  for (let i = 0; i < CONFIG.starCount; i += 1) {
-    const index = i * 3;
-    positions[index] = THREE.MathUtils.randFloatSpread(132);
-    positions[index + 1] = THREE.MathUtils.randFloatSpread(72) + 10;
-    positions[index + 2] = THREE.MathUtils.randFloat(-240, -24);
-    const brightness = THREE.MathUtils.randFloat(0.24, 0.78);
-    colors[index] = brightness * 0.48;
-    colors[index + 1] = brightness * 0.7;
-    colors[index + 2] = brightness;
+function renderNextScreen() {
+  const task = getNextTask();
+  if (!task) {
+    ui.screenContent.innerHTML = `<div class="empty-state"><strong>No urgent task left.</strong><p>Do a quick floor scan, then write a handoff note. Try not to look too victorious. The store can sense it.</p></div>`;
+    return;
   }
-  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-  geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-  starfield = new THREE.Points(geometry, new THREE.PointsMaterial({ size: 0.06, vertexColors: true, transparent: true, opacity: 0.68, depthWrite: false }));
-  scene.add(starfield);
+  ui.screenContent.innerHTML = taskCard(task, false, true);
+  ui.screenContent.querySelector("button")?.addEventListener("click", () => completeTask(task.id));
 }
 
-function createWarpStreaks() {
-  const positions = new Float32Array(CONFIG.warpLineCount * 2 * 3);
-  const speeds = [];
-  for (let i = 0; i < CONFIG.warpLineCount; i += 1) {
-    const index = i * 6;
-    const x = THREE.MathUtils.randFloatSpread(88);
-    const y = THREE.MathUtils.randFloatSpread(46) + 6;
-    const z = THREE.MathUtils.randFloat(-165, -24);
-    const length = THREE.MathUtils.randFloat(1.6, 6.2);
-    positions[index] = x; positions[index + 1] = y; positions[index + 2] = z;
-    positions[index + 3] = x; positions[index + 4] = y; positions[index + 5] = z + length;
-    speeds.push(THREE.MathUtils.randFloat(24, 64));
+function renderTasksScreen() {
+  const completed = new Set(getCompleted());
+  ui.screenContent.innerHTML = getTasks().map((task) => taskCard(task, completed.has(task.id), true)).join("");
+  ui.screenContent.querySelectorAll("button[data-task]").forEach((button) => {
+    button.addEventListener("click", () => completed.has(button.dataset.task) ? reopenTask(button.dataset.task) : completeTask(button.dataset.task));
+  });
+}
+
+function taskCard(task, done, withButton) {
+  return `
+    <article class="task-row ${done ? "done" : ""}">
+      <div class="task-check" aria-hidden="true"></div>
+      <div>
+        <div class="task-title">${escapeHTML(task.title)}</div>
+        <div class="task-meta">${escapeHTML(task.area)} · ${task.minutes} min${task.due ? ` · due ${escapeHTML(task.due)}` : ""}</div>
+      </div>
+      ${withButton ? `<button class="mini-button" type="button" data-task="${task.id}">${done ? "Undo" : "Done"}</button>` : `<span class="badge">${escapeHTML(task.area)}</span>`}
+    </article>`;
+}
+
+function renderReportScreen() {
+  ui.screenContent.innerHTML = `
+    <form class="form-grid" id="report-form">
+      <label>Type
+        <select name="type"><option>System outage</option><option>Short staffed</option><option>Safety issue</option><option>Customer incident</option><option>Delayed work</option><option>Other</option></select>
+      </label>
+      <label>What happened
+        <textarea name="summary" placeholder="Power outage, water leak, short staffed, IT call, delayed bookwork..."></textarea>
+      </label>
+      <label>Who was notified
+        <input name="notified" placeholder="Loretta, Richard, IT, maintenance..." />
+      </label>
+      <label>What got delayed
+        <textarea name="delayed" placeholder="Bookwork, cooler, dates, cleaning, truck, etc."></textarea>
+      </label>
+      <div class="action-row"><button class="primary-action" type="submit">Generate</button><button class="secondary-action" type="button" id="save-report">Save</button></div>
+    </form>
+    <div class="report-output" id="report-output">Generated report will appear here.</div>`;
+  const form = document.querySelector("#report-form");
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    generatedReport = buildReport(new FormData(form));
+    document.querySelector("#report-output").textContent = generatedReport;
+    ui.copyOutput.hidden = false;
+  });
+  document.querySelector("#save-report").addEventListener("click", () => {
+    generatedReport = generatedReport || buildReport(new FormData(form));
+    saveItem(STORAGE.reports, generatedReport);
+    setStatus("Report saved");
+    openScreen("log");
+  });
+}
+
+function buildReport(data) {
+  return `Update from Jamison - ${new Date().toLocaleString()}\n\nType: ${data.get("type") || "Incident"}\n\nWhat happened:\n${data.get("summary") || "No summary entered."}\n\nWho was notified:\n${data.get("notified") || "Not listed."}\n\nWork delayed or impacted:\n${data.get("delayed") || "Not listed."}\n\nNo reply needed unless you want me to handle this differently.`;
+}
+
+function renderLogScreen() {
+  const notes = readJSON(STORAGE.notes, []);
+  const reports = readJSON(STORAGE.reports, []);
+  const items = [
+    ...reports.map((text) => ({ type: "Report", text })),
+    ...notes.map((text) => ({ type: "Note", text }))
+  ].slice(-8).reverse();
+  if (!items.length) {
+    ui.screenContent.innerHTML = `<div class="empty-state"><strong>No log entries yet.</strong><p>Voice notes and saved reports will show here.</p></div>`;
+    return;
   }
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-  geometry.userData.speeds = speeds;
-  warpLines = new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ color: 0x98d7ff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
-  scene.add(warpLines);
+  ui.screenContent.innerHTML = items.map((item) => `<article class="note-row"><span class="badge">${item.type}</span><p>${escapeHTML(item.text).replace(/\n/g, "<br>")}</p></article>`).join("");
 }
 
-function bindUIEvents() {
-  ui.beginButton?.addEventListener("click", async () => { await audio.unlock(); ui.bootMessage?.classList.add("hidden"); openCommand("next"); });
-  ui.hudButtons.forEach((button) => button.addEventListener("click", async () => {
-    await audio.unlock();
-    audio.playClick();
-    const command = button.dataset.command;
-    bridgeControls?.pulseCommand(command);
-    openCommand(command);
-  }));
+function renderVoiceScreen() {
+  ui.screenContent.innerHTML = `
+    <div class="form-grid">
+      <label>Quick note
+        <textarea id="voice-note" placeholder="Type a note, or use dictation on your keyboard."></textarea>
+      </label>
+      <div class="action-row"><button class="primary-action" type="button" id="save-note">Save Note</button><button class="secondary-action" type="button" id="start-speech">Start Speech</button></div>
+    </div>`;
+  const note = document.querySelector("#voice-note");
+  document.querySelector("#save-note").addEventListener("click", () => {
+    if (!note.value.trim()) return setStatus("Nothing to save");
+    saveItem(STORAGE.notes, `${new Date().toLocaleString()}\n${note.value.trim()}`);
+    note.value = "";
+    setStatus("Note saved");
+  });
+  document.querySelector("#start-speech").addEventListener("click", () => startSpeech(note));
 }
 
-function bindResizeEvent() {
-  window.addEventListener("resize", onResize, { passive: true });
-  window.addEventListener("orientationchange", onResize, { passive: true });
-}
-
-async function handleConsoleCommand(command) { await audio.unlock(); audio.playClick(); openCommand(command); }
-
-async function handleLeverGrab() {
-  await audio.unlock();
-  setDetailMode(false);
-  applyDisplayContent({ title: "Throttle Control", copy: "Drag the lower-right lever. The projected display stays clear.", mode: "Manual", focus: "High" });
-}
-
-function openCommand(command) {
-  state.activeCommand = command;
-  setDetailMode(DETAIL_COMMANDS.has(command));
-  const content = storePilot.getScreenContent(command);
-  applyDisplayContent(content);
-  storePilot.render(command);
-}
-
-function setDetailMode(enabled) {
-  document.body.classList.toggle("detail-mode", enabled);
-  document.body.classList.toggle("cockpit-first", !enabled);
-}
-
-function handleThrottleChange(value) {
-  state.throttle = value;
-  audio.setThrottle(value);
-  ui.throttleReadout.textContent = `${Math.round(value * 100)}%`;
-}
-
-function applyDisplayContent({ title, copy, mode, focus }) {
-  ui.displayTitle.textContent = title;
-  ui.displayCopy.textContent = copy;
-  ui.modeReadout.textContent = mode;
-  ui.focusReadout.textContent = focus;
-  cockpitScreens?.updateContent({ title, copy, mode, focus });
-}
-
-function updateStatus(message) {
-  if (!message) return;
-  ui.systemStatusText.textContent = message;
-  window.clearTimeout(updateStatus.timeoutId);
-  updateStatus.timeoutId = window.setTimeout(() => { ui.systemStatusText.textContent = state.warpActive ? "Warp Engaged" : "Systems Ready"; }, 1500);
-}
-
-function triggerWarp() {
-  state.warpActive = true;
-  document.body.classList.add("warping");
-  ui.systemStatusText.textContent = "Warp Engaged";
-  audio.playWarp();
-  applyDisplayContent({ title: "Warp Threshold", copy: "Cockpit lighting surge engaged. Store bridge at full burn.", mode: "Warp", focus: "Maximum" });
-}
-
-function disengageWarp() {
-  state.warpActive = false;
-  document.body.classList.remove("warping");
-  ui.systemStatusText.textContent = "Systems Ready";
-  applyDisplayContent(storePilot.getScreenContent(state.activeCommand));
-}
-
-function onResize() {
-  state.width = window.innerWidth;
-  state.height = window.innerHeight;
-  camera.aspect = state.width / state.height;
-  camera.updateProjectionMatrix();
-  const pixelRatio = getSafePixelRatio();
-  renderer.setSize(state.width, state.height);
-  renderer.setPixelRatio(pixelRatio);
-  composer.setSize(state.width, state.height);
-  composer.setPixelRatio(pixelRatio);
-}
-
-function animate() {
-  const delta = Math.min(state.clock.getDelta(), 0.033);
-  const elapsed = state.clock.elapsedTime;
-  const throttle = bridgeControls.update(delta);
-  const visualState = { throttle, warpActive: state.warpActive };
-  updateStarfield(delta, elapsed, throttle);
-  updateWarp(delta, elapsed);
-  bridgeEnvironment.update(delta, elapsed, visualState);
-  cinematicLighting.update(delta, elapsed, visualState);
-  cockpitScreens.update(delta, elapsed, visualState);
-  updateCameraMotion(elapsed, throttle);
-  composer.render();
-  requestAnimationFrame(animate);
-}
-
-function updateStarfield(delta, elapsed, throttle) {
-  if (!starfield) return;
-  const positions = starfield.geometry.attributes.position.array;
-  const speed = THREE.MathUtils.lerp(1.6, 26, throttle);
-  for (let i = 0; i < positions.length; i += 3) {
-    positions[i + 2] += speed * delta;
-    if (positions[i + 2] > 7) {
-      positions[i] = THREE.MathUtils.randFloatSpread(132);
-      positions[i + 1] = THREE.MathUtils.randFloatSpread(72) + 10;
-      positions[i + 2] = THREE.MathUtils.randFloat(-240, -165);
-    }
+function startSpeech(target) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    setStatus("Use keyboard dictation");
+    target.focus();
+    return;
   }
-  starfield.rotation.z = Math.sin(elapsed * 0.08) * 0.006;
-  starfield.geometry.attributes.position.needsUpdate = true;
+  const recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = true;
+  recognition.onresult = (event) => {
+    target.value = Array.from(event.results).map((result) => result[0].transcript).join(" ");
+  };
+  recognition.onend = () => setStatus("Speech captured");
+  recognition.start();
+  setStatus("Listening");
 }
 
-function updateWarp(delta, elapsed) {
-  if (!warpLines) return;
-  const material = warpLines.material;
-  const geometry = warpLines.geometry;
-  const positions = geometry.attributes.position.array;
-  const speeds = geometry.userData.speeds;
-  material.opacity = THREE.MathUtils.lerp(material.opacity, state.warpActive ? 0.58 : 0, 0.08);
-  if (material.opacity < 0.01) return;
-  for (let i = 0; i < speeds.length; i += 1) {
-    const index = i * 6;
-    const speed = speeds[i] * (state.warpActive ? 3.1 : 0.55);
-    positions[index + 2] += speed * delta;
-    positions[index + 5] += speed * delta;
-    if (positions[index + 2] > 14) {
-      const x = THREE.MathUtils.randFloatSpread(88);
-      const y = THREE.MathUtils.randFloatSpread(46) + 6;
-      const z = THREE.MathUtils.randFloat(-188, -126);
-      const length = THREE.MathUtils.randFloat(4.4, 13.2);
-      positions[index] = x; positions[index + 1] = y; positions[index + 2] = z;
-      positions[index + 3] = x; positions[index + 4] = y; positions[index + 5] = z + length;
-    }
-  }
-  warpLines.rotation.z = Math.sin(elapsed * 0.6) * 0.014;
-  geometry.attributes.position.needsUpdate = true;
+function saveItem(key, value) {
+  const items = readJSON(key, []);
+  items.push(value);
+  writeJSON(key, items.slice(-50));
 }
 
-function updateCameraMotion(elapsed, throttle) {
-  const throttleShake = throttle * 0.009;
-  const warpShake = state.warpActive ? 0.016 : 0;
-  camera.position.x = Math.sin(elapsed * 1.02) * (0.006 + throttleShake);
-  camera.position.y = 0.96 + Math.sin(elapsed * 1.46) * (0.004 + warpShake);
-  camera.position.z = 7.95 + Math.sin(elapsed * 0.58) * 0.014 - throttle * 0.04;
-  camera.lookAt(0, 1.02 + throttle * 0.02, -2.1);
+async function copyGeneratedOutput() {
+  if (!generatedReport) return;
+  await navigator.clipboard?.writeText(generatedReport);
+  setStatus("Copied");
 }
 
-function getSafePixelRatio() { return Math.min(window.devicePixelRatio || 1, CONFIG.pixelRatioCap); }
+function setStatus(text) {
+  ui.status.textContent = text;
+  clearTimeout(setStatus.timer);
+  setStatus.timer = setTimeout(() => { ui.status.textContent = "Ready"; }, 1600);
+}
 
-function showFatalError() {
-  const errorBox = document.createElement("div");
-  errorBox.style.position = "fixed";
-  errorBox.style.inset = "16px";
-  errorBox.style.zIndex = "999";
-  errorBox.style.padding = "18px";
-  errorBox.style.border = "1px solid rgba(251, 113, 133, 0.6)";
-  errorBox.style.borderRadius = "18px";
-  errorBox.style.background = "rgba(15, 23, 42, 0.92)";
-  errorBox.style.color = "#eaf6ff";
-  errorBox.style.fontFamily = "system-ui, sans-serif";
-  errorBox.innerHTML = `<strong>Bridge initialization failed.</strong><p>The simulator could not start. Check that the Three.js CDN imports are loading correctly.</p>`;
-  document.body.appendChild(errorBox);
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
 }
