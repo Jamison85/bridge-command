@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#05070d" />
   <title>Store Bridge Simulator</title>
 
-  <link rel="stylesheet" href="./css/style.css?v=art-shell-4-2" />
-  <link rel="stylesheet" href="./css/art-shell.css?v=art-shell-4-2" />
+  <link rel="stylesheet" href="./css/style.css?v=art-shell-4-3" />
+  <link rel="stylesheet" href="./css/art-shell.css?v=art-shell-4-3" />
 
   <script type="importmap">
     {
@@ -41,7 +41,7 @@
         <div class="display-scanline" aria-hidden="true"></div>
         <p class="display-label">ACTIVE SCREEN</p>
         <h2 id="display-title">Shift Command</h2>
-        <p id="display-copy">Image-ready cockpit mode active. Drop the real cockpit image into assets and it becomes the background.</p>
+        <p id="display-copy">Image-ready cockpit mode active. Add the real cockpit image as cockpit-reference.webp, .jpg, or .png and it becomes the background.</p>
         <div class="metrics-row">
           <div class="metric-card"><span>Throttle</span><strong id="throttle-readout">0%</strong></div>
           <div class="metric-card"><span>Mode</span><strong id="mode-readout">Standby</strong></div>
@@ -61,15 +61,15 @@
 
     <section id="boot-message">
       <div class="boot-card">
-        <p class="eyebrow">IMAGE COCKPIT 4.2 BUILD</p>
+        <p class="eyebrow">IMAGE COCKPIT 4.3 BUILD</p>
         <h2>Real Image Slot Ready</h2>
-        <p>The app now looks for assets/cockpit-reference.webp first, then assets/cockpit-reference.jpg, and only uses the SVG as a fallback.</p>
+        <p>The app now looks for assets/cockpit-reference.webp first, then .jpg, then .png, and only uses the SVG as a fallback.</p>
         <button id="begin-button" type="button">Enter Bridge</button>
       </div>
     </section>
   </main>
 
   <noscript><div class="noscript-message">This bridge requires JavaScript.</div></noscript>
-  <script type="module" src="./js/main.js?v=art-shell-4-2"></script>
+  <script type="module" src="./js/main.js?v=art-shell-4-3"></script>
 </body>
 </html>
