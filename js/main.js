@@ -71,6 +71,8 @@ const ui = {
   openReport: document.querySelector("#open-report"),
   progressText: document.querySelector("#progress-text"),
   progressFill: document.querySelector("#progress-fill"),
+  progressRingText: document.querySelector("#progress-ring-text"),
+  progressRing: document.querySelector(".progress-ring"),
   progressSubtext: document.querySelector("#progress-subtext"),
   screenEyebrow: document.querySelector("#screen-eyebrow"),
   screenTitle: document.querySelector("#screen-title"),
@@ -239,7 +241,9 @@ function renderProgress() {
   const percent = tasks.length ? Math.round((completed.length / tasks.length) * 100) : 0;
   ui.progressText.textContent = `${percent}%`;
   ui.progressFill.style.width = `${percent}%`;
-  ui.progressSubtext.textContent = `${SHIFT_LABELS[currentShift]} shift: ${completed.length} of ${tasks.length} planned tasks complete.`;
+  ui.progressRingText.textContent = `${percent}%`;
+  ui.progressRing.style.setProperty("--progress-angle", `${percent * 3.6}deg`);
+  ui.progressSubtext.textContent = `${completed.length} of ${tasks.length} tasks complete.`;
 }
 
 function openScreen(screen) {
