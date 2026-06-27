@@ -1,8 +1,7 @@
 #app-shell { background: #02040a; }
 
 #bridge-canvas {
-  opacity: 0.03 !important;
-  filter: saturate(0.25) contrast(0.8) blur(1.4px) !important;
+  display: none !important;
 }
 
 .bridge-art-shell {
@@ -10,94 +9,87 @@
   inset: 0;
   z-index: 4;
   pointer-events: none;
-  background-image:
-    radial-gradient(ellipse at 50% 44%, transparent 30%, rgba(0,0,0,.08) 66%, rgba(0,0,0,.42) 100%),
-    linear-gradient(180deg, rgba(0,0,0,.02), transparent 38%, rgba(0,0,0,.16)),
-    url("../assets/cockpit-reference.svg?v=uploaded-cockpit-4-4"),
-    url("../assets/cockpit-reference.webp?v=uploaded-cockpit-4-4"),
-    url("../assets/cockpit-reference.jpg?v=uploaded-cockpit-4-4"),
-    url("../assets/cockpit-reference.png?v=uploaded-cockpit-4-4"),
-    url("../assets/cockpit-premium.svg?v=uploaded-cockpit-4-4");
-  background-position: center, center, center, center, center, center, center;
-  background-size: cover, cover, cover, cover, cover, cover, cover;
-  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+  background: #02040a;
+  overflow: hidden;
+}
+
+.cockpit-reference-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+  opacity: 1;
+  filter: none;
+  transform: none;
 }
 
 .bridge-art-shell::after {
   content: "";
   position: absolute;
   inset: 0;
-  border: min(2.8vw, 18px) solid rgba(255,255,255,.04);
-  box-shadow: inset 0 0 28px rgba(0,0,0,.24), inset 0 0 90px rgba(2,5,11,.24);
+  background:
+    radial-gradient(ellipse at 50% 48%, transparent 52%, rgba(0,0,0,.28) 100%),
+    linear-gradient(180deg, rgba(0,0,0,.08), transparent 28%, rgba(0,0,0,.18));
+  box-shadow: inset 0 0 34px rgba(0,0,0,.26);
 }
 
 .bridge-art-label {
-  position: absolute;
-  left: max(16px, env(safe-area-inset-left));
-  bottom: calc(max(16px, env(safe-area-inset-bottom)) + 74px);
-  z-index: 11;
-  padding: 6px 10px;
-  border: 1px solid rgba(222,166,67,.1);
-  border-radius: 999px;
-  color: transparent;
-  background: rgba(2,6,18,.1);
-  backdrop-filter: blur(5px);
-  font-size: 0;
-  font-weight: 900;
-  letter-spacing: .12em;
+  display: none !important;
 }
-.bridge-art-label::after { content: "UPLOADED IMAGE"; color: rgba(255,224,154,.5); font-size: .54rem; }
 
 #hud-overlay { z-index: 10 !important; }
-.hud-header { transform: scale(.74); transform-origin: top left; opacity: .4; }
-.hud-header h1 { opacity: .56; }
-.status-pill { transform: scale(.74); transform-origin: top right; background: rgba(2,6,18,.16) !important; border-color: rgba(116,190,214,.05) !important; box-shadow: none !important; }
+.hud-header { transform: scale(.72); transform-origin: top left; opacity: .52; }
+.hud-header h1 { opacity: .64; }
+.status-pill { transform: scale(.72); transform-origin: top right; background: rgba(2,6,18,.18) !important; border-color: rgba(116,190,214,.08) !important; box-shadow: none !important; }
 
 .transparent-display {
   position: fixed !important;
   left: 50% !important;
-  top: 35.5% !important;
+  top: 39.5% !important;
   transform: translateX(-50%) !important;
-  width: min(39vw, 264px) !important;
-  min-width: 202px !important;
-  max-height: 120px !important;
+  width: min(44vw, 300px) !important;
+  min-width: 218px !important;
+  max-height: 124px !important;
   margin: 0 !important;
   padding: 8px 10px !important;
   border-radius: 14px !important;
-  border: 1px solid rgba(116,190,214,.1) !important;
-  background: linear-gradient(180deg, rgba(2,8,18,.2), rgba(2,6,14,.07)) !important;
-  backdrop-filter: blur(2.2px) saturate(1.02) !important;
-  box-shadow: 0 8px 22px rgba(0,0,0,.18), inset 0 0 10px rgba(79,195,218,.012) !important;
+  border: 1px solid rgba(82,150,170,.16) !important;
+  background: linear-gradient(180deg, rgba(3,10,20,.34), rgba(2,6,14,.18)) !important;
+  backdrop-filter: none !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.18), inset 0 0 12px rgba(79,195,218,.018) !important;
 }
 
-.display-label { font-size: .46rem !important; letter-spacing: .14em !important; color: rgba(150,220,235,.48) !important; }
-.transparent-display h2 { font-size: clamp(.8rem,3vw,.98rem) !important; margin-bottom: 3px !important; color: rgba(235,247,252,.72) !important; }
-#display-copy { max-height: 2.45em !important; color: rgba(205,222,234,.48) !important; font-size: .58rem !important; line-height: 1.28 !important; overflow: hidden !important; }
+.display-label { font-size: .46rem !important; letter-spacing: .14em !important; color: rgba(150,220,235,.56) !important; }
+.transparent-display h2 { font-size: clamp(.82rem,3vw,1rem) !important; margin-bottom: 3px !important; color: rgba(235,247,252,.78) !important; }
+#display-copy { max-height: 2.45em !important; color: rgba(220,234,244,.64) !important; font-size: .59rem !important; line-height: 1.28 !important; overflow: hidden !important; }
 .metrics-row { grid-template-columns: repeat(3,1fr) !important; gap: 4px !important; margin-top: 6px !important; }
-.metric-card { padding: 5px 6px !important; border-radius: 10px !important; background: rgba(2,6,14,.2) !important; border-color: rgba(79,195,218,.06) !important; }
-.metric-card span { font-size: .44rem !important; color: rgba(142,166,185,.54) !important; }
+.metric-card { padding: 5px 6px !important; border-radius: 10px !important; background: rgba(2,6,14,.28) !important; border-color: rgba(79,195,218,.08) !important; }
+.metric-card span { font-size: .44rem !important; color: rgba(170,190,205,.7) !important; }
 .metric-card strong { font-size: .56rem !important; }
 
 .pilot-panel { max-height: 0; margin-top: 0; overflow: hidden; opacity: 0; }
 
 body.detail-mode .transparent-display {
   top: auto !important;
-  bottom: calc(max(16px, env(safe-area-inset-bottom)) + 94px) !important;
-  width: min(88vw, 560px) !important;
+  bottom: calc(max(16px, env(safe-area-inset-bottom)) + 190px) !important;
+  width: min(86vw, 560px) !important;
   min-width: 0 !important;
-  max-height: min(30vh, 260px) !important;
+  max-height: min(28vh, 240px) !important;
   padding: 12px 14px !important;
   border-radius: 20px !important;
-  background: linear-gradient(180deg, rgba(3,8,18,.58), rgba(1,4,10,.72)) !important;
-  backdrop-filter: blur(8px) saturate(1.05) !important;
-  box-shadow: 0 -14px 38px rgba(0,0,0,.42), inset 0 0 18px rgba(79,195,218,.018) !important;
+  background: linear-gradient(180deg, rgba(3,8,18,.68), rgba(1,4,10,.78)) !important;
+  backdrop-filter: none !important;
+  box-shadow: 0 -14px 38px rgba(0,0,0,.36), inset 0 0 18px rgba(79,195,218,.018) !important;
 }
 
 body.detail-mode .transparent-display h2 { font-size: 1rem !important; }
 body.detail-mode #display-copy { max-height: 2.8em !important; font-size: .66rem !important; }
 body.detail-mode .metrics-row { display: none !important; }
 body.detail-mode .pilot-panel {
-  max-height: min(18vh, 150px);
+  max-height: min(16vh, 140px);
   margin-top: 8px;
   opacity: 1;
   overflow-y: auto;
@@ -110,8 +102,8 @@ body.detail-mode .focus-lock,
 body.detail-mode .progress-strip {
   padding: 10px !important;
   border-radius: 14px !important;
-  background: rgba(2,6,14,.34) !important;
-  border-color: rgba(79,195,218,.08) !important;
+  background: rgba(2,6,14,.42) !important;
+  border-color: rgba(79,195,218,.1) !important;
 }
 
 body.detail-mode textarea,
@@ -119,7 +111,7 @@ body.detail-mode input,
 body.detail-mode select {
   min-height: 62px !important;
   font-size: .85rem !important;
-  background: rgba(0,0,0,.24) !important;
+  background: rgba(0,0,0,.3) !important;
 }
 
 body.detail-mode .mini-button,
@@ -128,13 +120,40 @@ body.detail-mode .hud-button {
   min-height: 38px !important;
 }
 
-.command-bar { z-index: 11; width: min(88vw,570px) !important; bottom: calc(max(16px, env(safe-area-inset-bottom)) + 6px) !important; padding: 10px 11px 12px !important; border-radius: 26px 26px 18px 18px !important; border: 1px solid rgba(79,195,218,.07) !important; background: linear-gradient(180deg, rgba(7,13,24,.38), rgba(1,4,10,.84)) !important; box-shadow: 0 -12px 30px rgba(0,0,0,.24), 0 18px 44px rgba(0,0,0,.54) !important; }
-.hud-button { min-height: 46px !important; border-radius: 16px !important; opacity: .78; text-transform: uppercase; letter-spacing: .045em; background: linear-gradient(180deg, rgba(13,20,34,.68), rgba(2,5,12,.9)) !important; border-color: rgba(79,195,218,.08) !important; }
-.hud-button.primary { opacity: .94; color: #09111c !important; background: linear-gradient(180deg, rgba(255,224,154,.74), rgba(213,154,44,.62)) !important; border-color: rgba(255,224,154,.18) !important; }
+.command-bar {
+  z-index: 11;
+  width: min(76vw, 520px) !important;
+  bottom: calc(max(16px, env(safe-area-inset-bottom)) + 118px) !important;
+  padding: 0 !important;
+  gap: 9px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.hud-button {
+  min-height: 48px !important;
+  border-radius: 14px !important;
+  opacity: .9;
+  text-transform: uppercase;
+  letter-spacing: .045em;
+  background: linear-gradient(180deg, rgba(13,20,34,.72), rgba(2,5,12,.88)) !important;
+  border: 1px solid rgba(79,195,218,.12) !important;
+  box-shadow: 0 10px 22px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.04) !important;
+}
+
+.hud-button.primary {
+  opacity: .96;
+  color: #09111c !important;
+  background: linear-gradient(180deg, rgba(255,224,154,.78), rgba(213,154,44,.66)) !important;
+  border-color: rgba(255,224,154,.22) !important;
+}
 
 @media (max-height: 760px) {
-  .transparent-display { top: 35% !important; max-height: 116px !important; }
+  .transparent-display { top: 37.5% !important; max-height: 116px !important; }
   #display-copy { max-height: 2.1em !important; }
-  body.detail-mode .transparent-display { max-height: min(28vh, 220px) !important; }
-  body.detail-mode .pilot-panel { max-height: min(15vh, 122px); }
+  .command-bar { bottom: calc(max(16px, env(safe-area-inset-bottom)) + 106px) !important; }
+  body.detail-mode .transparent-display { max-height: min(26vh, 210px) !important; bottom: calc(max(16px, env(safe-area-inset-bottom)) + 172px) !important; }
+  body.detail-mode .pilot-panel { max-height: min(14vh, 116px); }
 }
