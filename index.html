@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#05070d" />
   <title>Store Bridge Simulator</title>
 
-  <link rel="stylesheet" href="./css/style.css?v=art-shell-4-3" />
-  <link rel="stylesheet" href="./css/art-shell.css?v=art-shell-4-3" />
+  <link rel="stylesheet" href="./css/style.css?v=uploaded-cockpit-4-4" />
+  <link rel="stylesheet" href="./css/art-shell.css?v=uploaded-cockpit-4-4" />
 
   <script type="importmap">
     {
@@ -23,7 +23,7 @@
     <canvas id="bridge-canvas" aria-label="Interactive starship bridge simulator"></canvas>
 
     <div class="bridge-art-shell" aria-hidden="true"></div>
-    <div class="bridge-art-label" aria-hidden="true">IMAGE READY</div>
+    <div class="bridge-art-label" aria-hidden="true">UPLOADED IMAGE</div>
 
     <section id="hud-overlay" aria-label="Store pilot heads-up display">
       <header class="hud-header">
@@ -41,7 +41,7 @@
         <div class="display-scanline" aria-hidden="true"></div>
         <p class="display-label">ACTIVE SCREEN</p>
         <h2 id="display-title">Shift Command</h2>
-        <p id="display-copy">Image-ready cockpit mode active. Add the real cockpit image as cockpit-reference.webp, .jpg, or .png and it becomes the background.</p>
+        <p id="display-copy">Uploaded cockpit image active. Store Pilot stays small unless details are needed.</p>
         <div class="metrics-row">
           <div class="metric-card"><span>Throttle</span><strong id="throttle-readout">0%</strong></div>
           <div class="metric-card"><span>Mode</span><strong id="mode-readout">Standby</strong></div>
@@ -61,15 +61,15 @@
 
     <section id="boot-message">
       <div class="boot-card">
-        <p class="eyebrow">IMAGE COCKPIT 4.3 BUILD</p>
-        <h2>Real Image Slot Ready</h2>
-        <p>The app now looks for assets/cockpit-reference.webp first, then .jpg, then .png, and only uses the SVG as a fallback.</p>
+        <p class="eyebrow">UPLOADED COCKPIT 4.4 BUILD</p>
+        <h2>Reference Image Active</h2>
+        <p>The app now uses the uploaded cockpit reference SVG as the primary background image, with older placeholders only as fallback.</p>
         <button id="begin-button" type="button">Enter Bridge</button>
       </div>
     </section>
   </main>
 
   <noscript><div class="noscript-message">This bridge requires JavaScript.</div></noscript>
-  <script type="module" src="./js/main.js?v=art-shell-4-3"></script>
+  <script type="module" src="./js/main.js?v=uploaded-cockpit-4-4"></script>
 </body>
 </html>
