@@ -1,91 +1,68 @@
-# Store Bridge Simulator
+# Store Pilot
 
-A high-performance, mobile-first Starship Bridge Simulator for piloting a retail shift.
+A calm, mobile-first Store Pilot for running a retail shift without turning the screen into a haunted spaceship dashboard.
 
-## What is included
+## Current direction
 
-- Full-screen Three.js scene
-- EffectComposer bloom pass
-- Procedural starfield
-- Programmatic 3D dashboard primitives
-- Large tactile button banks
-- Draggable 3D throttle lever
-- Warp threshold particle-streak animation
-- Glassmorphism HUD overlay
-- Generated placeholder Web Audio effects
-- Static GitHub Pages friendly architecture
-- Real store-manager workflow panel
-- Next Action engine for shift priorities
-- Task completion tracking with local storage
-- Incident / delay report generator
-- Captain's Log notes
-- Voice note capture with speech recognition fallback
-- History screen for saved reports, notes, voice notes, and completed tasks
+The active `main` branch has been reset from the cockpit experiment into a clean premium mobile app.
 
-## Milestone 2: Cinematic Bridge Realism Pass
+The useful Store Pilot workflow remains:
 
-This milestone moves the app from a simple sci-fi prototype toward a true seated cockpit experience.
+- Next Best Action
+- task checklist
+- shift progress
+- incident / delay report generator
+- saved reports and notes
+- voice / dictation note capture
+- local device storage
+- GitHub Pages deployment
 
-Added:
+The failed cockpit / Three.js visual experiment has been archived on this branch:
 
-- `bridgeScene.js` for the physical cockpit environment
-- `materials.js` for reusable procedural sci-fi materials
-- `lighting.js` for cinematic cockpit lighting
-- `cockpitScreens.js` for animated in-world holographic displays
-- Rebuilt tactile controls with larger physical buttons, labels, toggles, indicators, and a central throttle cluster
-- Better seated camera composition
-- Cockpit light response during throttle and warp
-- Holographic in-world Store Pilot display synced with the DOM workflow panel
+```txt
+cockpit-experiment-archive
+```
 
-## Directory structure
+That branch preserves the previous sci-fi prototype for reference without letting it keep bullying the live app.
+
+## Active files
 
 ```txt
 /
-├── index.html
+├── index.html        # Clean mobile app shell
 ├── css/
-│   └── style.css
+│   └── style.css     # Premium Store Pilot UI styling
 ├── js/
-│   ├── main.js
-│   ├── bridgeScene.js
-│   ├── materials.js
-│   ├── lighting.js
-│   ├── cockpitScreens.js
-│   ├── controls.js
-│   ├── storePilot.js
-│   └── audio.js
-└── assets/
-    ├── README.md
-    ├── audio/
-    │   └── README.md
-    └── textures/
-        └── README.md
+│   └── main.js       # Store Pilot app controller and local storage
+└── README.md
 ```
+
+Some old experimental files may still exist in the repo history or directory, but the active app no longer depends on them.
 
 ## Store workflow modules
 
-The `js/storePilot.js` module contains the retail workflow brain:
+The reset app includes practical shift tools for a Casey's store manager:
 
-- Morning opening priorities
-- SmartSafe / bookwork flow
+- Bookwork / SmartSafe match
 - Smart Counts
 - LTO screenshot reminder
 - Daily walk
-- Coffee / fountain supplies
-- BIB checks
-- Food warmers
-- Open-air cooler rotation
-- Restrooms
-- Shift notes
+- coffee and fountain reset
+- open-air cooler dates
+- food warmers
+- restrooms
+- shift note / handoff
 - Monday store order
-- Tuesday cigarette audits and backstock
-- Wednesday truck prep and truck triage
+- Tuesday cigarette audits
+- Tuesday backstock reset
+- Wednesday truck prep and triage
 - Sunday outs
 
-The app scores tasks by due time, shift, day of week, weekly routines, and urgency. It saves completed tasks and logs locally on the device.
+Tasks are saved by local date in `localStorage`, so the device remembers what is complete for the day.
 
 ## Run locally
 
-Because this uses ES modules and an import map, serve it from a local web server instead of opening the file directly.
+This is a static app. Serve it from a small local server:
 
 ```bash
 python -m http.server 5173
@@ -110,7 +87,3 @@ After deployment, the app should be available at:
 ```txt
 https://jamison85.github.io/bridge-command/
 ```
-
-## Audio
-
-Audio is currently generated with Web Audio placeholders. Real files can be dropped into `assets/audio/` later and wired into `js/audio.js` without changing the rest of the simulator.
