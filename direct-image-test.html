@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#02040a" />
+  <title>Direct Cockpit Test</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #02040a; font-family: system-ui, sans-serif; }
+    .stage { position: fixed; inset: 0; background: #02040a; }
+    .stage img { width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block; }
+    .hud { position: fixed; left: 50%; top: 40%; transform: translateX(-50%); width: min(42vw, 300px); min-width: 210px; padding: 10px 12px; border-radius: 16px; border: 1px solid rgba(80, 170, 200, .22); background: rgba(2, 8, 18, .42); color: rgba(235,247,252,.9); box-shadow: 0 10px 30px rgba(0,0,0,.22); }
+    .hud small { display: block; color: rgba(90,210,230,.75); font-weight: 900; letter-spacing: .16em; font-size: .58rem; margin-bottom: 4px; }
+    .hud strong { display: block; font-size: 1rem; }
+    .hud p { margin: 4px 0 0; color: rgba(220,234,244,.72); font-size: .68rem; line-height: 1.25; }
+    .buttons { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 118px); transform: translateX(-50%); display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; width: min(76vw, 520px); }
+    button { min-height: 48px; border-radius: 15px; border: 1px solid rgba(80,170,200,.16); background: linear-gradient(180deg, rgba(13,20,34,.72), rgba(2,5,12,.88)); color: rgba(235,247,252,.82); font-weight: 800; font-size: .82rem; letter-spacing: .04em; }
+    button:last-child { color: #09111c; background: linear-gradient(180deg, rgba(255,224,154,.78), rgba(213,154,44,.66)); border-color: rgba(255,224,154,.22); }
+    .badge { position: fixed; left: 14px; bottom: calc(env(safe-area-inset-bottom) + 76px); padding: 7px 10px; border-radius: 999px; background: rgba(2,6,18,.32); color: rgba(255,224,154,.85); font-size: .62rem; font-weight: 900; letter-spacing: .12em; }
+  </style>
+</head>
+<body>
+  <div class="stage"><img src="./assets/cockpit-reference.svg?v=direct-test-1" alt="" /></div>
+  <div class="hud"><small>DIRECT IMAGE TEST</small><strong>Uploaded cockpit should be clear</strong><p>No Three.js, no app CSS, no background stacking, no blurry nonsense.</p></div>
+  <div class="buttons"><button>NEXT</button><button>TASKS</button><button>REPORT</button><button>LOG</button><button>VOICE</button></div>
+  <div class="badge">DIRECT TEST</div>
+</body>
+</html>
