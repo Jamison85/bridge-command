@@ -6,15 +6,16 @@
   <meta name="theme-color" content="#f4efe5" />
   <meta name="description" content="A calm mobile Store Pilot for running a retail shift." />
   <title>Store Pilot</title>
-  <link rel="stylesheet" href="./css/style.css?v=voice-commands-11" />
-  <link rel="stylesheet" href="./css/handoff.css?v=voice-commands-11" />
-  <link rel="stylesheet" href="./css/followups.css?v=voice-commands-11" />
-  <link rel="stylesheet" href="./css/review.css?v=voice-commands-11" />
+  <link rel="stylesheet" href="./css/style.css?v=templates-12" />
+  <link rel="stylesheet" href="./css/handoff.css?v=templates-12" />
+  <link rel="stylesheet" href="./css/followups.css?v=templates-12" />
+  <link rel="stylesheet" href="./css/review.css?v=templates-12" />
+  <link rel="stylesheet" href="./css/templates.css?v=templates-12" />
 </head>
 <body>
   <main class="app-shell">
     <header class="top-bar">
-      <button class="icon-button" type="button" aria-label="Menu">☰</button>
+      <button class="icon-button" type="button" aria-label="Templates">☰</button>
       <div class="brand-lockup">
         <p class="eyebrow">CASEY'S</p>
         <h1>Store Pilot</h1>
@@ -25,9 +26,9 @@
     <section class="shift-card" aria-label="Shift selector">
       <p class="eyebrow">SELECT SHIFT</p>
       <div class="shift-toggle" role="group" aria-label="Choose shift">
-        <button class="shift-button" type="button" data-shift="morning">☀ Morning</button>
-        <button class="shift-button" type="button" data-shift="mid">☼ Mid</button>
-        <button class="shift-button" type="button" data-shift="close">☾ Close</button>
+        <button class="shift-button" type="button" data-shift="morning">Morning</button>
+        <button class="shift-button" type="button" data-shift="mid">Mid</button>
+        <button class="shift-button" type="button" data-shift="close">Close</button>
       </div>
     </section>
 
@@ -39,7 +40,7 @@
         </div>
         <p class="eyebrow">NEXT BEST ACTION</p>
         <h2 id="next-title">Loading shift plan...</h2>
-        <p id="next-copy">Finding the cleanest next move so your brain does not have to juggle knives.</p>
+        <p id="next-copy">Finding the cleanest next move for this shift.</p>
         <div class="hero-actions">
           <button class="primary-action" id="complete-next" type="button">Start Task</button>
           <button class="secondary-action" id="open-report" type="button">Report</button>
@@ -48,9 +49,7 @@
 
       <section class="progress-card">
         <p class="eyebrow">SHIFT PROGRESS</p>
-        <div class="progress-ring" aria-hidden="true">
-          <span id="progress-ring-text">0%</span>
-        </div>
+        <div class="progress-ring" aria-hidden="true"><span id="progress-ring-text">0%</span></div>
         <strong id="progress-text">0%</strong>
         <div class="progress-track"><div id="progress-fill"></div></div>
         <p id="progress-subtext">Start with the one task that matters most.</p>
@@ -73,14 +72,11 @@
     <section class="voice-sheet" id="voice-sheet" aria-hidden="true">
       <div class="voice-sheet-card">
         <div class="screen-header">
-          <div>
-            <p class="eyebrow">QUICK CAPTURE</p>
-            <h2>Add with voice</h2>
-          </div>
+          <div><p class="eyebrow">QUICK CAPTURE</p><h2>Add with voice</h2></div>
           <button class="text-button" id="close-voice-sheet" type="button">Close</button>
         </div>
-        <p class="helper-text">Speak or type what needs done. It saves as a task for this shift unless you choose note.</p>
-        <textarea id="voice-capture-text" placeholder="Example: Add cooler doors need wiped down after the walk..."></textarea>
+        <p class="helper-text">Speak or type what needs done. It can be saved as a task or note.</p>
+        <textarea id="voice-capture-text" placeholder="Example: mark coffee done or add cooler doors need wiped down"></textarea>
         <div class="action-row">
           <button class="primary-action" id="start-global-speech" type="button">Start Talking</button>
           <button class="secondary-action" id="save-capture-task" type="button">Save Task</button>
@@ -98,8 +94,8 @@
     </nav>
   </main>
 
-  <script type="module" src="./js/main-v6.js?v=voice-commands-11"></script>
-  <script type="module" src="./js/review-layer.js?v=voice-commands-11"></script>
-  <script type="module" src="./js/voice-commands.js?v=voice-commands-11"></script>
+  <script type="module" src="./js/main-v7.js?v=templates-12"></script>
+  <script type="module" src="./js/review-layer.js?v=templates-12"></script>
+  <script type="module" src="./js/voice-commands.js?v=templates-12"></script>
 </body>
 </html>
