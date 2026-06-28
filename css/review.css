@@ -59,6 +59,29 @@
   font-size: 0.86rem;
 }
 
+.handoff-options {
+  background:
+    radial-gradient(circle at 96% 0%, rgba(184, 115, 54, 0.13), transparent 28%),
+    rgba(255, 255, 255, 0.5);
+}
+
+.handoff-option-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.35fr;
+  gap: 10px;
+}
+
+.handoff-option-grid label {
+  color: var(--forest);
+}
+
+.handoff-option-grid select {
+  min-height: 46px;
+  border-color: rgba(7, 63, 47, 0.16);
+  background: rgba(255, 250, 241, 0.88);
+  font-weight: 850;
+}
+
 .review-message-box {
   min-height: 220px;
   margin-top: 10px;
@@ -94,5 +117,9 @@
 
   .review-stat strong {
     font-size: 1.05rem;
+  }
+
+  .handoff-option-grid {
+    grid-template-columns: 1fr;
   }
 }
