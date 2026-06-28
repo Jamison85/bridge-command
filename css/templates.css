@@ -1,0 +1,73 @@
+.template-card {
+  border: 1px solid rgba(7, 63, 47, 0.14);
+  border-radius: 22px;
+  background: rgba(255, 250, 241, 0.78);
+  box-shadow: 0 14px 34px rgba(44, 31, 16, 0.1);
+  padding: 15px;
+}
+
+.template-card h3 {
+  margin: 0;
+  color: var(--forest);
+  font-size: 1.18rem;
+}
+
+.template-list {
+  display: grid;
+  gap: 9px;
+  margin: 12px 0;
+}
+
+.template-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 11px;
+  border: 1px solid rgba(63, 48, 31, 0.1);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.52);
+}
+
+.template-row strong,
+.template-row span {
+  display: block;
+}
+
+.template-row span {
+  margin-top: 3px;
+  color: var(--soft);
+  font-size: 0.78rem;
+}
+
+.template-row-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.template-row-actions .mini-button {
+  min-height: 36px;
+  padding: 0 10px;
+}
+
+.template-add-form {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 72px auto;
+  gap: 8px;
+  align-items: end;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(63, 48, 31, 0.1);
+}
+
+@media (max-width: 520px) {
+  .template-row,
+  .template-add-form {
+    grid-template-columns: 1fr;
+  }
+
+  .template-row-actions {
+    display: grid;
+    grid-template-columns: 44px 44px 1fr;
+  }
+}
