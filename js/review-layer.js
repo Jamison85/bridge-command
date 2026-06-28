@@ -4,10 +4,24 @@ const REVIEW_STORAGE = {
   reports: "storePilot.reports.v6",
   customTasks: "storePilot.customTasks.v6",
   shift: "storePilot.shift.v6",
-  taskStates: "storePilot.taskStates.v6"
+  taskStates: "storePilot.taskStates.v6",
+  handoffPrefs: "storePilot.handoffPrefs.v10"
 };
 
 const REVIEW_SHIFT_LABELS = { morning: "Morning", mid: "Mid", close: "Close" };
+
+const HANDOFF_RECIPIENTS = {
+  loretta: { label: "Loretta", greeting: "Loretta", focus: "store-level progress and what was kept moving" },
+  richard: { label: "Richard", greeting: "Richard", focus: "operational priorities, follow-ups, and what needs visibility" },
+  both: { label: "Both", greeting: "Loretta and Richard", focus: "completed priorities and follow-ups that need shared visibility" }
+};
+
+const HANDOFF_TONES = {
+  quick: { label: "Quick", description: "Short and simple" },
+  detailed: { label: "Detailed", description: "More manager context" },
+  issue: { label: "Issue-focused", description: "Emphasizes delays and follow-ups" },
+  positive: { label: "Positive spin", description: "Achievement-forward" }
+};
 
 const REVIEW_TASKS = {
   morning: [
@@ -53,6 +67,10 @@ function readJSON(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
 }
 
+function writeJSON(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
 function getDateKey(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
@@ -78,6 +96,14 @@ function getReviewTasks() {
   const weekly = shift === "morning" ? (REVIEW_WEEKLY[new Date().getDay()] || []) : [];
   const custom = readJSON(REVIEW_STORAGE.customTasks, {})[getShiftKey()] || [];
   return [...base, ...weekly, ...custom];
+}
+
+function getHandoffPrefs() {
+  return readJSON(REVIEW_STORAGE.handoffPrefs, { recipient: "loretta", tone: "positive" });
+}
+
+function setHandoffPrefs(prefs) {
+  writeJSON(REVIEW_STORAGE.handoffPrefs, prefs);
 }
 
 function getReviewData() {
@@ -113,7 +139,8 @@ function renderEndOfDayReview() {
   if (!content || !eyebrow || !title) return;
 
   const review = getReviewData();
-  const message = buildEditableMessage(review);
+  const prefs = getHandoffPrefs();
+  const message = buildEditableMessage(review, prefs);
   eyebrow.textContent = "Review";
   title.textContent = "End-of-Day";
   content.innerHTML = `
@@ -133,6 +160,7 @@ function renderEndOfDayReview() {
         ${stat("Watch", review.open.length)}
       </div>
 
+      ${handoffOptions(prefs)}
       ${section("Completed", review.completed)}
       ${section("Delayed", review.delayed, review.states)}
       ${section("Carry Forward", review.carried, review.states)}
@@ -140,7 +168,7 @@ function renderEndOfDayReview() {
 
       <div class="review-section">
         <h4>Editable message</h4>
-        <p class="helper-text">Review this before sending. It is written to sound productive and positive, not defensive.</p>
+        <p class="helper-text">Review this before sending. The options above change who it is written for and how much detail it includes.</p>
         <textarea class="review-message-box" id="review-message">${escapeHTML(message)}</textarea>
         <div class="review-actions">
           <button class="primary-action" type="button" id="share-review">Text / Share</button>
@@ -150,9 +178,46 @@ function renderEndOfDayReview() {
       </div>
     </article>`;
 
+  document.querySelector("#handoff-recipient")?.addEventListener("change", updateHandoffOptions);
+  document.querySelector("#handoff-tone")?.addEventListener("change", updateHandoffOptions);
   document.querySelector("#share-review")?.addEventListener("click", () => shareText(document.querySelector("#review-message")?.value || message));
   document.querySelector("#copy-review")?.addEventListener("click", () => copyText(document.querySelector("#review-message")?.value || message));
-  document.querySelector("#refresh-review")?.addEventListener("click", renderEndOfDayReview);
+  document.querySelector("#refresh-review")?.addEventListener("click", () => refreshMessageOnly(review));
+}
+
+function handoffOptions(prefs) {
+  return `
+    <div class="review-section handoff-options">
+      <h4>Handoff options</h4>
+      <div class="handoff-option-grid">
+        <label>Send to
+          <select id="handoff-recipient">
+            ${Object.entries(HANDOFF_RECIPIENTS).map(([value, item]) => `<option value="${value}" ${prefs.recipient === value ? "selected" : ""}>${item.label}</option>`).join("")}
+          </select>
+        </label>
+        <label>Tone
+          <select id="handoff-tone">
+            ${Object.entries(HANDOFF_TONES).map(([value, item]) => `<option value="${value}" ${prefs.tone === value ? "selected" : ""}>${item.label} - ${item.description}</option>`).join("")}
+          </select>
+        </label>
+      </div>
+    </div>`;
+}
+
+function updateHandoffOptions() {
+  const prefs = {
+    recipient: document.querySelector("#handoff-recipient")?.value || "loretta",
+    tone: document.querySelector("#handoff-tone")?.value || "positive"
+  };
+  setHandoffPrefs(prefs);
+  refreshMessageOnly(getReviewData());
+}
+
+function refreshMessageOnly(review) {
+  const prefs = getHandoffPrefs();
+  const box = document.querySelector("#review-message");
+  if (box) box.value = buildEditableMessage(review, prefs);
+  setStatus("Message refreshed");
 }
 
 function stat(label, value) {
@@ -168,9 +233,11 @@ function section(label, items, states = {}) {
   return `<div class="review-section"><h4>${label}</h4><ul>${lines}</ul></div>`;
 }
 
-function buildEditableMessage(review) {
+function buildEditableMessage(review, prefs = getHandoffPrefs()) {
+  const recipient = HANDOFF_RECIPIENTS[prefs.recipient] || HANDOFF_RECIPIENTS.loretta;
+  const tone = prefs.tone || "positive";
   const completedLines = review.completed.length
-    ? review.completed.slice(0, 12).map((task) => `• ${task.title}`).join("\n")
+    ? review.completed.slice(0, tone === "quick" ? 6 : 12).map((task) => `• ${task.title}`).join("\n")
     : "• Kept the shift moving and identified the highest-priority follow-ups.";
 
   const followUps = [
@@ -178,10 +245,22 @@ function buildEditableMessage(review) {
     ...review.carried.map((task) => `• ${task.title} - carried forward: ${review.states[task.id]?.reason || "next best window"}`),
     ...review.open.map((task) => `• ${task.title} - still watching`)
   ];
+  const maxFollowUps = tone === "quick" ? 4 : tone === "issue" ? 12 : 8;
+  const followUpLines = followUps.length ? followUps.slice(0, maxFollowUps).join("\n") : "• No major follow-ups from the planned list at this time.";
 
-  const followUpLines = followUps.length ? followUps.slice(0, 10).join("\n") : "• No major follow-ups from the planned list at this time.";
+  if (tone === "quick") {
+    return `Good ${getDayPart()} ${recipient.greeting}, quick ${REVIEW_SHIFT_LABELS[review.shift].toLowerCase()} update from Jamison.\n\nCompleted ${review.completed.length} of ${review.tasks.length} planned items. Main wins:\n${completedLines}\n\nFollow-ups:\n${followUpLines}\n\nNo reply needed unless you want anything handled differently.`;
+  }
 
-  return `Good ${getDayPart()}, quick ${REVIEW_SHIFT_LABELS[review.shift].toLowerCase()} shift update from Jamison.\n\nI was able to complete ${review.completed.length} of ${review.tasks.length} planned items for this shift, including:\n${completedLines}\n\nFollow-ups identified / carry forward:\n${followUpLines}\n\nI prioritized the highest-impact customer-facing and operational items first and documented delays or carry-forward items as they came up. No reply needed unless you want anything handled differently.`;
+  if (tone === "issue") {
+    return `Good ${getDayPart()} ${recipient.greeting}, ${REVIEW_SHIFT_LABELS[review.shift].toLowerCase()} shift update from Jamison.\n\nI kept the main priorities moving and completed ${review.completed.length} of ${review.tasks.length} planned items.\n\nCompleted / handled:\n${completedLines}\n\nFollow-ups identified for visibility:\n${followUpLines}\n\nI documented the delays and carry-forward items so the next best window is clear. No reply needed unless you want me to prioritize any of these differently.`;
+  }
+
+  if (tone === "detailed") {
+    return `Good ${getDayPart()} ${recipient.greeting}, detailed ${REVIEW_SHIFT_LABELS[review.shift].toLowerCase()} shift update from Jamison.\n\nI focused on ${recipient.focus}. I was able to complete ${review.completed.length} of ${review.tasks.length} planned items for this shift, including:\n${completedLines}\n\nFollow-ups identified / carry forward:\n${followUpLines}\n\nOverall, I prioritized the highest-impact customer-facing and operational items first, documented delays as they came up, and carried forward anything that needs the next best window. No reply needed unless you want anything handled differently.`;
+  }
+
+  return `Good ${getDayPart()} ${recipient.greeting}, quick ${REVIEW_SHIFT_LABELS[review.shift].toLowerCase()} shift update from Jamison.\n\nI was able to complete ${review.completed.length} of ${review.tasks.length} planned items and kept the shift focused on the highest-impact priorities.\n\nCompleted / moved forward:\n${completedLines}\n\nFollow-ups identified / carry forward:\n${followUpLines}\n\nI prioritized customer-facing and operational items first and documented anything that needs the next best window. No reply needed unless you want anything handled differently.`;
 }
 
 function getDayPart() {
