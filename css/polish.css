@@ -139,6 +139,17 @@ body {
 .progress-card {
   min-height: 236px;
   border-radius: 30px;
+  padding: 20px 16px;
+  align-content: center;
+}
+
+.progress-card .eyebrow {
+  margin-bottom: 4px;
+}
+
+.progress-ring {
+  background: conic-gradient(var(--forest) var(--progress-angle, 0deg), rgba(62,45,25,0.1) 0deg);
+  box-shadow: inset 0 0 0 14px rgba(255,250,241,0.95), 0 14px 26px rgba(44,31,16,0.08);
 }
 
 .screen-card {
@@ -191,6 +202,19 @@ body {
   font-size: 0.79rem;
 }
 
+.task-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+.task-actions .mini-button {
+  min-height: 46px;
+  padding: 0 8px;
+  font-size: 0.88rem;
+}
+
 input,
 textarea,
 select {
@@ -219,26 +243,91 @@ select {
   font-size: 0.78rem;
 }
 
+@media (max-width: 700px) {
+  .voice-fab {
+    display: none;
+  }
+
+  .screen-card {
+    margin-bottom: 8px;
+  }
+}
+
 @media (max-width: 430px) {
   .app-shell {
     padding-left: 13px;
     padding-right: 13px;
+    padding-bottom: calc(env(safe-area-inset-bottom) + 114px);
   }
+
+  .top-bar {
+    margin-bottom: 14px;
+  }
+
+  .shift-card {
+    margin-bottom: 14px;
+  }
+
   .dashboard-grid {
     gap: 10px;
+    margin-bottom: 14px;
   }
+
   .hero-card,
   .progress-card {
     min-height: 220px;
     border-radius: 25px;
   }
+
   .hero-card {
     padding: 17px;
   }
+
+  .hero-card h2 {
+    font-size: clamp(1.14rem, 6vw, 1.58rem);
+  }
+
+  .hero-card p:not(.eyebrow) {
+    font-size: 0.8rem;
+  }
+
+  .progress-card {
+    padding: 17px 11px;
+  }
+
+  .progress-ring {
+    min-width: 88px;
+    min-height: 88px;
+    box-shadow: inset 0 0 0 11px rgba(255,250,241,0.95), 0 10px 22px rgba(44,31,16,0.08);
+  }
+
   .screen-card {
     padding: 16px;
+    padding-bottom: 20px;
   }
+
   .task-row {
     grid-template-columns: auto 1fr;
+    align-items: start;
+  }
+
+  .task-row > .badge,
+  .task-row > .mini-button,
+  .task-row > .task-actions {
+    grid-column: 1 / -1;
+  }
+
+  .task-actions {
+    margin-top: 2px;
+  }
+
+  .bottom-nav {
+    width: min(calc(100% - 22px), 720px);
+    padding: 7px;
+  }
+
+  .nav-button {
+    min-height: 50px;
+    font-size: 0.73rem;
   }
 }
