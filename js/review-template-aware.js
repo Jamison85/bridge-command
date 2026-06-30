@@ -14,6 +14,9 @@ const RECIPIENTS = {
   richard: "Richard",
   both: "Loretta and Richard"
 };
+const HANDOFF_ENGINE = "Handoff Variety v4";
+const TONE_COUNTS = { quick: 6, detailed: 6, issue: 6, positive: 8 };
+const TONE_LABELS = { quick: "Quick text", detailed: "Detailed handoff", issue: "Issue-first", positive: "Warm daily" };
 
 function readJSON(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
@@ -52,6 +55,16 @@ function rotation(count) {
 
 function reviewSeed(review, prefs) {
   return `${dateKey()}-${review.shift}-${prefs.recipient}-${prefs.tone}-${review.completed.length}-${review.delayed.length}-${review.carried.length}-${review.open.length}`;
+}
+
+function variationInfo(prefs, message) {
+  const count = TONE_COUNTS[prefs.tone] || 1;
+  return {
+    label: TONE_LABELS[prefs.tone] || "Message",
+    current: rotation(count) + 1,
+    count,
+    id: hashText(message).toString(36).slice(0, 5).toUpperCase()
+  };
 }
 
 function getTemplateReviewData() {
@@ -233,9 +246,10 @@ function renderTemplateAwareReview() {
   const review = getTemplateReviewData();
   const prefs = readJSON(TEMPLATE_REVIEW.handoffPrefs, { recipient: "loretta", tone: "positive" });
   const message = buildMessage(review);
+  const proof = variationInfo(prefs, message);
   eyebrow.textContent = "Review";
   title.textContent = "End-of-Day";
-  content.innerHTML = `<article class="review-card"><div class="screen-header"><div><p class="eyebrow">END OF DAY REVIEW</p><h3>Daily handoff</h3></div><span class="badge">${SHIFT_NAMES[review.shift]}</span></div><div class="review-grid">${stat("Done", review.completed.length)}${stat("Delayed", review.delayed.length)}${stat("Carry", review.carried.length)}${stat("Watch", review.open.length)}</div><div class="review-section handoff-options"><h4>Handoff options</h4><p class="helper-text">Choose the recipient and tone. Refresh cycles through different message versions inside the same tone while keeping the facts accurate.</p><div class="handoff-option-grid"><label>Send to<select id="handoff-recipient">${option("loretta", "Loretta", prefs.recipient)}${option("richard", "Richard", prefs.recipient)}${option("both", "Both", prefs.recipient)}</select></label><label>Tone<select id="handoff-tone">${option("quick", "Quick text", prefs.tone)}${option("detailed", "Detailed handoff", prefs.tone)}${option("issue", "Issue-first", prefs.tone)}${option("positive", "Warm daily", prefs.tone)}</select></label></div></div>${list("Completed", review.completed)}${list("Delayed", review.delayed, review.states)}${list("Carry Forward", review.carried, review.states)}${list("Still Watching", review.open)}<div class="review-section"><h4>Editable message</h4><textarea class="review-message-box" id="review-message">${escapeHTML(message)}</textarea><div class="review-actions"><button class="primary-action" id="share-review" type="button">Text / Share</button><button class="secondary-action" id="copy-review" type="button">Copy</button><button class="secondary-action" id="refresh-review" type="button">Refresh Message</button></div></div></article>`;
+  content.innerHTML = `<article class="review-card"><div class="screen-header"><div><p class="eyebrow">END OF DAY REVIEW</p><h3>Daily handoff</h3></div><span class="badge">${SHIFT_NAMES[review.shift]}</span></div><div class="review-grid">${stat("Done", review.completed.length)}${stat("Delayed", review.delayed.length)}${stat("Carry", review.carried.length)}${stat("Watch", review.open.length)}</div><div class="review-section handoff-options"><h4>Handoff options</h4><p class="helper-text">Choose the recipient and tone. Refresh cycles through different message versions inside the same tone while keeping the facts accurate.</p><p class="helper-text"><strong>Engine:</strong> ${HANDOFF_ENGINE} · <strong>Version:</strong> ${proof.label} ${proof.current} of ${proof.count} · <strong>Message ID:</strong> ${proof.id}</p><div class="handoff-option-grid"><label>Send to<select id="handoff-recipient">${option("loretta", "Loretta", prefs.recipient)}${option("richard", "Richard", prefs.recipient)}${option("both", "Both", prefs.recipient)}</select></label><label>Tone<select id="handoff-tone">${option("quick", "Quick text", prefs.tone)}${option("detailed", "Detailed handoff", prefs.tone)}${option("issue", "Issue-first", prefs.tone)}${option("positive", "Warm daily", prefs.tone)}</select></label></div></div>${list("Completed", review.completed)}${list("Delayed", review.delayed, review.states)}${list("Carry Forward", review.carried, review.states)}${list("Still Watching", review.open)}<div class="review-section"><h4>Editable message</h4><textarea class="review-message-box" id="review-message">${escapeHTML(message)}</textarea><div class="review-actions"><button class="primary-action" id="share-review" type="button">Text / Share</button><button class="secondary-action" id="copy-review" type="button">Copy</button><button class="secondary-action" id="refresh-review" type="button">Refresh Message</button></div></div></article>`;
   document.querySelector("#handoff-recipient")?.addEventListener("change", savePrefsAndRefresh);
   document.querySelector("#handoff-tone")?.addEventListener("change", savePrefsAndRefresh);
   document.querySelector("#refresh-review")?.addEventListener("click", refreshVariantAndRender);
