@@ -1,3 +1,5 @@
+import("./hero-readability-lock.js?v=1").catch((error) => console.warn("Store Pilot hero readability lock failed", error));
+
 const SI_KEYS = {
   completed: "storePilot.completed.v6",
   customTasks: "storePilot.customTasks.v6",
