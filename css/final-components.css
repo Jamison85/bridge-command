@@ -1,0 +1,66 @@
+.app-shell {
+  width: min(100%, 880px);
+  margin-inline: auto;
+}
+
+.screen-card,
+.hero-card,
+.progress-card,
+.shift-card,
+.template-card,
+.active-task-card,
+.review-card,
+.production-tools-card {
+  backdrop-filter: blur(16px);
+}
+
+.task-row {
+  border: 1px solid rgba(62, 45, 25, 0.1);
+  background: linear-gradient(180deg, rgba(255,250,241,0.94), rgba(255,244,226,0.72));
+}
+
+.task-row.next-up {
+  border-color: rgba(210,147,82,0.42);
+  box-shadow: 0 12px 30px rgba(184,115,54,0.13);
+}
+
+.next-up-chip {
+  display: inline-grid;
+  margin-top: 7px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(210,147,82,0.14);
+  color: #7a421f;
+  font-size: 0.68rem;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.task-row.done .task-title {
+  color: rgba(22,33,27,0.62);
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  text-decoration-color: rgba(7,63,47,0.24);
+}
+
+.task-state-note {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: rgba(7,63,47,0.06);
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+.empty-state {
+  border: 1px dashed rgba(7,63,47,0.18);
+  background: rgba(255,250,241,0.76);
+}
+
+textarea {
+  min-height: 132px;
+  resize: vertical;
+}
