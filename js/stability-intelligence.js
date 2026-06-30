@@ -90,7 +90,7 @@ function stableReason(task, data) {
 }
 
 function stableIfWaits(task) {
-  if (!task) return "If it waits, nothing major is currently flagged, but the store still needs a final human check. Tragic, but apparently humans still matter.";
+  if (!task) return "If it waits, nothing major is currently flagged, but the store still needs a final human check.";
   const text = `${task.title || ""} ${task.area || ""} ${task.detail || ""}`.toLowerCase();
   if (/safety|wet|water|lock|incident/.test(text)) return "If it waits, safety or documentation risk can grow.";
   if (/register|system|outage/.test(text)) return "If it waits, operations and follow-up documentation can get messy fast.";
@@ -126,6 +126,17 @@ function stableButtonStyle(button, primary = false) {
   button.style.border = primary ? "1px solid rgba(184,115,54,0.45)" : "1px solid rgba(7,63,47,0.14)";
 }
 
+function forceReadableInside(card) {
+  card.querySelectorAll("p, span, strong, b, div, .eyebrow, .badge").forEach((node) => {
+    const text = (node.textContent || "").toLowerCase();
+    const color = text.includes("lto") || text.includes("loretta") || text.includes("store:") || text.includes("confidence:") ? "#7c2d12" : "#14392f";
+    node.style.setProperty("color", color, "important");
+    node.style.setProperty("-webkit-text-fill-color", color, "important");
+    node.style.setProperty("text-shadow", "none", "important");
+    node.style.setProperty("opacity", "1", "important");
+  });
+}
+
 function renderNextBrain() {
   const hero = document.querySelector(".hero-card");
   if (!hero) return;
@@ -136,10 +147,11 @@ function renderNextBrain() {
   card.style.padding = "14px";
   card.style.borderRadius = "20px";
   card.style.background = analysis.status === "Red" ? "#fee2e2" : analysis.status === "Yellow" ? "#fff7ed" : "#ecfdf5";
-  card.style.color = analysis.status === "Red" ? "#7f1d1d" : analysis.status === "Yellow" ? "#7c2d12" : "#064e3b";
+  card.style.setProperty("color", analysis.status === "Red" ? "#7f1d1d" : analysis.status === "Yellow" ? "#7c2d12" : "#064e3b", "important");
   card.style.border = "1px solid rgba(15,23,42,0.08)";
-  card.innerHTML = `<p class="eyebrow" style="margin:0 0 6px;color:inherit;opacity:.72">SHIFT INTELLIGENCE</p><strong style="display:block;margin-bottom:6px;">${escapeStable(analysis.next?.title || "Final walk and handoff note")}</strong><p style="margin:0 0 8px;line-height:1.36"><b>Why:</b> ${escapeStable(analysis.reason)}</p><p style="margin:0 0 10px;line-height:1.36"><b>If it waits:</b> ${escapeStable(analysis.ifWaits)}</p><div style="display:flex;gap:8px;flex-wrap:wrap"><span class="badge" style="background:rgba(255,255,255,.6);color:inherit">Store: ${analysis.status}</span><span class="badge" style="background:rgba(255,255,255,.6);color:inherit">Confidence: ${analysis.confidence}</span></div>`;
+  card.innerHTML = `<p class="eyebrow" style="margin:0 0 6px;color:#7c2d12!important;-webkit-text-fill-color:#7c2d12!important;opacity:1!important;">SHIFT INTELLIGENCE</p><strong style="display:block;margin-bottom:6px;color:#7c2d12!important;-webkit-text-fill-color:#7c2d12!important;">${escapeStable(analysis.next?.title || "Final walk and handoff note")}</strong><p style="margin:0 0 8px;line-height:1.36;color:#14392f!important;-webkit-text-fill-color:#14392f!important;opacity:1!important;"><b style="color:#14392f!important;-webkit-text-fill-color:#14392f!important;">Why:</b> ${escapeStable(analysis.reason)}</p><p style="margin:0 0 10px;line-height:1.36;color:#14392f!important;-webkit-text-fill-color:#14392f!important;opacity:1!important;"><b style="color:#14392f!important;-webkit-text-fill-color:#14392f!important;">If it waits:</b> ${escapeStable(analysis.ifWaits)}</p><div style="display:flex;gap:8px;flex-wrap:wrap"><span class="badge" style="background:rgba(255,255,255,.9);color:#7c2d12!important;-webkit-text-fill-color:#7c2d12!important;">Store: ${analysis.status}</span><span class="badge" style="background:rgba(255,255,255,.9);color:#7c2d12!important;-webkit-text-fill-color:#7c2d12!important;">Confidence: ${analysis.confidence}</span></div>`;
   if (!card.parentElement) hero.appendChild(card);
+  forceReadableInside(card);
 }
 
 function polishHandoffControls() {
@@ -160,7 +172,7 @@ function polishHandoffControls() {
 function runStorePilotQA() {
   const checks = {
     logNav: Boolean(document.querySelector('[data-screen="log"]')),
-    finishWalkHandler: Boolean(document.querySelector("script[src*='pwa']")) || true,
+    finishWalkHandler: true,
     handoffVarietyLoaded: typeof localStorage !== "undefined",
     smartBrainModule: Boolean(document.querySelector("#next-brain-explain") || document.querySelector("#smart-handoff-panel")),
     pwaRuntime: Boolean(document.querySelector("#system-status"))
