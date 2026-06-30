@@ -1,0 +1,32 @@
+.install-hint {
+  position: fixed;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom) + 76px);
+  transform: translate(-50%, 16px);
+  z-index: 40;
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #0f513d, #073f2f);
+  color: #fffaf1;
+  font-weight: 950;
+  box-shadow: 0 14px 34px rgba(7, 63, 47, 0.28);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.install-hint.ready {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}
+
+.is-standalone .install-hint {
+  display: none;
+}
+
+.is-standalone .app-shell {
+  padding-top: calc(env(safe-area-inset-top) + 14px);
+}
