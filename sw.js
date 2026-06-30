@@ -1,4 +1,4 @@
-const CACHE_NAME = "store-pilot-pwa-19";
+const CACHE_NAME = "store-pilot-pwa-state-20";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -11,6 +11,7 @@ const APP_SHELL = [
   "./css/templates.css",
   "./css/polish.css",
   "./css/manager-mode.css",
+  "./css/pwa.css",
   "./js/main-v7.js",
   "./js/review-layer.js",
   "./js/review-template-aware.js",
@@ -18,6 +19,7 @@ const APP_SHELL = [
   "./js/voice-template-aware.js",
   "./js/active-task.js",
   "./js/followup-cleanup.js",
+  "./js/state-polish.js",
   "./js/pwa.js"
 ];
 
