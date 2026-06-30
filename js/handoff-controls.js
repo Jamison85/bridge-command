@@ -33,10 +33,9 @@ function enhanceHandoffControls() {
   options.appendChild(topButton);
 }
 
-import("./stability-intelligence.js").catch((error) => console.warn("Store Pilot stabilization layer failed", error));
 import("./lto-contrast-fix.js").catch((error) => console.warn("Store Pilot LTO contrast fix failed", error));
 import("./lto-contrast-v2.js").catch((error) => console.warn("Store Pilot LTO contrast v2 failed", error));
-import("./shift-intel-readable.js?v=1").catch((error) => console.warn("Store Pilot readable shift intelligence failed", error));
+import("./shift-intel-readable.js?v=2").catch((error) => console.warn("Store Pilot readable shift intelligence failed", error));
 document.addEventListener("click", () => setTimeout(enhanceHandoffControls, 80));
 document.addEventListener("change", () => setTimeout(enhanceHandoffControls, 80));
 setInterval(enhanceHandoffControls, 900);
