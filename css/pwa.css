@@ -30,3 +30,58 @@
 .is-standalone .app-shell {
   padding-top: calc(env(safe-area-inset-top) + 14px);
 }
+
+@media (max-width: 700px) {
+  .progress-ring {
+    position: relative;
+    isolation: isolate;
+    background: rgba(7, 63, 47, 0.08) !important;
+    border: 9px solid rgba(7, 63, 47, 0.12);
+    box-shadow: 0 8px 16px rgba(44, 31, 16, 0.07) !important;
+  }
+
+  .progress-ring::after {
+    content: "";
+    position: absolute;
+    inset: -9px;
+    border-radius: 999px;
+    border: 9px solid transparent;
+    border-top-color: rgba(7, 63, 47, 0.9);
+    border-right-color: rgba(7, 63, 47, 0.9);
+    transform: rotate(28deg);
+    z-index: -1;
+  }
+
+  #progress-ring-text {
+    display: block;
+    position: relative;
+    z-index: 2;
+    color: var(--forest);
+    font-size: 0.98rem;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .empty-state.followup-empty {
+    display: grid;
+    gap: 12px;
+  }
+
+  .empty-state-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+  }
+
+  .empty-state-actions .primary-action,
+  .empty-state-actions .secondary-action {
+    min-height: 44px;
+    border-radius: 15px;
+    font-size: 0.86rem;
+  }
+
+  .empty-state-actions .secondary-action {
+    background: rgba(7, 63, 47, 0.08);
+    color: var(--forest);
+  }
+}
