@@ -4,6 +4,7 @@ import "./final-nav.js";
 import "./final-task-highlight.js";
 import "./review-layer-variety.js";
 import "./handoff-controls.js";
+import "./shift-brain.js";
 
 const installHintKey = "storePilot.installHintSeen.v1";
 let deferredInstallPrompt = null;
