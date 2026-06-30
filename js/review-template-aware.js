@@ -5,7 +5,7 @@ const TEMPLATE_REVIEW = {
   taskStates: "storePilot.taskStates.v6",
   templates: "storePilot.templates.v7",
   handoffPrefs: "storePilot.handoffPrefs.v10",
-  handoffVariant: "storePilot.handoffVariant.v1"
+  handoffVariant: "storePilot.handoffVariant.v3"
 };
 
 const SHIFT_NAMES = { morning: "Morning", mid: "Mid", close: "Close" };
@@ -51,6 +51,10 @@ function pick(options, seed, offset = 0) {
   return options[(hashText(seed) + offset) % options.length];
 }
 
+function variant(seed, count = 4) {
+  return hashText(seed) % count;
+}
+
 function getTemplateReviewData() {
   const shift = currentShift();
   const templates = readJSON(TEMPLATE_REVIEW.templates, {});
@@ -69,11 +73,18 @@ function getTemplateReviewData() {
   };
 }
 
-function lineList(items, limit, emptyText, formatter = (task) => `• ${task.title}`) {
-  if (!items.length) return `• ${emptyText}`;
+function lineList(items, limit, emptyText, formatter = (task) => `- ${task.title}`) {
+  if (!items.length) return `- ${emptyText}`;
   const visible = items.slice(0, limit).map(formatter);
   const hidden = items.length - visible.length;
-  return hidden > 0 ? `${visible.join("\n")}\n• ${hidden} more item${hidden === 1 ? "" : "s"} still listed in the app.` : visible.join("\n");
+  return hidden > 0 ? `${visible.join("\n")}\n- ${hidden} more item${hidden === 1 ? "" : "s"} still listed in the app.` : visible.join("\n");
+}
+
+function inlineList(items, limit, emptyText) {
+  if (!items.length) return emptyText;
+  const names = items.slice(0, limit).map((task) => task.title);
+  const hidden = items.length - names.length;
+  return hidden > 0 ? `${names.join(", ")}, plus ${hidden} more` : names.join(", ");
 }
 
 function followupItems(review) {
@@ -90,18 +101,19 @@ function completedSummary(review, limit) {
 
 function followupSummary(review, limit) {
   const items = followupItems(review);
-  return lineList(items, limit, "No major follow-ups from the planned list at this time.", (item) => `• ${item.task.title} - ${item.label}: ${item.reason}`);
+  return lineList(items, limit, "No major follow-ups from the planned list at this time.", (item) => `- ${item.task.title}: ${item.label}, ${item.reason}`);
 }
 
 function recipientContext(recipientKey, seed) {
   if (recipientKey === "richard") {
     return {
       greeting: pick(["Good", "Hello", "Hi"], seed),
-      focus: "I’m documenting the shift status and any operational impact so there is a clear record.",
+      stance: "documented for visibility and follow-up",
+      focus: "I am keeping the update focused on completion, impact, and what still needs a window.",
       closing: pick([
         "No reply needed unless you want a different follow-up.",
-        "I’ll keep anything still open documented for the next best window.",
-        "Just keeping you informed so there is a clean trail on what was completed and what moved."
+        "I will keep anything still open documented for the next best window.",
+        "This is mainly to keep a clear trail of what was completed and what moved."
       ], seed, 3)
     };
   }
@@ -109,48 +121,82 @@ function recipientContext(recipientKey, seed) {
   if (recipientKey === "both") {
     return {
       greeting: pick(["Good", "Hello", "Hi"], seed),
-      focus: "I wanted to give you both a clear shift update with what was handled and what still needs attention.",
+      stance: "shared so you both have the same picture",
+      focus: "I wanted to give you both a clean view of what was handled and what still needs attention.",
       closing: pick([
         "No reply needed unless either of you wants me to handle something differently.",
-        "I’ll keep the remaining items documented and ready for the next best window.",
-        "This should give both of you a clean view of where the shift landed."
+        "This should give both of you a clear view of where the shift landed.",
+        "I will keep the remaining items documented and ready for the next best window."
       ], seed, 5)
     };
   }
 
   return {
     greeting: pick(["Good", "Hi", "Hey"], seed),
+    stance: "sent as a daily handoff",
     focus: pick([
-      "I wanted to send you a real update on where the shift landed today.",
-      "Here’s today’s shift update so you have a clear picture without having to dig for it.",
-      "I’m sending the daily handoff with what got handled and what still needs a window."
+      "I wanted this to feel like a real update, not just a checklist dump.",
+      "Here is where the shift landed so you have the honest picture without having to dig for it.",
+      "I am sending the daily handoff with what got handled and what still needs a window.",
+      "I wanted to keep you in the loop on what moved forward and what still needs attention."
     ], seed, 7),
     closing: pick([
       "No reply needed unless you want me to adjust anything.",
-      "I’ll keep working from the highest-impact items first.",
-      "I just wanted you to have a clear and honest update from the shift."
+      "I will keep working from the highest-impact items first.",
+      "I just wanted you to have a clear and honest update from the shift.",
+      "I will keep the remaining items from getting lost."
     ], seed, 9)
   };
 }
 
 function buildQuickMessage(review, prefs, seed, recipientName, context) {
   const followups = followupItems(review);
-  return `${context.greeting} ${dayPart()} ${recipientName}, quick ${SHIFT_NAMES[review.shift].toLowerCase()} shift update from Jamison.\n\n${context.focus}\n\nCompleted: ${review.completed.length}/${review.tasks.length}\nFollow-ups: ${followups.length}\n\nTop completed:\n${completedSummary(review, 4)}\n\nNeeds follow-up:\n${followupSummary(review, 4)}\n\n${context.closing}`;
+  const style = variant(seed, 3);
+  if (style === 0) {
+    return `${recipientName} - quick ${SHIFT_NAMES[review.shift].toLowerCase()} update:\n\n${review.completed.length}/${review.tasks.length} planned items are done. ${followups.length} item${followups.length === 1 ? "" : "s"} need follow-up.\n\nDone: ${inlineList(review.completed, 3, "nothing checked off yet")}\n\nFollow-up: ${inlineList(followups.map((item) => item.task), 3, "nothing major right now")}\n\n${context.closing}`;
+  }
+  if (style === 1) {
+    return `${context.greeting} ${dayPart()} ${recipientName}, quick handoff from Jamison.\n\nMain status: ${review.completed.length} done, ${review.delayed.length} delayed, ${review.carried.length} carried, ${review.open.length} still watching.\n\nMost important completed work:\n${completedSummary(review, 3)}\n\nOnly follow-ups I would flag:\n${followupSummary(review, 3)}\n\n${context.closing}`;
+  }
+  return `Quick shift note for ${recipientName}:\n\nHandled:\n${completedSummary(review, 4)}\n\nStill needs a window:\n${followupSummary(review, 4)}\n\nI kept the focus on what mattered most for the shift and documented anything that could not be finished cleanly.`;
 }
 
 function buildDetailedMessage(review, prefs, seed, recipientName, context) {
-  return `${context.greeting} ${dayPart()} ${recipientName}, here’s the detailed ${SHIFT_NAMES[review.shift].toLowerCase()} shift handoff from Jamison.\n\n${context.focus}\n\nShift snapshot:\n• Completed: ${review.completed.length} of ${review.tasks.length}\n• Delayed: ${review.delayed.length}\n• Carried forward: ${review.carried.length}\n• Still watching: ${review.open.length}\n\nCompleted / moved forward:\n${completedSummary(review, 10)}\n\nDelayed, carried, or still watching:\n${followupSummary(review, 10)}\n\nPriority used:\n• Customer-facing and safety items first\n• Time-sensitive admin next\n• Anything unfinished documented instead of left vague\n\n${context.closing}`;
+  const style = variant(seed, 3);
+  if (style === 0) {
+    return `${context.greeting} ${dayPart()} ${recipientName}, detailed ${SHIFT_NAMES[review.shift].toLowerCase()} shift handoff from Jamison.\n\nStatus snapshot:\n- Completed: ${review.completed.length} of ${review.tasks.length}\n- Delayed: ${review.delayed.length}\n- Carried forward: ${review.carried.length}\n- Still watching: ${review.open.length}\n\nWork completed:\n${completedSummary(review, 10)}\n\nOpen / delayed / carried:\n${followupSummary(review, 10)}\n\nHow I prioritized it:\n- Customer-facing and safety items first\n- Time-sensitive admin next\n- Anything unfinished documented instead of left vague\n\n${context.closing}`;
+  }
+  if (style === 1) {
+    return `Detailed handoff for ${recipientName}\nShift: ${SHIFT_NAMES[review.shift]}\nFrom: Jamison\n\n1. What got done\n${completedSummary(review, 10)}\n\n2. What changed or moved\n${followupSummary(review, 10)}\n\n3. Overall read\n${context.focus}\n\n4. Next best window\nThe remaining items are already documented so they do not disappear into the usual retail void.\n\n${context.closing}`;
+  }
+  return `${context.greeting} ${dayPart()} ${recipientName}, here is the full shift picture.\n\nThe shift landed at ${review.completed.length}/${review.tasks.length} completed. The main work moved forward, and the items that could not be finished are separated below so the handoff is not vague.\n\nCompleted list:\n${completedSummary(review, 12)}\n\nNeeds attention next:\n${followupSummary(review, 12)}\n\nSummary judgment: ${context.focus}\n\n${context.closing}`;
 }
 
 function buildIssueMessage(review, prefs, seed, recipientName, context) {
-  const issueLine = review.delayed.length || review.carried.length || review.open.length
-    ? "The main thing to note is that some work needed a later window, so I documented the reason/status instead of leaving it unclear."
-    : "No major issue is standing out from the planned list right now.";
-  return `${context.greeting} ${dayPart()} ${recipientName}, follow-up focused update from Jamison.\n\n${issueLine}\n\nItems needing attention:\n${followupSummary(review, 12)}\n\nCompleted items for context:\n${completedSummary(review, 6)}\n\nOperational note:\n${context.focus}\n\n${context.closing}`;
+  const style = variant(seed, 3);
+  const hasIssues = review.delayed.length || review.carried.length || review.open.length;
+  if (style === 0) {
+    return `Follow-up / issue update for ${recipientName}\n\nMain concern:\n${hasIssues ? "Some items needed a later window, so I documented the reason/status instead of leaving them sitting in the active list." : "No major issue is standing out from the planned list right now."}\n\nNeeds attention first:\n${followupSummary(review, 12)}\n\nCompleted for context:\n${completedSummary(review, 5)}\n\n${context.closing}`;
+  }
+  if (style === 1) {
+    return `${context.greeting} ${dayPart()} ${recipientName}, this is the issue-focused handoff from Jamison.\n\nWhat may affect the next window:\n${followupSummary(review, 12)}\n\nWhat was still handled:\n${completedSummary(review, 6)}\n\nImpact note:\n${hasIssues ? "The important part is that the unfinished work is documented with status instead of being hidden in the checklist." : "No major blocker is currently documented."}\n\n${context.closing}`;
+  }
+  return `Heads-up update for ${recipientName}:\n\nItems that need attention:\n${followupSummary(review, 12)}\n\nWhy I am flagging it:\n${hasIssues ? "These are the items most likely to matter after this shift because they are delayed, carried, or still open." : "There is not much to flag right now, but I am still sending the status for the record."}\n\nCompleted items:\n${completedSummary(review, 6)}\n\n${context.closing}`;
 }
 
 function buildPositiveMessage(review, prefs, seed, recipientName, context) {
-  return `${context.greeting} ${dayPart()} ${recipientName}, ${pick(["I wanted to send a quick sincere update", "here’s a clean shift update", "I’m sending today’s handoff"], seed, 11)} from Jamison.\n\n${context.focus}\n\nWhat went well:\n${completedSummary(review, 7)}\n\nWhat still needs a window:\n${followupSummary(review, 6)}\n\nOverall, I tried to keep the shift moving by handling the highest-impact items first and documenting anything that could not be finished cleanly.\n\n${context.closing}`;
+  const style = variant(seed, 4);
+  const loretta = prefs.recipient === "loretta";
+  if (style === 0) {
+    return `${context.greeting} ${dayPart()} ${recipientName}, ${loretta ? "I wanted to send you a sincere daily handoff" : "here is the positive shift handoff"} from Jamison.\n\n${context.focus}\n\nWhat moved forward today:\n${completedSummary(review, 7)}\n\nWhat still needs a window:\n${followupSummary(review, 6)}\n\nOverall, I kept the shift moving by handling the highest-impact items first and documenting anything that could not be finished cleanly.\n\n${context.closing}`;
+  }
+  if (style === 1) {
+    return `${recipientName}, here is where I landed today.\n\nI got ${review.completed.length} of ${review.tasks.length} planned items completed. The best wins were:\n${completedSummary(review, 5)}\n\nThe things I do not want to get lost are:\n${followupSummary(review, 5)}\n\n${loretta ? "I know these days can get pulled in a dozen directions, so I tried to keep this honest and useful instead of just making it sound pretty." : context.focus}\n\n${context.closing}`;
+  }
+  if (style === 2) {
+    return `${context.greeting} ${dayPart()} ${recipientName}. Before I wrap this up, here is the honest shift picture.\n\nHandled well:\n${completedSummary(review, 6)}\n\nStill open, but documented:\n${followupSummary(review, 6)}\n\nThe main thing is that the shift did move forward, and the unfinished items have a clear status instead of being left vague.\n\n${context.closing}`;
+  }
+  return `Daily handoff for ${recipientName}\n\nWhat I focused on:\n${inlineList(review.completed, 4, "keeping the shift stable and documenting follow-ups")}\n\nWhat still needs attention:\n${inlineList(followupItems(review).map((item) => item.task), 4, "nothing major from the planned list")}\n\nMore detail:\n${completedSummary(review, 6)}\n\nFollow-up detail:\n${followupSummary(review, 6)}\n\n${context.closing}`;
 }
 
 function buildMessage(review) {
@@ -192,7 +238,7 @@ function renderTemplateAwareReview() {
   const message = buildMessage(review);
   eyebrow.textContent = "Review";
   title.textContent = "End-of-Day";
-  content.innerHTML = `<article class="review-card"><div class="screen-header"><div><p class="eyebrow">END OF DAY REVIEW</p><h3>Daily handoff</h3></div><span class="badge">${SHIFT_NAMES[review.shift]}</span></div><div class="review-grid">${stat("Done", review.completed.length)}${stat("Delayed", review.delayed.length)}${stat("Carry", review.carried.length)}${stat("Watch", review.open.length)}</div><div class="review-section handoff-options"><h4>Handoff options</h4><p class="helper-text">Choose who this is going to and how direct it should feel. Refresh gives you a different sincere version without changing the facts.</p><div class="handoff-option-grid"><label>Send to<select id="handoff-recipient">${option("loretta", "Loretta", prefs.recipient)}${option("richard", "Richard", prefs.recipient)}${option("both", "Both", prefs.recipient)}</select></label><label>Tone<select id="handoff-tone">${option("quick", "Quick", prefs.tone)}${option("detailed", "Detailed", prefs.tone)}${option("issue", "Issue-focused", prefs.tone)}${option("positive", "Positive / sincere", prefs.tone)}</select></label></div></div>${list("Completed", review.completed)}${list("Delayed", review.delayed, review.states)}${list("Carry Forward", review.carried, review.states)}${list("Still Watching", review.open)}<div class="review-section"><h4>Editable message</h4><textarea class="review-message-box" id="review-message">${escapeHTML(message)}</textarea><div class="review-actions"><button class="primary-action" id="share-review" type="button">Text / Share</button><button class="secondary-action" id="copy-review" type="button">Copy</button><button class="secondary-action" id="refresh-review" type="button">Refresh Message</button></div></div></article>`;
+  content.innerHTML = `<article class="review-card"><div class="screen-header"><div><p class="eyebrow">END OF DAY REVIEW</p><h3>Daily handoff</h3></div><span class="badge">${SHIFT_NAMES[review.shift]}</span></div><div class="review-grid">${stat("Done", review.completed.length)}${stat("Delayed", review.delayed.length)}${stat("Carry", review.carried.length)}${stat("Watch", review.open.length)}</div><div class="review-section handoff-options"><h4>Handoff options</h4><p class="helper-text">Choose who this is going to and how direct it should feel. Refresh now changes the layout and wording while keeping the facts accurate.</p><div class="handoff-option-grid"><label>Send to<select id="handoff-recipient">${option("loretta", "Loretta", prefs.recipient)}${option("richard", "Richard", prefs.recipient)}${option("both", "Both", prefs.recipient)}</select></label><label>Tone<select id="handoff-tone">${option("quick", "Quick text", prefs.tone)}${option("detailed", "Detailed handoff", prefs.tone)}${option("issue", "Issue-first", prefs.tone)}${option("positive", "Warm daily", prefs.tone)}</select></label></div></div>${list("Completed", review.completed)}${list("Delayed", review.delayed, review.states)}${list("Carry Forward", review.carried, review.states)}${list("Still Watching", review.open)}<div class="review-section"><h4>Editable message</h4><textarea class="review-message-box" id="review-message">${escapeHTML(message)}</textarea><div class="review-actions"><button class="primary-action" id="share-review" type="button">Text / Share</button><button class="secondary-action" id="copy-review" type="button">Copy</button><button class="secondary-action" id="refresh-review" type="button">Refresh Message</button></div></div></article>`;
   document.querySelector("#handoff-recipient")?.addEventListener("change", savePrefsAndRefresh);
   document.querySelector("#handoff-tone")?.addEventListener("change", savePrefsAndRefresh);
   document.querySelector("#refresh-review")?.addEventListener("click", refreshVariantAndRender);
