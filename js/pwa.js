@@ -1,4 +1,5 @@
 import "./state-polish.js";
+import "./production-tools.js";
 
 const installHintKey = "storePilot.installHintSeen.v1";
 let deferredInstallPrompt = null;
