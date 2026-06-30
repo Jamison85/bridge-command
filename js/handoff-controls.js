@@ -33,6 +33,7 @@ function enhanceHandoffControls() {
   options.appendChild(topButton);
 }
 
+import("./stability-intelligence.js").catch((error) => console.warn("Store Pilot stabilization layer failed", error));
 document.addEventListener("click", () => setTimeout(enhanceHandoffControls, 80));
 document.addEventListener("change", () => setTimeout(enhanceHandoffControls, 80));
 setInterval(enhanceHandoffControls, 900);
