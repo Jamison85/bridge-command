@@ -15,6 +15,41 @@ function siKey() { return `${siDay()}:${siShift()}`; }
 function siEscape(value) { return String(value ?? "").replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char])); }
 function important(node, prop, value) { node?.style?.setProperty(prop, value, "important"); }
 
+function keepHeroReadable() {
+  const hero = document.querySelector(".hero-card");
+  if (!hero) return;
+  const bright = "#fffaf0";
+  const muted = "rgba(255,250,240,0.78)";
+  const gold = "#f0c979";
+  const title = hero.querySelector("#next-title");
+  if (title) {
+    important(title, "color", bright);
+    important(title, "-webkit-text-fill-color", bright);
+    important(title, "opacity", "1");
+    important(title, "text-shadow", "none");
+  }
+  const copy = hero.querySelector("#next-copy");
+  if (copy) {
+    important(copy, "color", muted);
+    important(copy, "-webkit-text-fill-color", muted);
+    important(copy, "opacity", "1");
+    important(copy, "text-shadow", "none");
+  }
+  hero.querySelectorAll(".hero-meta span, #shift-label, #date-label").forEach((node) => {
+    important(node, "color", muted);
+    important(node, "-webkit-text-fill-color", muted);
+    important(node, "opacity", "1");
+    important(node, "text-shadow", "none");
+  });
+  hero.querySelectorAll(".eyebrow").forEach((node) => {
+    if (node.closest("#next-brain-explain")) return;
+    important(node, "color", gold);
+    important(node, "-webkit-text-fill-color", gold);
+    important(node, "opacity", "1");
+    important(node, "text-shadow", "none");
+  });
+}
+
 function getData() {
   const shift = siShift();
   const key = siKey();
@@ -139,6 +174,7 @@ function styleCard(card) {
 function renderStableIntel() {
   const hero = document.querySelector(".hero-card");
   if (!hero) return;
+  keepHeroReadable();
   const item = analyze();
   const signature = JSON.stringify({ title: item.next?.title || "Final walk and handoff note", status: item.status, confidence: item.confidence, reason: item.reason, waits: item.waits });
   const card = document.querySelector("#next-brain-explain") || document.createElement("div");
@@ -151,6 +187,7 @@ function renderStableIntel() {
   }
   if (!card.parentElement) hero.appendChild(card);
   styleCard(card);
+  keepHeroReadable();
 }
 
 document.addEventListener("click", () => setTimeout(renderStableIntel, 120));
