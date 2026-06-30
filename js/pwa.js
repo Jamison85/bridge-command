@@ -2,6 +2,7 @@ import "./state-polish.js";
 import "./production-tools.js";
 import "./final-nav.js";
 import "./final-task-highlight.js";
+import "./review-layer-variety.js";
 
 const installHintKey = "storePilot.installHintSeen.v1";
 let deferredInstallPrompt = null;
