@@ -34,6 +34,7 @@ function enhanceHandoffControls() {
 }
 
 import("./stability-intelligence.js").catch((error) => console.warn("Store Pilot stabilization layer failed", error));
+import("./lto-contrast-fix.js").catch((error) => console.warn("Store Pilot LTO contrast fix failed", error));
 document.addEventListener("click", () => setTimeout(enhanceHandoffControls, 80));
 document.addEventListener("change", () => setTimeout(enhanceHandoffControls, 80));
 setInterval(enhanceHandoffControls, 900);
