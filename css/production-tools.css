@@ -1,0 +1,83 @@
+.production-tools-card {
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid rgba(7, 63, 47, 0.13);
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(255, 250, 241, 0.96), rgba(255, 244, 226, 0.84));
+  box-shadow: 0 16px 38px rgba(44, 31, 16, 0.11);
+}
+
+.production-tools-card h3 {
+  margin: 0;
+  color: var(--forest);
+  font-size: 1.12rem;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.qa-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.qa-row {
+  min-height: 42px;
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.qa-row span {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  font-weight: 950;
+}
+
+.qa-row.pass span {
+  background: rgba(7, 63, 47, 0.11);
+  color: var(--forest);
+}
+
+.qa-row.fail span {
+  background: rgba(184, 115, 54, 0.14);
+  color: #8b4e1f;
+}
+
+.prod-tool-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 9px;
+}
+
+.prod-tool-grid .secondary-action {
+  min-height: 44px;
+  background: rgba(7, 63, 47, 0.08);
+  color: var(--forest);
+}
+
+.prod-tool-grid .danger {
+  grid-column: 1 / -1;
+  background: rgba(184, 115, 54, 0.13);
+  color: #8b4e1f;
+}
+
+@media (max-width: 430px) {
+  .production-tools-card {
+    padding: 14px;
+  }
+
+  .qa-list {
+    grid-template-columns: 1fr;
+  }
+}
