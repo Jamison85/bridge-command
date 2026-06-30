@@ -1,3 +1,5 @@
+import "./state-polish.js";
+
 const installHintKey = "storePilot.installHintSeen.v1";
 let deferredInstallPrompt = null;
 
