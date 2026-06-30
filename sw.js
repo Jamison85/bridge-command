@@ -1,4 +1,4 @@
-const CACHE_NAME = "store-pilot-pwa-state-20";
+const CACHE_NAME = "store-pilot-blink-fix-21";
 const APP_SHELL = [
   "./",
   "./index.html",
