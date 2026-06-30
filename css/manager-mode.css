@@ -1,0 +1,218 @@
+@media (max-width: 700px) {
+  .app-shell {
+    padding-top: calc(env(safe-area-inset-top) + 10px);
+    padding-bottom: calc(env(safe-area-inset-bottom) + 104px);
+  }
+
+  .top-bar {
+    grid-template-columns: 44px 1fr auto;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .icon-button {
+    width: 42px;
+    height: 42px;
+    border-radius: 15px;
+  }
+
+  .brand-lockup .eyebrow {
+    margin-bottom: 2px;
+    font-size: 0.58rem;
+  }
+
+  .brand-lockup h1 {
+    font-size: clamp(1.16rem, 5vw, 1.52rem);
+  }
+
+  .status-pill {
+    min-height: 34px;
+    padding: 7px 10px;
+    font-size: 0.7rem;
+  }
+
+  .shift-card {
+    padding: 9px;
+    margin-bottom: 10px;
+    border-radius: 20px;
+  }
+
+  .shift-card > .eyebrow {
+    margin: 0 0 8px;
+    font-size: 0.6rem;
+  }
+
+  .shift-toggle {
+    gap: 8px;
+  }
+
+  .shift-button {
+    min-height: 44px;
+    border-radius: 15px;
+    font-size: 0.92rem;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 1.28fr) minmax(112px, 0.72fr);
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .hero-card,
+  .progress-card {
+    min-height: 174px;
+    border-radius: 24px;
+  }
+
+  .hero-card {
+    padding: 14px;
+  }
+
+  .hero-meta {
+    margin-bottom: 8px;
+    font-size: 0.61rem;
+  }
+
+  .hero-card .eyebrow {
+    margin-bottom: 5px;
+    font-size: 0.58rem;
+  }
+
+  .hero-card h2 {
+    max-width: 12ch;
+    font-size: clamp(1.05rem, 5.2vw, 1.38rem);
+    line-height: 1.01;
+  }
+
+  .hero-card p:not(.eyebrow) {
+    margin-top: 8px;
+    font-size: 0.72rem;
+    line-height: 1.32;
+  }
+
+  .hero-actions {
+    gap: 7px;
+    margin-top: 11px;
+  }
+
+  .hero-actions .primary-action,
+  .hero-actions .secondary-action {
+    min-height: 38px;
+    border-radius: 14px;
+    font-size: 0.84rem;
+  }
+
+  .progress-card {
+    padding: 13px 9px;
+    align-content: center;
+  }
+
+  .progress-card .eyebrow {
+    margin-bottom: 6px;
+    font-size: 0.57rem;
+    line-height: 1.25;
+  }
+
+  .progress-ring {
+    width: 74px;
+    height: 74px;
+    min-width: 74px;
+    min-height: 74px;
+    box-shadow: inset 0 0 0 9px rgba(255,250,241,0.96), 0 8px 16px rgba(44,31,16,0.07);
+  }
+
+  #progress-ring-text {
+    font-size: 1.02rem;
+  }
+
+  .progress-track {
+    height: 7px;
+    margin-top: 2px;
+  }
+
+  #progress-subtext {
+    font-size: 0.7rem;
+    line-height: 1.22;
+  }
+
+  .screen-card {
+    padding: 14px;
+    border-radius: 24px;
+    min-height: unset;
+  }
+
+  .screen-header {
+    margin-bottom: 10px;
+  }
+
+  .screen-header .eyebrow {
+    margin-bottom: 4px;
+    font-size: 0.58rem;
+  }
+
+  .screen-header h2 {
+    font-size: 1.18rem;
+  }
+
+  .task-row,
+  .note-row,
+  .report-output,
+  .empty-state,
+  .walk-card {
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .task-check {
+    width: 28px;
+    height: 28px;
+  }
+
+  .task-title {
+    font-size: 0.92rem;
+  }
+
+  .task-meta {
+    font-size: 0.74rem;
+  }
+
+  .task-actions .mini-button {
+    min-height: 40px;
+    border-radius: 14px;
+    font-size: 0.8rem;
+  }
+
+  .bottom-nav {
+    bottom: calc(env(safe-area-inset-bottom) + 8px);
+    padding: 7px;
+    border-radius: 24px 24px 18px 18px;
+  }
+
+  .nav-button {
+    min-height: 46px;
+    border-radius: 17px;
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .hero-card,
+  .progress-card {
+    min-height: 162px;
+  }
+
+  .hero-card h2 {
+    font-size: 1.06rem;
+  }
+
+  .hero-card p:not(.eyebrow) {
+    display: none;
+  }
+
+  .progress-ring {
+    width: 66px;
+    height: 66px;
+    min-width: 66px;
+    min-height: 66px;
+  }
+}
