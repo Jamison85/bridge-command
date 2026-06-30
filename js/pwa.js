@@ -3,7 +3,7 @@ import "./production-tools.js";
 import "./final-nav.js";
 import "./final-task-highlight.js";
 import "./review-layer-variety.js";
-import "./handoff-controls.js";
+import "./runtime-clean-bridge.js?v=1";
 import "./shift-brain.js";
 import "./walk-fix.js";
 
