@@ -44,7 +44,6 @@ function keepHeroReadable() {
     important(node, "text-shadow", "none");
   });
   hero.querySelectorAll(".eyebrow").forEach((node) => {
-    if (node.closest("#next-brain-explain")) return;
     important(node, "color", gold);
     important(node, "-webkit-text-fill-color", gold);
     important(node, "opacity", "1");
@@ -69,7 +68,7 @@ function getData() {
 }
 
 function dueScore(task) {
-  if (!task.due) return 0;
+  if (!task?.due) return 0;
   const match = String(task.due).match(/(\d{1,2})(?::(\d{2}))?\s*(AM|PM)?/i);
   if (!match) return 8;
   let hour = Number(match[1]);
@@ -136,14 +135,25 @@ function analyze() {
   return { next, status, confidence, reason: reason(next, data.states), waits: ifWaits(next) };
 }
 
+function isNextScreenActive() {
+  return document.querySelector("#screen-title")?.textContent?.trim().toLowerCase() === "next";
+}
+
+function getIntelligenceTarget() {
+  if (!isNextScreenActive()) return null;
+  return document.querySelector("#screen-content");
+}
+
 function styleCard(card) {
-  important(card, "margin-top", "14px");
+  important(card, "margin-top", "2px");
   important(card, "padding", "14px");
   important(card, "border-radius", "20px");
   important(card, "border", "1px solid rgba(15,23,42,0.08)");
   important(card, "box-shadow", "0 14px 34px rgba(15,23,42,0.08)");
   important(card, "color", "#14392f");
   important(card, "-webkit-text-fill-color", "#14392f");
+  important(card, "position", "relative");
+  important(card, "z-index", "1");
   card.querySelectorAll(".intel-kicker, .intel-title, .intel-badges span").forEach((node) => {
     important(node, "color", "#7c2d12");
     important(node, "-webkit-text-fill-color", "#7c2d12");
@@ -174,12 +184,17 @@ function styleCard(card) {
 }
 
 function renderStableIntel() {
-  const hero = document.querySelector(".hero-card");
-  if (!hero) return;
   keepHeroReadable();
+  const target = getIntelligenceTarget();
+  const existing = document.querySelector("#next-brain-explain");
+  if (!target) {
+    existing?.remove();
+    return;
+  }
+
   const item = analyze();
   const signature = JSON.stringify({ title: item.next?.title || "Final walk and handoff note", status: item.status, confidence: item.confidence, reason: item.reason, waits: item.waits });
-  const card = document.querySelector("#next-brain-explain") || document.createElement("div");
+  const card = existing || document.createElement("article");
   card.id = "next-brain-explain";
   card.className = "shift-intel-stable";
   important(card, "background", item.status === "Red" ? "#fee2e2" : item.status === "Yellow" ? "#fff7ed" : "#ecfdf5");
@@ -187,7 +202,7 @@ function renderStableIntel() {
     card.dataset.signature = signature;
     card.innerHTML = `<p class="intel-kicker">SHIFT INTELLIGENCE</p><strong class="intel-title">${siEscape(item.next?.title || "Final walk and handoff note")}</strong><p class="intel-body"><b>Why:</b> ${siEscape(item.reason)}</p><p class="intel-body"><b>If it waits:</b> ${siEscape(item.waits)}</p><div class="intel-badges"><span>Store: ${siEscape(item.status)}</span><span>Confidence: ${siEscape(item.confidence)}</span></div>`;
   }
-  if (!card.parentElement) hero.appendChild(card);
+  if (card.parentElement !== target) target.appendChild(card);
   styleCard(card);
   keepHeroReadable();
 }
