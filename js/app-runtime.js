@@ -8,9 +8,10 @@ import "./shift-brain.js?v=1";
 import "./task-state-clarity.js?v=1";
 import "./feedback-layer.js?v=1";
 import "./smart-context-engine.js?v=1";
+import "./smart-alerts.js?v=1";
 
 window.StorePilotRuntime = {
-  version: "smart-context-1",
+  version: "smart-alerts-1",
   loadedAt: new Date().toISOString(),
   modules: [
     "state-polish",
@@ -22,6 +23,7 @@ window.StorePilotRuntime = {
     "shift-brain",
     "task-state-clarity",
     "feedback-layer",
-    "smart-context-engine"
+    "smart-context-engine",
+    "smart-alerts"
   ]
 };
