@@ -1,0 +1,76 @@
+.feedback-banner {
+  margin: 0 0 14px;
+  padding: 13px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(7, 63, 47, 0.16);
+  background: rgba(236, 253, 245, 0.92);
+  color: #14392f;
+  box-shadow: var(--shadow-soft);
+  font-weight: 900;
+  line-height: 1.34;
+  display: none;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.feedback-banner.visible {
+  display: flex;
+}
+
+.feedback-banner::before {
+  content: "✓";
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  border-radius: 999px;
+  background: rgba(15, 91, 66, 0.12);
+  color: #0f5b42;
+  font-weight: 1000;
+}
+
+.feedback-banner.feedback-warn {
+  border-color: rgba(180, 83, 9, 0.22);
+  background: rgba(255, 247, 237, 0.94);
+  color: #7c2d12;
+}
+
+.feedback-banner.feedback-warn::before {
+  content: "!";
+  background: rgba(180, 83, 9, 0.12);
+  color: #9a3412;
+}
+
+.feedback-banner.feedback-info {
+  border-color: rgba(67, 56, 202, 0.18);
+  background: rgba(238, 242, 255, 0.92);
+  color: #3730a3;
+}
+
+.feedback-banner.feedback-info::before {
+  content: "i";
+  background: rgba(67, 56, 202, 0.12);
+  color: #3730a3;
+}
+
+.feedback-banner span {
+  display: block;
+}
+
+.feedback-banner small {
+  display: block;
+  margin-top: 2px;
+  color: inherit;
+  opacity: 0.72;
+  font-size: 0.76rem;
+  font-weight: 850;
+}
+
+@media (max-width: 430px) {
+  .feedback-banner {
+    margin-bottom: 12px;
+    padding: 12px;
+    border-radius: 18px;
+  }
+}
