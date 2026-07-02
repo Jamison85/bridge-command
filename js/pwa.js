@@ -1,12 +1,3 @@
-import "./state-polish.js";
-import "./production-tools.js";
-import "./final-nav.js";
-import "./final-task-highlight.js";
-import "./review-layer-variety.js";
-import "./runtime-clean-bridge.js?v=1";
-import "./shift-brain.js";
-import "./walk-flow-v2.js?v=1";
-
 const installHintKey = "storePilot.installHintSeen.v1";
 let deferredInstallPrompt = null;
 
