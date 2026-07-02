@@ -32,7 +32,7 @@ function enhanceHandoffControls() {
   options.appendChild(topButton);
 }
 
-import("./shift-intel-stable.js?v=4").catch((error) => console.warn("Store Pilot stable shift intelligence failed", error));
+import("./shift-intel-stable.js?v=5").catch((error) => console.warn("Store Pilot stable shift intelligence failed", error));
 
 document.addEventListener("click", () => setTimeout(enhanceHandoffControls, 80));
 document.addEventListener("change", () => setTimeout(enhanceHandoffControls, 80));
