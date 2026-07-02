@@ -1,0 +1,157 @@
+.task-row,
+.walk-card {
+  position: relative;
+}
+
+.task-row.state-open,
+.walk-card.state-open {
+  border-color: rgba(7, 63, 47, 0.12);
+}
+
+.task-row.state-done,
+.walk-card.state-done,
+.task-row.done,
+.walk-card.done {
+  border-color: rgba(15, 91, 66, 0.22);
+  background: rgba(236, 253, 245, 0.76);
+  opacity: 0.86;
+}
+
+.task-row.state-delayed,
+.walk-card.state-delayed,
+.task-row.delayed,
+.walk-card.delayed {
+  border-color: rgba(180, 83, 9, 0.34);
+  background: rgba(255, 247, 237, 0.9);
+}
+
+.task-row.state-carry,
+.walk-card.state-carry,
+.task-row.carry,
+.walk-card.carry {
+  border-color: rgba(67, 56, 202, 0.26);
+  background: rgba(238, 242, 255, 0.86);
+}
+
+.task-row.state-follow-up,
+.walk-card.state-follow-up {
+  border-color: rgba(184, 115, 54, 0.3);
+  background: rgba(255, 244, 223, 0.78);
+}
+
+.task-row.state-leadership,
+.walk-card.state-leadership {
+  box-shadow: inset 4px 0 0 rgba(184, 115, 54, 0.7), var(--shadow-soft);
+}
+
+.task-state-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.state-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 24px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.74);
+  color: #14392f;
+  font-size: 0.68rem;
+  font-weight: 950;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.state-pill.state-open {
+  color: #14532d;
+  background: rgba(240, 253, 244, 0.92);
+  border-color: rgba(20, 83, 45, 0.14);
+}
+
+.state-pill.state-done {
+  color: #064e3b;
+  background: rgba(209, 250, 229, 0.92);
+  border-color: rgba(6, 78, 59, 0.14);
+}
+
+.state-pill.state-delayed {
+  color: #9a3412;
+  background: rgba(255, 237, 213, 0.94);
+  border-color: rgba(154, 52, 18, 0.18);
+}
+
+.state-pill.state-carry {
+  color: #3730a3;
+  background: rgba(224, 231, 255, 0.94);
+  border-color: rgba(55, 48, 163, 0.16);
+}
+
+.state-pill.state-follow-up {
+  color: #7c2d12;
+  background: rgba(255, 244, 223, 0.94);
+  border-color: rgba(124, 45, 18, 0.16);
+}
+
+.state-pill.state-leadership {
+  color: #7c2d12;
+  background: rgba(254, 243, 199, 0.95);
+  border-color: rgba(180, 83, 9, 0.18);
+}
+
+.state-pill.state-risk {
+  color: #991b1b;
+  background: rgba(254, 226, 226, 0.94);
+  border-color: rgba(153, 27, 27, 0.18);
+}
+
+.task-state-note {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.status-tag {
+  padding: 5px 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.status-tag.delayed {
+  background: rgba(255, 237, 213, 0.94);
+  color: #9a3412;
+}
+
+.status-tag.carry {
+  background: rgba(224, 231, 255, 0.94);
+  color: #3730a3;
+}
+
+.task-row.done .task-title,
+.walk-card.done .task-title {
+  color: #14532d;
+}
+
+.task-row.delayed .task-title,
+.walk-card.delayed .task-title,
+.task-row.state-delayed .task-title,
+.walk-card.state-delayed .task-title {
+  color: #9a3412;
+}
+
+.task-row.carry .task-title,
+.walk-card.carry .task-title,
+.task-row.state-carry .task-title,
+.walk-card.state-carry .task-title {
+  color: #3730a3;
+}
