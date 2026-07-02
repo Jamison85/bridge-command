@@ -6,9 +6,10 @@ import "./review-layer-variety.js";
 import "./runtime-clean-bridge.js?v=2";
 import "./shift-brain.js";
 import "./task-state-clarity.js?v=1";
+import "./feedback-layer.js?v=1";
 
 window.StorePilotRuntime = {
-  version: "task-states-1",
+  version: "feedback-1",
   loadedAt: new Date().toISOString(),
   modules: [
     "state-polish",
@@ -18,6 +19,7 @@ window.StorePilotRuntime = {
     "review-layer-variety",
     "runtime-clean-bridge",
     "shift-brain",
-    "task-state-clarity"
+    "task-state-clarity",
+    "feedback-layer"
   ]
 };
