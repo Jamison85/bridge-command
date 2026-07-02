@@ -129,9 +129,24 @@ async function callSmartEndpoint(endpoint, payload) {
   return { message: await response.text() };
 }
 
+function completionLabel(review) {
+  if (!review.tasks.length) return "0%";
+  return `${Math.round((review.completed.length / review.tasks.length) * 100)}%`;
+}
+
+function modeLabel() {
+  return readJSON(BRAIN_KEYS.endpoint, "") ? "API Connected" : "Local Only";
+}
+
+function modeClass() {
+  return readJSON(BRAIN_KEYS.endpoint, "") ? "api" : "local";
+}
+
 function setSmartStatus(text) {
   const node = document.querySelector("#smart-handoff-status");
   if (node) node.textContent = text;
+  const status = document.querySelector("#system-status");
+  if (status && text) status.textContent = text;
 }
 
 async function makeSmartHandoff() {
@@ -163,47 +178,90 @@ function configureEndpoint() {
   const value = prompt("Paste your secure AI endpoint URL. Leave blank to use local Shift Brain only. Do not paste an API key here.", current) || "";
   writeJSON(BRAIN_KEYS.endpoint, value.trim());
   setSmartStatus(value.trim() ? "API endpoint saved." : "Using local Shift Brain only.");
+  refreshSmartPanel();
 }
 
 function renderBrainResult(brain, why, status) {
   const result = document.querySelector("#smart-brain-result");
   if (!result) return;
-  result.innerHTML = `<strong>Store Status: ${escapeHTML(status)}</strong><br><span>Recommended next: ${escapeHTML(brain.next?.title || "Final walk and handoff note")}</span><br><span>${escapeHTML(why)}</span>`;
+  result.innerHTML = `<div class="smart-brain-next"><p class="smart-brain-kicker">CURRENT READ</p><strong>Store Status: ${escapeHTML(status)}</strong><p>Recommended next: ${escapeHTML(brain.next?.title || "Final walk and handoff note")}</p><p>${escapeHTML(why)}</p></div>`;
+  const panel = document.querySelector("#smart-handoff-panel");
+  if (panel) panel.dataset.status = String(status || brain.status || "green").toLowerCase();
 }
 
-function styleButton(button, primary = false) {
-  button.style.background = primary ? "#fff4df" : "rgba(255,255,255,0.82)";
-  button.style.color = "#43260f";
-  button.style.border = "1px solid rgba(184, 115, 54, 0.45)";
-  button.style.borderRadius = "16px";
-  button.style.padding = "12px 14px";
-  button.style.fontWeight = "950";
-  button.style.boxShadow = primary ? "0 10px 24px rgba(184,115,54,0.15)" : "none";
+function buildPanelHTML(review, brain) {
+  const endpoint = readJSON(BRAIN_KEYS.endpoint, "");
+  const shiftName = SHIFT_NAMES[review.shift] || "Shift";
+  const nextTitle = brain.next?.title || "Final walk and handoff note";
+  const status = String(brain.status || "Green").toLowerCase();
+  return `
+    <div class="smart-brain-head">
+      <div class="smart-brain-title">
+        <p>SMART SHIFT BRAIN</p>
+        <h4>${escapeHTML(shiftName)} command read</h4>
+      </div>
+      <span class="smart-brain-mode ${modeClass()}">${escapeHTML(modeLabel())}</span>
+    </div>
+    <div class="smart-brain-status">
+      <div class="smart-brain-stat"><span>Store</span><strong>${escapeHTML(brain.status)}</strong></div>
+      <div class="smart-brain-stat"><span>Done</span><strong>${escapeHTML(completionLabel(review))}</strong></div>
+      <div class="smart-brain-stat"><span>Follow-ups</span><strong>${review.delayed.length + review.carried.length + review.open.length}</strong></div>
+    </div>
+    <div id="smart-brain-result">
+      <div class="smart-brain-next">
+        <p class="smart-brain-kicker">RECOMMENDED NEXT MOVE</p>
+        <strong>${escapeHTML(nextTitle)}</strong>
+        <p>${escapeHTML(brain.reason)}</p>
+      </div>
+    </div>
+    <div class="smart-brain-actions">
+      <button id="make-smart-handoff" class="smart-primary" type="button">Build Smart Handoff</button>
+      <button id="set-smart-endpoint" class="smart-secondary" type="button">${endpoint ? "Change API" : "Set API"}</button>
+    </div>
+    <p id="smart-handoff-status">${endpoint ? "API mode available. Local fallback still active." : "Local Shift Brain ready. API is optional."}</p>
+    <p class="smart-brain-foot">Use this to rewrite the handoff without inventing completed work. Stunning that we have to say that, but here we are.</p>`;
 }
 
 function enhanceSmartHandoff() {
   const logActive = document.querySelector('[data-screen="log"]')?.classList.contains("active");
-  if (!logActive || document.querySelector("#smart-handoff-panel")) return;
+  if (!logActive) return;
   const options = document.querySelector(".handoff-options");
   const reviewBox = document.querySelector("#review-message");
   if (!options || !reviewBox) return;
+
   const review = getReviewData();
   const brain = analyzeShift(review);
-  const panel = document.createElement("div");
-  panel.id = "smart-handoff-panel";
-  panel.style.marginTop = "14px";
-  panel.style.padding = "14px";
-  panel.style.border = "1px solid rgba(7,63,47,0.12)";
-  panel.style.borderRadius = "20px";
-  panel.style.background = "rgba(255,255,255,0.68)";
-  panel.innerHTML = `<h4 style="margin:0 0 6px;color:#14392f;">Smart Shift Brain</h4><p id="smart-brain-result" class="helper-text" style="margin:0 0 10px;"><strong>Store Status: ${escapeHTML(brain.status)}</strong><br><span>Recommended next: ${escapeHTML(brain.next?.title || "Final walk and handoff note")}</span><br><span>${escapeHTML(brain.reason)}</span></p><div style="display:flex;gap:8px;flex-wrap:wrap;"><button id="make-smart-handoff" type="button">Make Smart Handoff</button><button id="set-smart-endpoint" type="button">Set API Endpoint</button></div><p id="smart-handoff-status" class="helper-text" style="margin:10px 0 0;">Local Shift Brain ready. API optional.</p>`;
-  options.appendChild(panel);
-  const smartButton = panel.querySelector("#make-smart-handoff");
-  const endpointButton = panel.querySelector("#set-smart-endpoint");
-  styleButton(smartButton, true);
-  styleButton(endpointButton, false);
-  smartButton.addEventListener("click", makeSmartHandoff);
-  endpointButton.addEventListener("click", configureEndpoint);
+  const signature = JSON.stringify({
+    status: brain.status,
+    next: brain.next?.title || "Final walk and handoff note",
+    completion: completionLabel(review),
+    delayed: review.delayed.length,
+    carried: review.carried.length,
+    open: review.open.length,
+    mode: modeLabel()
+  });
+
+  let panel = document.querySelector("#smart-handoff-panel");
+  if (!panel) {
+    panel = document.createElement("section");
+    panel.id = "smart-handoff-panel";
+    panel.className = "smart-brain-panel";
+    options.appendChild(panel);
+  }
+
+  panel.dataset.status = String(brain.status || "green").toLowerCase();
+  if (panel.dataset.signature !== signature) {
+    panel.dataset.signature = signature;
+    panel.innerHTML = buildPanelHTML(review, brain);
+    panel.querySelector("#make-smart-handoff")?.addEventListener("click", makeSmartHandoff);
+    panel.querySelector("#set-smart-endpoint")?.addEventListener("click", configureEndpoint);
+  }
+}
+
+function refreshSmartPanel() {
+  const panel = document.querySelector("#smart-handoff-panel");
+  if (panel) panel.dataset.signature = "";
+  enhanceSmartHandoff();
 }
 
 function upgradeDelayPrompt() {
