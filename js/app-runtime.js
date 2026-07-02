@@ -5,9 +5,10 @@ import "./final-task-highlight.js";
 import "./review-layer-variety.js";
 import "./runtime-clean-bridge.js?v=2";
 import "./shift-brain.js";
+import "./task-state-clarity.js?v=1";
 
 window.StorePilotRuntime = {
-  version: "next-layout-1",
+  version: "task-states-1",
   loadedAt: new Date().toISOString(),
   modules: [
     "state-polish",
@@ -16,6 +17,7 @@ window.StorePilotRuntime = {
     "final-task-highlight",
     "review-layer-variety",
     "runtime-clean-bridge",
-    "shift-brain"
+    "shift-brain",
+    "task-state-clarity"
   ]
 };
