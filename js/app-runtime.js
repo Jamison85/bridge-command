@@ -7,9 +7,10 @@ import "./runtime-clean-bridge.js?v=2";
 import "./shift-brain.js?v=1";
 import "./task-state-clarity.js?v=1";
 import "./feedback-layer.js?v=1";
+import "./smart-context-engine.js?v=1";
 
 window.StorePilotRuntime = {
-  version: "brain-panel-1",
+  version: "smart-context-1",
   loadedAt: new Date().toISOString(),
   modules: [
     "state-polish",
@@ -20,6 +21,7 @@ window.StorePilotRuntime = {
     "runtime-clean-bridge",
     "shift-brain",
     "task-state-clarity",
-    "feedback-layer"
+    "feedback-layer",
+    "smart-context-engine"
   ]
 };
