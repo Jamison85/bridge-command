@@ -3,11 +3,11 @@ import "./production-tools.js";
 import "./final-nav.js";
 import "./final-task-highlight.js";
 import "./review-layer-variety.js";
-import "./runtime-clean-bridge.js?v=1";
+import "./runtime-clean-bridge.js?v=2";
 import "./shift-brain.js";
 
 window.StorePilotRuntime = {
-  version: "walk-core-1",
+  version: "next-layout-1",
   loadedAt: new Date().toISOString(),
   modules: [
     "state-polish",
