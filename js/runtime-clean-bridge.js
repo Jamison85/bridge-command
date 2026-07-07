@@ -35,6 +35,7 @@ function enhanceHandoffControls() {
 import("./shift-intel-stable.js?v=5").catch((error) => console.warn("Store Pilot stable shift intelligence failed", error));
 import("./log-page-css.js?v=log-page-1").catch((error) => console.warn("Store Pilot log style failed", error));
 import("./log-page-fixes.js?v=log-page-1").catch((error) => console.warn("Store Pilot log page fixes failed", error));
+import("./log-final-polish.js?v=log-final-1").catch((error) => console.warn("Store Pilot final log polish failed", error));
 
 document.addEventListener("click", () => setTimeout(enhanceHandoffControls, 80));
 document.addEventListener("change", () => setTimeout(enhanceHandoffControls, 80));
