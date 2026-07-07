@@ -7,11 +7,11 @@ import "./runtime-clean-bridge.js?v=2";
 import "./shift-brain.js?v=1";
 import "./task-state-clarity.js?v=1";
 import "./feedback-layer.js?v=1";
-import "./smart-context-engine.js?v=1";
-import "./smart-alerts.js?v=1";
+import "./smart-context-engine.js?v=home-compress-1";
+import "./smart-alerts.js?v=home-compress-1";
 
 window.StorePilotRuntime = {
-  version: "smart-alerts-1",
+  version: "home-compress-1",
   loadedAt: new Date().toISOString(),
   modules: [
     "state-polish",
