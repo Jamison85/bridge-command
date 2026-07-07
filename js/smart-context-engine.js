@@ -19,6 +19,7 @@ const CONTEXT_MODES = [
 ];
 
 const SHIFT_NAMES = { morning: "Morning", mid: "Mid", close: "Close" };
+let contextEditorOpen = false;
 
 function contextRead(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
@@ -172,9 +173,11 @@ function ensureContextControls() {
   }
   if (!card) return;
 
+  contextEditorOpen = contextEditorOpen || Boolean(card.querySelector(".context-edit-drawer")?.open);
   const analysis = analyzeContext();
   card.className = "context-engine-card context-engine-compact";
   card.dataset.risk = analysis.risk;
+  document.documentElement.classList.toggle("context-editing", contextEditorOpen);
   card.innerHTML = `
     <div class="context-compact-row">
       <div>
@@ -184,15 +187,23 @@ function ensureContextControls() {
       </div>
       <span class="context-risk-pill">${escapeContext(riskLabel(analysis.risk))}</span>
     </div>
-    <details class="context-edit-drawer">
+    <details class="context-edit-drawer" ${contextEditorOpen ? "open" : ""}>
       <summary>Edit context</summary>
       <div class="context-mode-strip" role="group" aria-label="Shift context mode">
         ${CONTEXT_MODES.map((mode) => `<button class="context-mode-button ${mode.id === analysis.mode.id ? "active" : ""}" type="button" data-context-mode="${mode.id}">${escapeContext(mode.label)}</button>`).join("")}
       </div>
     </details>`;
 
+  const drawer = card.querySelector(".context-edit-drawer");
+  drawer?.addEventListener("toggle", () => {
+    contextEditorOpen = drawer.open;
+    document.documentElement.classList.toggle("context-editing", contextEditorOpen);
+  });
+
   card.querySelectorAll("[data-context-mode]").forEach((button) => button.addEventListener("click", () => {
     contextWrite(CONTEXT_KEYS.mode, button.dataset.contextMode);
+    contextEditorOpen = false;
+    document.documentElement.classList.remove("context-editing");
     const status = document.querySelector("#system-status");
     if (status) status.textContent = `${button.textContent} mode`;
     renderSmartContext();
@@ -233,5 +244,11 @@ window.StorePilotContextEngine = { analyze: analyzeContext, modes: CONTEXT_MODES
 
 document.addEventListener("click", () => setTimeout(renderSmartContext, 120));
 document.addEventListener("change", () => setTimeout(renderSmartContext, 120));
+document.addEventListener("toggle", (event) => {
+  if (event.target?.matches?.(".context-edit-drawer")) {
+    contextEditorOpen = event.target.open;
+    document.documentElement.classList.toggle("context-editing", contextEditorOpen);
+  }
+}, true);
 setInterval(renderSmartContext, 1000);
 setTimeout(renderSmartContext, 220);
