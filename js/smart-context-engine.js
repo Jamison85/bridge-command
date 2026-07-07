@@ -71,6 +71,15 @@ function taskText(task) {
   return `${task?.title || ""} ${task?.area || ""} ${task?.detail || ""}`.toLowerCase();
 }
 
+function urgentText(task, states = {}) {
+  return `${task?.title || ""} ${task?.area || ""} ${states[task?.id]?.reason || ""}`.toLowerCase();
+}
+
+function isUrgentIssue(task, states = {}) {
+  const text = urgentText(task, states);
+  return /safety|unsafe|injury|accident|spill|wet floor|power outage|outage|system down|register down|pos down|food safety|temperature|spoiled|cooler down|freezer down|staffing crisis|short staffed|call out|alone|incident report|customer incident|security|police|medical/i.test(text);
+}
+
 function dueScore(task) {
   if (!task?.due) return 0;
   const match = String(task.due).match(/(\d{1,2})(?::(\d{2}))?\s*(AM|PM)?/i);
@@ -93,12 +102,12 @@ function dueScore(task) {
 function scoreTask(task, data, mode) {
   const text = taskText(task);
   let value = Math.max(0, 120 - Number(task.priority || 12) * 6) + dueScore(task);
-  if (/wet|water|incident|outage|register|system|lock/.test(text)) value += 36;
+  if (isUrgentIssue(task, data.states)) value += 36;
   if (/loretta|richard|lto|report|handoff|bookwork|smartsafe|deposit|audit|order|labor/.test(text)) value += 30;
   if (/fresh|cooler|date|food|warmer|coffee|fountain|restroom|trash|floor|walk|customer|safety/.test(text)) value += 22;
   if ((task.minutes || 0) <= 10) value += 14;
-  if (data.states[task.id]?.type === "delayed") value += 24;
-  if (data.states[task.id]?.type === "carry") value += 18;
+  if (data.states[task.id]?.type === "delayed") value += 18;
+  if (data.states[task.id]?.type === "carry") value += 12;
   if (mode.boost?.test(text)) value += 26;
   return value;
 }
@@ -109,7 +118,7 @@ function explainTask(task, data, mode) {
   const reasons = [];
   if (task.due) reasons.push(`due ${task.due}`);
   if (mode.id !== "normal" && mode.boost?.test(text)) reasons.push(`matches ${mode.label.toLowerCase()} mode`);
-  if (/wet|water|incident|outage|register|system|lock/.test(text)) reasons.push("protects operations or documentation");
+  if (isUrgentIssue(task, data.states)) reasons.push("protects safety, systems, staffing, or incident documentation");
   if (/loretta|richard|lto|report|handoff|bookwork|smartsafe|deposit|audit|order|labor/.test(text)) reasons.push("leadership-visible");
   if (/fresh|cooler|date|food|warmer/.test(text)) reasons.push("protects freshness and store standards");
   if (/coffee|fountain|restroom|trash|floor|customer|walk|safety/.test(text)) reasons.push("customer-facing and standards-related");
@@ -118,11 +127,10 @@ function explainTask(task, data, mode) {
   return reasons.length ? `Best next because it is ${reasons.join(", ")}.` : "Best next based on priority, state, and current shift context.";
 }
 
-function ifWaits(task) {
+function ifWaits(task, states = {}) {
   if (!task) return "If it waits, the shift is probably okay, but the handoff still needs a final pass.";
   const text = taskText(task);
-  if (/wet|water|lock|incident/.test(text)) return "If it waits, safety or documentation risk grows.";
-  if (/register|system|outage/.test(text)) return "If it waits, operations and follow-up documentation can get messy fast.";
+  if (isUrgentIssue(task, states)) return "If it waits, a real operations, safety, staffing, or documentation risk can grow.";
   if (/lto|loretta|richard|report|bookwork|smartsafe|deposit|audit|order|labor/.test(text)) return "If it waits, leadership-visible work may need extra explanation later.";
   if (/fresh|cooler|date|food|warmer/.test(text)) return "If it waits, freshness standards or customer-facing quality can slip.";
   if (/coffee|fountain|restroom|trash|floor|customer|safety/.test(text)) return "If it waits, customer-facing standards can slip.";
@@ -134,11 +142,11 @@ function analyzeContext() {
   const mode = activeMode();
   const ranked = data.open.map((task) => ({ task, score: scoreTask(task, data, mode) })).sort((a, b) => b.score - a.score);
   const next = ranked[0]?.task || null;
-  const incident = data.open.some((task) => /wet|water|outage|register|system|incident|lock/i.test(taskText(task)));
+  const urgent = data.open.some((task) => isUrgentIssue(task, data.states));
   const leadership = data.open.some((task) => /loretta|richard|lto|bookwork|smartsafe|audit|deposit|report|labor/i.test(taskText(task)));
   const completion = data.tasks.length ? data.completed.length / data.tasks.length : 0;
   let risk = "green";
-  if (incident || data.delayed.length >= 3 || data.carried.length >= 3) risk = "red";
+  if (urgent) risk = "red";
   else if (data.open.length || completion < 0.75 || leadership || mode.id !== "normal") risk = "yellow";
   return {
     data,
@@ -147,7 +155,7 @@ function analyzeContext() {
     risk,
     completion,
     reason: explainTask(next, data, mode),
-    waits: ifWaits(next),
+    waits: ifWaits(next, data.states),
     chips: [
       `${Math.round(completion * 100)}% done`,
       `${data.open.length} open`,
@@ -225,8 +233,15 @@ function updateHeroWithContext() {
   const analysis = analyzeContext();
   const heroTitle = document.querySelector("#next-title");
   const heroCopy = document.querySelector("#next-copy");
-  if (!heroTitle || !heroCopy || !analysis.next) return;
-  const title = heroTitle.textContent?.trim() || analysis.next.title || "";
+  if (!heroTitle || !heroCopy) return;
+  const title = heroTitle.textContent?.trim() || analysis.next?.title || "";
+  const documented = analysis.data.delayed.length + analysis.data.carried.length;
+  if (/ready for review/i.test(title) || (!analysis.data.freshOpen.length && documented)) {
+    heroTitle.textContent = "Ready for review";
+    heroCopy.textContent = `${analysis.data.completed.length} done, ${documented} documented for handoff.`;
+    return;
+  }
+  if (!analysis.next) return;
   heroCopy.textContent = stableHeroLine(title);
 }
 
