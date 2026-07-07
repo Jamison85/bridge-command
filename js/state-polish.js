@@ -40,9 +40,10 @@ function stateCounts() {
   const done = new Set(stateCompleted());
   const states = stateMap();
   const tasks = stateTasks();
+  const completed = tasks.filter((task) => done.has(task.id));
   const active = tasks.filter((task) => !done.has(task.id) && !states[task.id]);
   const followups = tasks.filter((task) => !done.has(task.id) && states[task.id]);
-  return { active, followups };
+  return { tasks, completed, active, followups };
 }
 
 function openReview() {
@@ -53,8 +54,23 @@ function openTasks() {
   document.querySelector('[data-screen="tasks"]')?.click();
 }
 
+function updateDocumentedProgress(counts) {
+  const subtext = document.querySelector("#progress-subtext");
+  if (!subtext) return;
+  const doneCount = counts.completed.length;
+  const documentedCount = counts.followups.length;
+  const openCount = counts.active.length;
+  if (documentedCount) {
+    subtext.textContent = openCount
+      ? `${doneCount} done, ${documentedCount} documented, ${openCount} still open.`
+      : `${doneCount} done, ${documentedCount} documented for handoff.`;
+  }
+}
+
 function polishNoActiveState() {
-  const { active, followups } = stateCounts();
+  const counts = stateCounts();
+  updateDocumentedProgress(counts);
+  const { active, followups, completed } = counts;
   if (active.length) return;
 
   const title = document.querySelector("#next-title");
@@ -63,7 +79,7 @@ function polishNoActiveState() {
   if (title && copy && start) {
     title.textContent = "Ready for review";
     copy.textContent = followups.length
-      ? `${followups.length} follow-up item${followups.length === 1 ? " is" : "s are"} documented for handoff.`
+      ? `${completed.length} done, ${followups.length} documented for handoff.`
       : "The active task list is handled for this shift.";
     start.disabled = false;
     start.textContent = "Review Handoff";
@@ -76,7 +92,7 @@ function polishNoActiveState() {
   if (!content.textContent.includes("No active task waiting")) return;
 
   const count = followups.length;
-  content.innerHTML = `<div class="empty-state followup-empty"><strong>No active task waiting.</strong><p>${count} item${count === 1 ? " is" : "s are"} documented for the End-of-Day Review.</p><div class="empty-state-actions"><button class="primary-action" type="button" data-state-open-review>Open Review</button><button class="secondary-action" type="button" data-state-open-tasks>View Tasks</button></div></div>`;
+  content.innerHTML = `<div class="empty-state followup-empty"><strong>No active task waiting.</strong><p>${completed.length} done. ${count} item${count === 1 ? " is" : "s are"} documented for the End-of-Day Review.</p><div class="empty-state-actions"><button class="primary-action" type="button" data-state-open-review>Open Review</button><button class="secondary-action" type="button" data-state-open-tasks>View Tasks</button></div></div>`;
 }
 
 document.addEventListener("click", (event) => {
