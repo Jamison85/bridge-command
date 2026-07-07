@@ -7,7 +7,7 @@ import "./runtime-clean-bridge.js?v=2";
 import "./shift-brain.js?v=1";
 import "./task-state-clarity.js?v=1";
 import "./feedback-layer.js?v=1";
-import "./smart-context-engine.js?v=home-stable-1";
+import "./smart-context-engine.js?v=context-open-1";
 import "./smart-alerts.js?v=home-density-3";
 import "./home-normalizer.js?v=home-normalized-1";
 import "./home-fit.js?v=home-fit-2";
@@ -15,7 +15,7 @@ import "./command-hierarchy.js?v=home-stable-1";
 import "./pwa-fit-fix.js?v=pwa-fit-1";
 
 window.StorePilotRuntime = {
-  version: "pwa-fit-1",
+  version: "context-open-1",
   loadedAt: new Date().toISOString(),
   modules: [
     "state-polish",
