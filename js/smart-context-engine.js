@@ -92,9 +92,9 @@ function dueScore(task) {
 function scoreTask(task, data, mode) {
   const text = taskText(task);
   let value = Math.max(0, 120 - Number(task.priority || 12) * 6) + dueScore(task);
-  if (/safety|wet|water|incident|outage|register|system|lock/.test(text)) value += 36;
+  if (/wet|water|incident|outage|register|system|lock/.test(text)) value += 36;
   if (/loretta|richard|lto|report|handoff|bookwork|smartsafe|deposit|audit|order|labor/.test(text)) value += 30;
-  if (/fresh|cooler|date|food|warmer|coffee|fountain|restroom|trash|floor|walk|customer/.test(text)) value += 22;
+  if (/fresh|cooler|date|food|warmer|coffee|fountain|restroom|trash|floor|walk|customer|safety/.test(text)) value += 22;
   if ((task.minutes || 0) <= 10) value += 14;
   if (data.states[task.id]?.type === "delayed") value += 24;
   if (data.states[task.id]?.type === "carry") value += 18;
@@ -108,10 +108,10 @@ function explainTask(task, data, mode) {
   const reasons = [];
   if (task.due) reasons.push(`due ${task.due}`);
   if (mode.id !== "normal" && mode.boost?.test(text)) reasons.push(`matches ${mode.label.toLowerCase()} mode`);
-  if (/safety|wet|water|incident|outage|register|system|lock/.test(text)) reasons.push("protects safety or operations");
+  if (/wet|water|incident|outage|register|system|lock/.test(text)) reasons.push("protects operations or documentation");
   if (/loretta|richard|lto|report|handoff|bookwork|smartsafe|deposit|audit|order|labor/.test(text)) reasons.push("leadership-visible");
   if (/fresh|cooler|date|food|warmer/.test(text)) reasons.push("protects freshness and store standards");
-  if (/coffee|fountain|restroom|trash|floor|customer|walk/.test(text)) reasons.push("customer-facing");
+  if (/coffee|fountain|restroom|trash|floor|customer|walk|safety/.test(text)) reasons.push("customer-facing and standards-related");
   if ((task.minutes || 0) <= 10) reasons.push("a quick win");
   if (data.states[task.id]?.type) reasons.push(`already marked ${data.states[task.id].type}`);
   return reasons.length ? `Best next because it is ${reasons.join(", ")}.` : "Best next based on priority, state, and current shift context.";
@@ -120,11 +120,11 @@ function explainTask(task, data, mode) {
 function ifWaits(task) {
   if (!task) return "If it waits, the shift is probably okay, but the handoff still needs a final pass.";
   const text = taskText(task);
-  if (/safety|wet|water|lock|incident/.test(text)) return "If it waits, safety or documentation risk grows.";
+  if (/wet|water|lock|incident/.test(text)) return "If it waits, safety or documentation risk grows.";
   if (/register|system|outage/.test(text)) return "If it waits, operations and follow-up documentation can get messy fast.";
   if (/lto|loretta|richard|report|bookwork|smartsafe|deposit|audit|order|labor/.test(text)) return "If it waits, leadership-visible work may need extra explanation later.";
   if (/fresh|cooler|date|food|warmer/.test(text)) return "If it waits, freshness standards or customer-facing quality can slip.";
-  if (/coffee|fountain|restroom|trash|floor|customer/.test(text)) return "If it waits, customers may notice first.";
+  if (/coffee|fountain|restroom|trash|floor|customer|safety/.test(text)) return "If it waits, customer-facing standards can slip.";
   return "If it waits, it becomes one more loose end for the handoff.";
 }
 
@@ -133,7 +133,7 @@ function analyzeContext() {
   const mode = activeMode();
   const ranked = data.open.map((task) => ({ task, score: scoreTask(task, data, mode) })).sort((a, b) => b.score - a.score);
   const next = ranked[0]?.task || null;
-  const incident = data.open.some((task) => /safety|wet|water|outage|register|system|incident|lock/i.test(taskText(task)));
+  const incident = data.open.some((task) => /wet|water|outage|register|system|incident|lock/i.test(taskText(task)));
   const leadership = data.open.some((task) => /loretta|richard|lto|bookwork|smartsafe|audit|deposit|report|labor/i.test(taskText(task)));
   const completion = data.tasks.length ? data.completed.length / data.tasks.length : 0;
   let risk = "green";
