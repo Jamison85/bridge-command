@@ -7,13 +7,14 @@ import "./runtime-clean-bridge.js?v=2";
 import "./shift-brain.js?v=1";
 import "./task-state-clarity.js?v=1";
 import "./feedback-layer.js?v=1";
-import "./smart-context-engine.js?v=home-density-3";
+import "./smart-context-engine.js?v=home-stable-1";
 import "./smart-alerts.js?v=home-density-3";
 import "./home-normalizer.js?v=home-normalized-1";
-import "./home-fit.js?v=home-fit-1";
+import "./home-fit.js?v=home-fit-2";
+import "./command-hierarchy.js?v=home-stable-1";
 
 window.StorePilotRuntime = {
-  version: "home-fit-1",
+  version: "home-stable-1",
   loadedAt: new Date().toISOString(),
   modules: [
     "state-polish",
@@ -28,6 +29,7 @@ window.StorePilotRuntime = {
     "smart-context-engine",
     "smart-alerts",
     "home-normalizer",
-    "home-fit"
+    "home-fit",
+    "command-hierarchy"
   ]
 };
