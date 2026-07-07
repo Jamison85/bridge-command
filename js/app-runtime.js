@@ -12,9 +12,10 @@ import "./smart-alerts.js?v=home-density-3";
 import "./home-normalizer.js?v=home-normalized-1";
 import "./home-fit.js?v=home-fit-2";
 import "./command-hierarchy.js?v=home-stable-1";
+import "./pwa-fit-fix.js?v=pwa-fit-1";
 
 window.StorePilotRuntime = {
-  version: "home-stable-1",
+  version: "pwa-fit-1",
   loadedAt: new Date().toISOString(),
   modules: [
     "state-polish",
@@ -30,6 +31,7 @@ window.StorePilotRuntime = {
     "smart-alerts",
     "home-normalizer",
     "home-fit",
-    "command-hierarchy"
+    "command-hierarchy",
+    "pwa-fit-fix"
   ]
 };
