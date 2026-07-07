@@ -1,43 +1,56 @@
 .context-engine-card {
-  margin: -2px 0 14px;
-  padding: 13px;
-  border: 1px solid rgba(7, 63, 47, 0.12);
-  border-radius: 22px;
-  background: rgba(255, 250, 241, 0.9);
-  box-shadow: var(--shadow-soft);
+  margin: -2px 0 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(7, 63, 47, 0.1);
+  border-radius: 20px;
+  background: rgba(255, 250, 241, 0.86);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
 }
 
-.context-engine-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+.context-engine-compact {
+  display: grid;
+  gap: 7px;
+}
+
+.context-compact-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 10px;
-  margin-bottom: 10px;
+  align-items: center;
 }
 
-.context-engine-head p {
-  margin: 0 0 4px;
+.context-compact-row p {
+  margin: 0 0 2px;
   color: #7c2d12;
-  font-size: 0.68rem;
+  font-size: 0.62rem;
   font-weight: 950;
-  letter-spacing: 0.11em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
-.context-engine-head strong {
+.context-compact-row strong {
   display: block;
   color: #14392f;
-  font-size: 0.98rem;
+  font-size: 0.94rem;
   line-height: 1.12;
 }
 
+.context-compact-row span:not(.context-risk-pill) {
+  display: block;
+  margin-top: 2px;
+  color: #647267;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
 .context-risk-pill {
-  padding: 7px 10px;
+  padding: 6px 9px;
   border-radius: 999px;
   border: 1px solid rgba(7, 63, 47, 0.12);
   background: rgba(236, 253, 245, 0.88);
   color: #0f5b42;
-  font-size: 0.68rem;
+  font-size: 0.62rem;
   font-weight: 950;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -56,11 +69,36 @@
   color: #991b1b;
 }
 
+.context-edit-drawer {
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+  padding-top: 6px;
+}
+
+.context-edit-drawer summary {
+  cursor: pointer;
+  color: #6f5b3e;
+  font-size: 0.72rem;
+  font-weight: 950;
+  list-style: none;
+}
+
+.context-edit-drawer summary::-webkit-details-marker {
+  display: none;
+}
+
+.context-edit-drawer summary::after {
+  content: " +";
+}
+
+.context-edit-drawer[open] summary::after {
+  content: " −";
+}
+
 .context-mode-strip {
   display: flex;
   gap: 7px;
   overflow-x: auto;
-  padding-bottom: 4px;
+  padding: 8px 0 2px;
   scrollbar-width: none;
 }
 
@@ -70,13 +108,13 @@
 
 .context-mode-button {
   flex: 0 0 auto;
-  min-height: 38px;
+  min-height: 34px;
   border: 1px solid rgba(63, 48, 31, 0.12);
   border-radius: 999px;
-  padding: 0 12px;
+  padding: 0 11px;
   background: rgba(255, 255, 255, 0.72);
   color: #4f5f54;
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   font-weight: 950;
   white-space: nowrap;
 }
@@ -85,82 +123,35 @@
   background: linear-gradient(135deg, #073f2f, #0f513d);
   color: #fffaf0;
   border-color: transparent;
-  box-shadow: 0 9px 20px rgba(7, 63, 47, 0.18);
+  box-shadow: 0 8px 18px rgba(7, 63, 47, 0.16);
 }
 
 .context-insight-card {
-  border: 1px solid rgba(7, 63, 47, 0.12);
-  border-radius: 20px;
-  background: rgba(236, 253, 245, 0.68);
-  padding: 14px;
-  box-shadow: var(--shadow-soft);
+  display: none !important;
 }
 
-.context-insight-card[data-risk="yellow"] {
-  background: rgba(255, 247, 237, 0.88);
-  border-color: rgba(180, 83, 9, 0.18);
-}
-
-.context-insight-card[data-risk="red"] {
-  background: rgba(254, 226, 226, 0.84);
-  border-color: rgba(153, 27, 27, 0.16);
-}
-
-.context-insight-card p.context-kicker {
-  margin: 0 0 6px;
-  color: #7c2d12;
-  font-size: 0.68rem;
-  font-weight: 950;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
-}
-
-.context-insight-card strong {
-  display: block;
-  color: #14392f;
-  font-size: 1rem;
-  line-height: 1.18;
-}
-
-.context-insight-card p {
-  margin: 8px 0 0;
-  color: #4f5f54;
-  font-size: 0.82rem;
-  line-height: 1.38;
-  font-weight: 800;
-}
-
-.context-chip-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  margin-top: 10px;
-}
-
+.context-chip-row,
 .context-chip {
-  padding: 7px 9px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.76);
-  border: 1px solid rgba(15, 23, 42, 0.07);
-  color: #14392f;
-  font-size: 0.68rem;
-  font-weight: 950;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  display: none;
 }
 
 @media (max-width: 430px) {
   .context-engine-card {
-    margin-bottom: 12px;
-    border-radius: 20px;
+    margin-bottom: 9px;
+    border-radius: 18px;
+    padding: 9px 10px;
   }
 
-  .context-engine-head {
-    align-items: flex-start;
+  .context-compact-row strong {
+    font-size: 0.88rem;
+  }
+
+  .context-compact-row span:not(.context-risk-pill) {
+    font-size: 0.68rem;
   }
 
   .context-risk-pill {
-    font-size: 0.64rem;
-    padding: 6px 9px;
+    font-size: 0.58rem;
+    padding: 5px 8px;
   }
 }
