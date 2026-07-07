@@ -203,19 +203,20 @@ function ensureInsightCard() {
   document.querySelector("#context-insight-card")?.remove();
 }
 
+function stableHeroLine(title) {
+  if (/closing walk|walk and recovery/i.test(title || "")) {
+    return "Best next: finish the walk, catch customer-facing issues, then document anything waiting.";
+  }
+  return "Best next: handle this focus item, then document anything waiting.";
+}
+
 function updateHeroWithContext() {
   const analysis = analyzeContext();
   const heroTitle = document.querySelector("#next-title");
   const heroCopy = document.querySelector("#next-copy");
   if (!heroTitle || !heroCopy || !analysis.next) return;
-  const currentTitle = heroTitle.textContent?.trim().toLowerCase();
-  const smartTitle = String(analysis.next.title || "").trim();
-  if (!smartTitle) return;
-  if (currentTitle !== smartTitle.toLowerCase()) {
-    heroCopy.textContent = `Smart pick: ${smartTitle}. ${analysis.reason}`;
-    return;
-  }
-  heroCopy.textContent = analysis.reason;
+  const title = heroTitle.textContent?.trim() || analysis.next.title || "";
+  heroCopy.textContent = stableHeroLine(title);
 }
 
 function renderSmartContext() {
@@ -230,7 +231,7 @@ function escapeContext(value) {
 
 window.StorePilotContextEngine = { analyze: analyzeContext, modes: CONTEXT_MODES };
 
-document.addEventListener("click", () => setTimeout(renderSmartContext, 140));
-document.addEventListener("change", () => setTimeout(renderSmartContext, 140));
-setInterval(renderSmartContext, 1800);
-setTimeout(renderSmartContext, 300);
+document.addEventListener("click", () => setTimeout(renderSmartContext, 120));
+document.addEventListener("change", () => setTimeout(renderSmartContext, 120));
+setInterval(renderSmartContext, 1000);
+setTimeout(renderSmartContext, 220);
