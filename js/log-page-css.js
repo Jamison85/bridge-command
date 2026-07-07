@@ -1,0 +1,3 @@
+const s = document.createElement('style');
+s.textContent = '.app-shell{padding-bottom:132px!important}.bottom-nav{z-index:80!important}.review-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important}#copy-review{display:inline-flex!important;background:#fffefa!important;color:#07513f!important;-webkit-text-fill-color:#07513f!important;border:1px solid rgba(7,81,63,.26)!important;opacity:1!important}#refresh-review{grid-column:1/-1!important;background:#fff4df!important;color:#43260f!important;-webkit-text-fill-color:#43260f!important}.review-message-box{min-height:250px!important;max-height:46vh!important;overflow:auto!important}.handoff-proof-line{display:none!important}';
+document.head.appendChild(s);
