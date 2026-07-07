@@ -9,9 +9,10 @@ import "./task-state-clarity.js?v=1";
 import "./feedback-layer.js?v=1";
 import "./smart-context-engine.js?v=home-density-3";
 import "./smart-alerts.js?v=home-density-3";
+import "./home-normalizer.js?v=home-normalized-1";
 
 window.StorePilotRuntime = {
-  version: "home-density-3",
+  version: "home-normalized-1",
   loadedAt: new Date().toISOString(),
   modules: [
     "state-polish",
@@ -24,6 +25,7 @@ window.StorePilotRuntime = {
     "task-state-clarity",
     "feedback-layer",
     "smart-context-engine",
-    "smart-alerts"
+    "smart-alerts",
+    "home-normalizer"
   ]
 };
