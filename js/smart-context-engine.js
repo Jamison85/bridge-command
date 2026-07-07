@@ -103,7 +103,7 @@ function scoreTask(task, data, mode) {
 }
 
 function explainTask(task, data, mode) {
-  if (!task) return "The core list is stable. Do a final walk, write a clean handoff, and do not create new chaos for sport.";
+  if (!task) return "Core work is complete. Do a final scan and write a clean handoff.";
   const text = taskText(task);
   const reasons = [];
   if (task.due) reasons.push(`due ${task.due}`);
@@ -112,19 +112,19 @@ function explainTask(task, data, mode) {
   if (/loretta|richard|lto|report|handoff|bookwork|smartsafe|deposit|audit|order|labor/.test(text)) reasons.push("leadership-visible");
   if (/fresh|cooler|date|food|warmer/.test(text)) reasons.push("protects freshness and store standards");
   if (/coffee|fountain|restroom|trash|floor|customer|walk/.test(text)) reasons.push("customer-facing");
-  if ((task.minutes || 0) <= 10) reasons.push("quick win");
+  if ((task.minutes || 0) <= 10) reasons.push("a quick win");
   if (data.states[task.id]?.type) reasons.push(`already marked ${data.states[task.id].type}`);
-  return reasons.length ? `Do this because it is ${reasons.join(", ")}.` : "Do this because it is the highest-impact open item based on priority, state, and current shift mode.";
+  return reasons.length ? `Best next because it is ${reasons.join(", ")}.` : "Best next based on priority, state, and current shift context.";
 }
 
 function ifWaits(task) {
-  if (!task) return "If it waits, the shift is probably okay, but the handoff still needs a human pass. Tragic, but true.";
+  if (!task) return "If it waits, the shift is probably okay, but the handoff still needs a final pass.";
   const text = taskText(task);
   if (/safety|wet|water|lock|incident/.test(text)) return "If it waits, safety or documentation risk grows.";
   if (/register|system|outage/.test(text)) return "If it waits, operations and follow-up documentation can get messy fast.";
   if (/lto|loretta|richard|report|bookwork|smartsafe|deposit|audit|order|labor/.test(text)) return "If it waits, leadership-visible work may need extra explanation later.";
   if (/fresh|cooler|date|food|warmer/.test(text)) return "If it waits, freshness standards or customer-facing quality can slip.";
-  if (/coffee|fountain|restroom|trash|floor|customer/.test(text)) return "If it waits, customers may notice before anyone gets around to being reasonable.";
+  if (/coffee|fountain|restroom|trash|floor|customer/.test(text)) return "If it waits, customers may notice first.";
   return "If it waits, it becomes one more loose end for the handoff.";
 }
 
@@ -158,7 +158,7 @@ function analyzeContext() {
 }
 
 function riskLabel(risk) {
-  return risk === "red" ? "Red shift" : risk === "yellow" ? "Yellow shift" : "Green shift";
+  return risk === "red" ? "Red priority" : risk === "yellow" ? "Watch" : "Normal";
 }
 
 function ensureContextControls() {
@@ -166,22 +166,30 @@ function ensureContextControls() {
   if (!card) {
     card = document.createElement("section");
     card.id = "context-engine-card";
-    card.className = "context-engine-card";
+    card.className = "context-engine-card context-engine-compact";
     const shiftCard = document.querySelector(".shift-card");
     if (shiftCard?.parentElement) shiftCard.parentElement.insertBefore(card, shiftCard.nextSibling);
   }
   if (!card) return;
 
   const analysis = analyzeContext();
+  card.className = "context-engine-card context-engine-compact";
   card.dataset.risk = analysis.risk;
   card.innerHTML = `
-    <div class="context-engine-head">
-      <div><p>SHIFT CONTEXT</p><strong>${escapeContext(analysis.mode.hint)}</strong></div>
+    <div class="context-compact-row">
+      <div>
+        <p>SHIFT CONTEXT</p>
+        <strong>${escapeContext(SHIFT_NAMES[analysis.data.shift] || "Shift")} • ${escapeContext(analysis.mode.label)}</strong>
+        <span>${escapeContext(analysis.mode.hint)}</span>
+      </div>
       <span class="context-risk-pill">${escapeContext(riskLabel(analysis.risk))}</span>
     </div>
-    <div class="context-mode-strip" role="group" aria-label="Shift context mode">
-      ${CONTEXT_MODES.map((mode) => `<button class="context-mode-button ${mode.id === analysis.mode.id ? "active" : ""}" type="button" data-context-mode="${mode.id}">${escapeContext(mode.label)}</button>`).join("")}
-    </div>`;
+    <details class="context-edit-drawer">
+      <summary>Edit context</summary>
+      <div class="context-mode-strip" role="group" aria-label="Shift context mode">
+        ${CONTEXT_MODES.map((mode) => `<button class="context-mode-button ${mode.id === analysis.mode.id ? "active" : ""}" type="button" data-context-mode="${mode.id}">${escapeContext(mode.label)}</button>`).join("")}
+      </div>
+    </details>`;
 
   card.querySelectorAll("[data-context-mode]").forEach((button) => button.addEventListener("click", () => {
     contextWrite(CONTEXT_KEYS.mode, button.dataset.contextMode);
@@ -192,27 +200,7 @@ function ensureContextControls() {
 }
 
 function ensureInsightCard() {
-  const nextActive = document.querySelector('[data-screen="next"]')?.classList.contains("active");
-  const content = document.querySelector("#screen-content");
-  const existing = document.querySelector("#context-insight-card");
-  if (!nextActive || !content) {
-    existing?.remove();
-    return;
-  }
-
-  const analysis = analyzeContext();
-  const card = existing || document.createElement("article");
-  card.id = "context-insight-card";
-  card.className = "context-insight-card";
-  card.dataset.risk = analysis.risk;
-  card.innerHTML = `
-    <p class="context-kicker">SMART CONTEXT ENGINE</p>
-    <strong>${escapeContext(analysis.next?.title || "Final walk and handoff note")}</strong>
-    <p>${escapeContext(analysis.reason)}</p>
-    <p><b>If it waits:</b> ${escapeContext(analysis.waits)}</p>
-    <div class="context-chip-row">${analysis.chips.map((chip) => `<span class="context-chip">${escapeContext(chip)}</span>`).join("")}</div>`;
-
-  if (card.parentElement !== content) content.appendChild(card);
+  document.querySelector("#context-insight-card")?.remove();
 }
 
 function updateHeroWithContext() {
@@ -227,7 +215,7 @@ function updateHeroWithContext() {
     heroCopy.textContent = `Smart pick: ${smartTitle}. ${analysis.reason}`;
     return;
   }
-  heroCopy.textContent = `${analysis.reason} ${analysis.waits}`;
+  heroCopy.textContent = analysis.reason;
 }
 
 function renderSmartContext() {
