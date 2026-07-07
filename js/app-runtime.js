@@ -10,9 +10,10 @@ import "./feedback-layer.js?v=1";
 import "./smart-context-engine.js?v=home-density-3";
 import "./smart-alerts.js?v=home-density-3";
 import "./home-normalizer.js?v=home-normalized-1";
+import "./home-fit.js?v=home-fit-1";
 
 window.StorePilotRuntime = {
-  version: "home-normalized-1",
+  version: "home-fit-1",
   loadedAt: new Date().toISOString(),
   modules: [
     "state-polish",
@@ -26,6 +27,7 @@ window.StorePilotRuntime = {
     "feedback-layer",
     "smart-context-engine",
     "smart-alerts",
-    "home-normalizer"
+    "home-normalizer",
+    "home-fit"
   ]
 };
