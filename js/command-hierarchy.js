@@ -73,15 +73,18 @@ function renderCommandDetails() {
   if (card.parentElement !== content) content.appendChild(card);
 }
 
+function cleanHeroLine(title) {
+  if (/closing walk|walk and recovery/i.test(title || "")) {
+    return "Best next: finish the walk, catch customer-facing issues, then document anything waiting.";
+  }
+  return "Best next: handle this focus item, then document anything waiting.";
+}
+
 function tightenHeroCopy() {
   const heroCopy = document.querySelector("#next-copy");
   const title = document.querySelector("#next-title")?.textContent?.trim();
-  const { context, topAlert, risk } = getCommandAnalysis();
   if (!heroCopy || !title) return;
-  const reason = context?.reason || "This is the current best move.";
-  const shortReason = reason.replace(/^Do this because it is\s*/i, "").replace(/^Best next because it is\s*/i, "").replace(/^This is recommended because it is\s*/i, "");
-  const alert = risk === "red" && topAlert?.title ? `${topAlert.title}: ` : "";
-  heroCopy.textContent = risk === "green" ? `Best move now. ${shortReason}` : `${alert}${shortReason}`;
+  heroCopy.textContent = cleanHeroLine(title);
 }
 
 function renderCommandHierarchy() {
@@ -95,7 +98,7 @@ function escapeCommand(value) {
   return String(value ?? "").replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
 }
 
-document.addEventListener("click", () => setTimeout(renderCommandHierarchy, 260));
-document.addEventListener("change", () => setTimeout(renderCommandHierarchy, 260));
-setInterval(renderCommandHierarchy, 900);
-setTimeout(renderCommandHierarchy, 700);
+document.addEventListener("click", () => setTimeout(renderCommandHierarchy, 160));
+document.addEventListener("change", () => setTimeout(renderCommandHierarchy, 160));
+setInterval(renderCommandHierarchy, 650);
+setTimeout(renderCommandHierarchy, 300);
