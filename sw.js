@@ -1,4 +1,4 @@
-const CACHE_NAME = "store-pilot-blink-fix-21";
+const CACHE_NAME = "store-pilot-context-open-1";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -12,14 +12,20 @@ const APP_SHELL = [
   "./css/polish.css",
   "./css/manager-mode.css",
   "./css/pwa.css",
-  "./js/main-v7.js",
+  "./css/production-tools.css",
+  "./css/task-states.css",
+  "./css/feedback.css",
+  "./css/smart-brain.css",
+  "./css/visual-polish.css",
+  "./css/smart-context.css",
+  "./css/smart-alerts.css",
+  "./css/command-hierarchy.css",
+  "./css/home-density.css",
+  "./js/main-v8.js",
   "./js/review-layer.js",
-  "./js/review-template-aware.js",
   "./js/voice-commands.js",
-  "./js/voice-template-aware.js",
-  "./js/active-task.js",
-  "./js/followup-cleanup.js",
-  "./js/state-polish.js",
+  "./js/app-runtime.js",
+  "./js/risk-tuning.js",
   "./js/pwa.js"
 ];
 
@@ -42,7 +48,7 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   event.respondWith(
-    fetch(event.request)
+    fetch(event.request, { cache: "no-store" })
       .then((response) => {
         const copy = response.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
