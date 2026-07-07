@@ -1,0 +1,132 @@
+:root {
+  --log-safe-bottom: calc(132px + env(safe-area-inset-bottom, 0px));
+}
+
+.app-shell {
+  padding-bottom: var(--log-safe-bottom) !important;
+}
+
+.screen-card,
+.screen-content,
+.review-card.log-layout-fixed {
+  padding-bottom: var(--log-safe-bottom) !important;
+}
+
+.bottom-nav {
+  z-index: 80 !important;
+}
+
+.review-card.log-layout-fixed {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.review-card.log-layout-fixed > .screen-header,
+.review-card.log-layout-fixed > .review-grid,
+.review-card.log-layout-fixed > .review-section {
+  margin-top: 0 !important;
+}
+
+.review-message-section {
+  border-color: rgba(184, 115, 54, 0.22) !important;
+  background: rgba(255, 252, 246, 0.96) !important;
+  scroll-margin-bottom: 220px;
+}
+
+.review-message-section h4 {
+  font-size: 1rem !important;
+  color: #07513f !important;
+  -webkit-text-fill-color: #07513f !important;
+}
+
+.review-message-box {
+  min-height: 250px !important;
+  max-height: 46vh !important;
+  overflow: auto !important;
+  resize: vertical !important;
+  border: 1px solid rgba(15, 23, 42, 0.13) !important;
+  background: #fffefa !important;
+  color: #1d2521 !important;
+  -webkit-text-fill-color: #1d2521 !important;
+  line-height: 1.45 !important;
+  font-size: 1rem !important;
+}
+
+.review-message-box:focus {
+  border-color: rgba(184, 115, 54, 0.48) !important;
+  box-shadow: 0 0 0 4px rgba(184, 115, 54, 0.12) !important;
+  outline: none !important;
+}
+
+.review-actions {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
+  align-items: stretch !important;
+}
+
+.review-actions > button {
+  min-height: 48px !important;
+  opacity: 1 !important;
+}
+
+#share-review {
+  color: #fffaf0 !important;
+  -webkit-text-fill-color: #fffaf0 !important;
+}
+
+#copy-review {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #fffefa !important;
+  color: #07513f !important;
+  -webkit-text-fill-color: #07513f !important;
+  border: 1px solid rgba(7, 81, 63, 0.26) !important;
+  box-shadow: 0 10px 22px rgba(7, 63, 47, 0.08) !important;
+}
+
+#refresh-review {
+  grid-column: 1 / -1 !important;
+  background: #fff4df !important;
+  color: #43260f !important;
+  -webkit-text-fill-color: #43260f !important;
+  border: 1px solid rgba(184, 115, 54, 0.45) !important;
+  box-shadow: 0 10px 24px rgba(184, 115, 54, 0.14) !important;
+  font-weight: 950 !important;
+}
+
+.handoff-options {
+  background: rgba(255, 252, 246, 0.74) !important;
+}
+
+.handoff-options .helper-text {
+  font-size: 0.95rem !important;
+  line-height: 1.38 !important;
+}
+
+.handoff-proof-line {
+  display: none !important;
+}
+
+#smart-handoff-panel .smart-brain-actions {
+  grid-template-columns: 1fr !important;
+}
+
+#smart-handoff-status {
+  font-size: 0.92rem !important;
+}
+
+@media (max-height: 760px) {
+  .review-message-box {
+    min-height: 220px !important;
+    max-height: 42vh !important;
+  }
+}
+
+@supports (height: 100dvh) {
+  .review-message-box:focus {
+    max-height: 38dvh !important;
+  }
+}
