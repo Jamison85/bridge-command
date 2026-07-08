@@ -5,74 +5,128 @@ function installHandoffScrollFix() {
   style.textContent = `
     html.v2-clean-active,
     html.v2-clean-active body {
-      height: auto !important;
+      height: 100dvh !important;
       min-height: 100dvh !important;
-      overflow-y: auto !important;
-      overscroll-behavior-y: contain;
-      -webkit-overflow-scrolling: touch;
+      overflow: hidden !important;
+      overscroll-behavior: none;
     }
 
     html.v2-clean-active #store-pilot-v2 {
-      height: auto !important;
+      height: 100dvh !important;
       min-height: 100dvh !important;
-      overflow: visible !important;
+      overflow: hidden !important;
       padding-bottom: calc(env(safe-area-inset-bottom) + 156px) !important;
+      box-sizing: border-box !important;
     }
 
     html.v2-clean-active .v2-stage {
       min-height: 0 !important;
-      overflow: visible !important;
-      padding-bottom: 84px !important;
+      max-height: calc(100dvh - 168px) !important;
+      overflow-y: auto !important;
+      padding-bottom: 150px !important;
+      -webkit-overflow-scrolling: touch;
     }
 
     html.v2-clean-active .v2-handoff {
       overflow: visible !important;
-      padding-bottom: 14px !important;
+      padding: 14px !important;
+    }
+
+    html.v2-clean-active .v2-handoff h2 {
+      margin-top: 4px !important;
+      margin-bottom: 8px !important;
+    }
+
+    html.v2-clean-active .v2-stats {
+      margin: 8px 0 !important;
+      gap: 7px !important;
+    }
+
+    html.v2-clean-active .v2-stats b {
+      padding: 8px 6px !important;
+      font-size: 1.05rem !important;
+      border-radius: 14px !important;
+    }
+
+    html.v2-clean-active .v2-recipient-label {
+      margin-top: 6px !important;
+    }
+
+    html.v2-clean-active .v2-tone,
+    html.v2-clean-active .v2-recipient {
+      gap: 6px !important;
+      margin: 6px 0 8px !important;
+    }
+
+    html.v2-clean-active .v2-tone button,
+    html.v2-clean-active .v2-recipient button {
+      min-height: 34px !important;
+      border-radius: 12px !important;
     }
 
     html.v2-clean-active #v2-message {
-      min-height: 180px !important;
-      height: 34dvh !important;
-      max-height: 330px !important;
+      min-height: 130px !important;
+      height: 26dvh !important;
+      max-height: 260px !important;
       overflow-y: auto !important;
-      resize: vertical;
+      resize: none !important;
       -webkit-overflow-scrolling: touch;
     }
 
     html.v2-clean-active .v2-handoff .v2-actions {
-      position: sticky !important;
-      bottom: calc(env(safe-area-inset-bottom) + 84px) !important;
-      z-index: 1600 !important;
-      margin: 14px -4px 0 !important;
+      position: fixed !important;
+      left: 50% !important;
+      bottom: calc(env(safe-area-inset-bottom) + 82px) !important;
+      transform: translateX(-50%) !important;
+      width: min(calc(100% - 24px), 720px) !important;
+      z-index: 2300 !important;
+      display: grid !important;
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 8px !important;
+      margin: 0 !important;
       padding: 8px !important;
+      box-sizing: border-box !important;
       border: 1px solid rgba(63,48,31,.12);
-      border-radius: 20px;
-      background: rgba(255,250,241,.96);
-      box-shadow: 0 16px 38px rgba(44,31,16,.22);
+      border-radius: 22px;
+      background: rgba(255,250,241,.98);
+      box-shadow: 0 16px 42px rgba(44,31,16,.24);
       backdrop-filter: blur(18px);
     }
 
     html.v2-clean-active .v2-handoff .v2-actions button {
-      min-height: 46px !important;
+      min-height: 44px !important;
+      border-radius: 14px !important;
     }
 
     html.v2-clean-active .v2-nav {
-      z-index: 1500 !important;
+      z-index: 2200 !important;
     }
 
     @media (max-height: 720px) {
-      html.v2-clean-active #v2-message {
-        height: 28dvh !important;
-        min-height: 150px !important;
+      html.v2-clean-active .v2-top {
+        margin-bottom: 7px !important;
       }
 
-      html.v2-clean-active .v2-stats {
-        margin: 10px 0 !important;
-      }
-
-      html.v2-clean-active .v2-tone,
-      html.v2-clean-active .v2-recipient {
+      html.v2-clean-active .v2-shifts {
         margin-bottom: 8px !important;
+        padding: 7px !important;
+      }
+
+      html.v2-clean-active .v2-shifts button {
+        min-height: 38px !important;
+      }
+
+      html.v2-clean-active .v2-handoff h2 {
+        font-size: 1.35rem !important;
+      }
+
+      html.v2-clean-active #v2-message {
+        height: 22dvh !important;
+        min-height: 105px !important;
+      }
+
+      html.v2-clean-active .v2-handoff .v2-actions {
+        bottom: calc(env(safe-area-inset-bottom) + 76px) !important;
       }
     }
   `;
@@ -89,5 +143,5 @@ function keepHandoffActionsReachable() {
 
 document.addEventListener('click', () => setTimeout(keepHandoffActionsReachable, 50));
 document.addEventListener('focusin', () => setTimeout(keepHandoffActionsReachable, 50));
-setInterval(keepHandoffActionsReachable, 400);
-setTimeout(keepHandoffActionsReachable, 300);
+setInterval(keepHandoffActionsReachable, 300);
+setTimeout(keepHandoffActionsReachable, 250);
