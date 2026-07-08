@@ -53,7 +53,7 @@ function lineItems(items, empty, data) {
   }).join('\n');
 }
 function combinedFollowups(data) { return [...data.delayed, ...data.carried, ...data.open]; }
-function messageFor(tone, variant, data) {
+function currentChoices(tone, data) {
   const label = SHIFT_LABELS[shift()];
   const followups = combinedFollowups(data);
   const done = lineItems(data.completed, 'Nothing checked off yet.', data);
@@ -90,7 +90,10 @@ function messageFor(tone, variant, data) {
       `Hey Loretta, smooth shift overall.\n\nDone:\n${done}\n\nStill left:\n${still}\n\nJust wanted it documented in one spot.`
     ]
   };
-  const choices = set[tone] || set.normal;
+  return set[tone] || set.normal;
+}
+function messageFor(tone, variant, data) {
+  const choices = currentChoices(tone, data);
   return choices[variant % choices.length];
 }
 function installToneStyles() {
@@ -99,6 +102,16 @@ function installToneStyles() {
   style.id = 'v2-tone-style';
   style.textContent = '.v2-tone{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.v2-tone button{min-height:38px;border:0;border-radius:14px;background:#e9eee6;color:#073f2f;font-weight:950;font-size:.78rem}.v2-tone button.active{background:linear-gradient(180deg,#0f513d,#073f2f);color:white}@media(max-width:430px){.v2-tone{grid-template-columns:repeat(2,1fr)}}';
   document.head.appendChild(style);
+}
+function rotateToneVersion(event) {
+  event?.preventDefault?.();
+  event?.stopImmediatePropagation?.();
+  const tone = read(TONE_KEY, 'normal');
+  const data = handoffData();
+  const count = currentChoices(tone, data).length;
+  write(VARIANT_KEY, (read(VARIANT_KEY, 0) + 1) % count);
+  lastSignature = '';
+  applyToneHandoff(true);
 }
 function applyToneHandoff(force = false) {
   installToneStyles();
@@ -123,14 +136,17 @@ function applyToneHandoff(force = false) {
   const version = document.querySelector('#v2-version');
   if (version && !version.dataset.toneBound) {
     version.dataset.toneBound = 'true';
-    version.addEventListener('click', () => { setTimeout(() => { write(VARIANT_KEY, read(VARIANT_KEY, 0) + 1); lastSignature = ''; applyToneHandoff(true); }, 0); }, true);
+    version.addEventListener('click', rotateToneVersion, true);
   }
   if (force || signature !== lastSignature || /needs another window|highest-impact work|No reply needed unless|hanging from the list|Still hanging/i.test(box.value)) {
     box.value = messageFor(tone, variant, data);
     lastSignature = signature;
   }
 }
-document.addEventListener('click', () => setTimeout(applyToneHandoff, 60));
+document.addEventListener('click', (event) => {
+  if (event.target?.closest?.('#v2-version')) rotateToneVersion(event);
+  setTimeout(applyToneHandoff, 60);
+}, true);
 document.addEventListener('change', () => setTimeout(applyToneHandoff, 60));
 setInterval(applyToneHandoff, 500);
 setTimeout(applyToneHandoff, 400);
