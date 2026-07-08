@@ -1,4 +1,5 @@
-import("./v2-clean-shell.js?v=v2-clean-1").catch((error) => console.warn("Store Pilot V2 clean shell failed", error));
+import("./v2-clean-shell.js?v=v2-clean-2").catch((error) => console.warn("Store Pilot V2 clean shell failed", error));
+import("./v2-handoff-tone.js?v=tone-1").catch((error) => console.warn("Store Pilot handoff tones failed", error));
 
 const PWA_FIT_STYLE = `
 html.home-fit .app-shell {
