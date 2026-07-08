@@ -1,7 +1,8 @@
 const PWA_FIT_STYLE = `
 html.home-fit .app-shell {
-  grid-template-rows: auto auto auto auto 1fr !important;
-  align-content: stretch !important;
+  grid-template-rows: auto auto auto auto auto auto !important;
+  align-content: start !important;
+  gap: 7px !important;
 }
 
 html.home-fit .voice-fab {
@@ -9,29 +10,50 @@ html.home-fit .voice-fab {
 }
 
 html.home-fit .screen-card {
-  height: 100% !important;
+  height: auto !important;
   min-height: 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden !important;
+  display: block !important;
+  overflow: visible !important;
+  align-self: start !important;
+  padding-bottom: 10px !important;
 }
 
 html.home-fit .screen-content {
   min-height: 0 !important;
-  flex: 1 1 auto !important;
-  display: flex !important;
+  flex: none !important;
+  display: block !important;
+  padding-bottom: 0 !important;
 }
 
 html.home-fit .task-row {
-  flex: 1 1 auto !important;
+  flex: none !important;
   width: 100% !important;
   min-height: 0 !important;
-  align-content: center !important;
+  align-content: start !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 8px !important;
+  padding: 14px !important;
+}
+
+html.home-fit .task-check {
+  display: none !important;
 }
 
 html.home-fit .task-actions,
 html.home-fit .task-row .action-row {
-  align-self: end !important;
+  align-self: auto !important;
+  grid-column: 1 !important;
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 8px !important;
+  margin-top: 10px !important;
+}
+
+html.home-fit .mini-button {
+  min-height: 36px !important;
+  opacity: 1 !important;
 }
 
 html.home-fit .hero-card p:not(.eyebrow) {
@@ -74,7 +96,7 @@ function installPwaFitStyle() {
 function stableHeroCopy() {
   const title = document.querySelector("#next-title")?.textContent?.trim() || "";
   const copy = document.querySelector("#next-copy");
-  if (!copy) return;
+  if (!copy || /ready for review/i.test(title)) return;
   const wanted = /closing walk|walk and recovery/i.test(title)
     ? "Best next: finish the walk, fix visible issues, document waits."
     : "Best next: handle this focus item, document waits.";
