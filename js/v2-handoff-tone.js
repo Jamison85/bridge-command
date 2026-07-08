@@ -57,14 +57,12 @@ function messageFor(tone, variant, data) {
   const label = SHIFT_LABELS[shift()];
   const followups = combinedFollowups(data);
   const done = lineItems(data.completed, 'Nothing checked off yet.', data);
-  const still = lineItems(followups, 'Nothing major still hanging from the list.', data);
-  const delayed = lineItems(data.delayed, 'Nothing delayed.', data);
-  const carried = lineItems(data.carried, 'Nothing carried forward.', data);
+  const still = lineItems(followups, 'Nothing major still left on the list.', data);
   const set = {
     normal: [
       `Hey Loretta, quick update from today.\n\nDone:\n${done}\n\nStill needs attention:\n${still}\n\nI documented what had to move so it does not get lost.`,
       `Hey Loretta, here is where I landed today.\n\nGot done:\n${done}\n\nStill not finished:\n${still}\n\nI marked the stuff that had to wait so it is clear for follow-up.`,
-      `Hey Loretta, quick ${label.toLowerCase()} handoff.\n\nChecked off:\n${done}\n\nStill hanging:\n${still}\n\nThat is where it landed today.`
+      `Hey Loretta, quick ${label.toLowerCase()} handoff.\n\nChecked off:\n${done}\n\nStill left:\n${still}\n\nThat is where it landed today.`
     ],
     busy: [
       `Hey Loretta, today got pretty busy, so I had to prioritize what I could.\n\nDone:\n${done}\n\nStill not finished:\n${still}\n\nI marked what had to wait so it is clear what happened.`,
@@ -72,7 +70,7 @@ function messageFor(tone, variant, data) {
       `Hey Loretta, today was one of those busy ones.\n\nChecked off:\n${done}\n\nHad to wait:\n${still}\n\nI noted the reasons so it is easy to see what happened.`
     ],
     short: [
-      `Hey Loretta, quick handoff:\n\nDone:\n${done}\n\nStill hanging:\n${still}\n\nThat is where I landed.`,
+      `Hey Loretta, quick handoff:\n\nDone:\n${done}\n\nStill needs attention:\n${still}\n\nThat is where I landed.`,
       `Hey Loretta, quick update:\n\nGot done:\n${done}\n\nStill not finished:\n${still}`,
       `Hey Loretta, ${label.toLowerCase()} update:\n\nDone:\n${done}\n\nStill needs attention:\n${still}`
     ],
@@ -89,7 +87,7 @@ function messageFor(tone, variant, data) {
     smooth: [
       `Hey Loretta, today went pretty smooth overall.\n\nDone:\n${done}\n\nStill watching:\n${still}\n\nNothing major, just sending the update so it is all in one place.`,
       `Hey Loretta, pretty normal day overall.\n\nChecked off:\n${done}\n\nStill needs attention:\n${still}\n\nNothing too wild.`,
-      `Hey Loretta, smooth shift overall.\n\nDone:\n${done}\n\nStill hanging:\n${still}\n\nJust wanted it documented in one spot.`
+      `Hey Loretta, smooth shift overall.\n\nDone:\n${done}\n\nStill left:\n${still}\n\nJust wanted it documented in one spot.`
     ]
   };
   const choices = set[tone] || set.normal;
@@ -127,7 +125,7 @@ function applyToneHandoff(force = false) {
     version.dataset.toneBound = 'true';
     version.addEventListener('click', () => { setTimeout(() => { write(VARIANT_KEY, read(VARIANT_KEY, 0) + 1); lastSignature = ''; applyToneHandoff(true); }, 0); }, true);
   }
-  if (force || signature !== lastSignature || /needs another window|highest-impact work|No reply needed unless/i.test(box.value)) {
+  if (force || signature !== lastSignature || /needs another window|highest-impact work|No reply needed unless|hanging from the list|Still hanging/i.test(box.value)) {
     box.value = messageFor(tone, variant, data);
     lastSignature = signature;
   }
