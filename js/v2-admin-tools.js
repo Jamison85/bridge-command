@@ -1,3 +1,5 @@
+import("./v2-task-checklists.js?v=task-checklists-1").catch((error) => console.warn("Store Pilot task checklists failed", error));
+
 const ADMIN_KEYS = {
   completed: 'storePilot.completed.v6',
   customTasks: 'storePilot.customTasks.v6',
