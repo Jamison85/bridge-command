@@ -1,3 +1,5 @@
+import("./v2-shift-truck-fix.js?v=shift-truck-2").catch((error) => console.warn("Store Pilot shift and truck tool failed", error));
+
 const TASK_CHECKLIST_KEY = 'storePilot.taskChecklists.v1';
 const TASK_CHECKLISTS = {
   bookwork: ['SmartSafe totals matched', 'Deposits checked', 'Lottery audit checked', 'Safe/cash counts checked', 'Post-voids or exceptions reviewed', 'Any mismatch documented'],
