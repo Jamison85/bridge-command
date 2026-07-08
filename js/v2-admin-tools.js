@@ -49,6 +49,9 @@ function installAdminStyles() {
     .v2-reset-grid button{min-height:46px;border:0;border-radius:16px;background:#e9eee6;color:#073f2f;font-weight:1000}
     .v2-reset-grid button.danger{background:#8d2d25;color:white}
     .v2-reset-grid button.safe{background:linear-gradient(180deg,#0f513d,#073f2f);color:white}
+    .v2-status-urgent{background:#f6e1dd!important;color:#7d241d!important}
+    .v2-status-watch{background:#fff1d9!important;color:#7b471c!important}
+    .v2-status-clear{background:#e8eee3!important;color:#073f2f!important}
   `;
   document.head.appendChild(style);
 }
@@ -134,9 +137,29 @@ function wireResetButton() {
   menu.setAttribute('aria-label', 'Reset shift or day');
   menu.addEventListener('click', showResetPanel);
 }
+function statusLabelAdmin() {
+  const stateMap = readAdmin(ADMIN_KEYS.states, {})[shiftKeyAdmin()] || {};
+  const reasonText = Object.values(stateMap).map((entry) => String(entry?.reason || '')).join(' ').toLowerCase();
+  const urgent = /unsafe|injury|accident|spill|wet floor|outage|system down|register down|pos down|food safety|temperature|cooler down|freezer down|short staffed|call out|alone|security|police|medical/.test(reasonText);
+  const hasOpen = Array.from(document.querySelectorAll('.v2-task em')).some((tag) => /open|documented/i.test(tag.textContent || ''));
+  if (urgent) return 'Urgent';
+  if (hasOpen || Object.keys(stateMap).length) return 'Watch';
+  return 'Clear';
+}
+function applyStatusLabel() {
+  const label = statusLabelAdmin();
+  document.querySelectorAll('.v2-top span, .v2-kicker b').forEach((chip) => {
+    const current = chip.textContent.trim();
+    if (/^(Red|Urgent|Watch|Clear)$/i.test(current)) chip.textContent = label;
+    chip.classList.toggle('v2-status-urgent', label === 'Urgent');
+    chip.classList.toggle('v2-status-watch', label === 'Watch');
+    chip.classList.toggle('v2-status-clear', label === 'Clear');
+  });
+}
 function runAdminTools() {
   wireResetButton();
   applyRecipientMessage(false);
+  applyStatusLabel();
 }
 document.addEventListener('click', () => setTimeout(runAdminTools, 80));
 document.addEventListener('change', () => setTimeout(runAdminTools, 80));
