@@ -1,3 +1,5 @@
+import("./v2-task-page-scroll.js?v=tasks-scroll-1").catch((error) => console.warn("Store Pilot task page scroll fix failed", error));
+
 const SHIFT_FIX_KEY = 'storePilot.shift.v6';
 const TRUCK_KEY = 'storePilot.truckDay.v1';
 const VALID_SHIFTS = ['morning', 'mid', 'close'];
