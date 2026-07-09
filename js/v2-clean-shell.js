@@ -40,7 +40,6 @@ const V2_TEMPLATES = {
 
 let v2Screen = "now";
 let v2MessageVariant = 0;
-let v2NoteModal = null;
 
 function t(id, title, area, minutes, detail, due = "") { return { id, title, area, minutes, detail, due }; }
 function r(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } }
@@ -71,28 +70,9 @@ function data() {
 
 function setShift(shift) { w(V2_KEYS.shift, shift); renderV2(); }
 function markDone(id) { const st = states(); delete st[id]; setStates(st); setCompletedIds([...completedIds(), id]); renderV2(); }
-function markDelay(id) { openNoteModal(id, "delayed", "Why is this delayed?", "Register coverage / customer rush / short staffed / lower priority today"); }
-function markCarry(id) { openNoteModal(id, "carry", "Carry forward note", "Next shift"); }
+function markDelay(id) { const reason = prompt("Why is this delayed?", "Register coverage / customer rush / short staffed / lower priority today") || "Reason noted"; const st = states(); st[id] = { type: "delayed", reason, updatedAt: new Date().toISOString() }; setStates(st); renderV2(); }
+function markCarry(id) { const reason = prompt("Carry forward note", "Next shift") || "Next shift"; const st = states(); st[id] = { type: "carry", reason, updatedAt: new Date().toISOString() }; setStates(st); renderV2(); }
 function reopen(id) { const st = states(); delete st[id]; setStates(st); setCompletedIds(completedIds().filter((doneId) => doneId !== id)); renderV2(); }
-
-function openNoteModal(id, type, title, placeholder) {
-  const task = tasks().find((item) => item.id === id);
-  v2NoteModal = { id, type, title, placeholder, taskTitle: task?.title || "Task note" };
-  renderV2();
-  setTimeout(() => document.querySelector("#v2-note-input")?.focus(), 80);
-}
-
-function saveNoteModal() {
-  if (!v2NoteModal) return;
-  const reason = document.querySelector("#v2-note-input")?.value?.trim() || (v2NoteModal.type === "carry" ? "Next shift" : "Reason noted");
-  const st = states();
-  st[v2NoteModal.id] = { type: v2NoteModal.type, reason, updatedAt: new Date().toISOString() };
-  setStates(st);
-  v2NoteModal = null;
-  renderV2();
-}
-
-function closeNoteModal() { v2NoteModal = null; renderV2(); }
 
 function progressText(d = data()) {
   const documented = d.delayed.length + d.carried.length;
@@ -102,7 +82,7 @@ function progressText(d = data()) {
 
 function priorityLabel(d = data()) {
   const text = d.unfinished.map((task) => `${task.title} ${task.area} ${d.states[task.id]?.reason || ""}`).join(" ").toLowerCase();
-  if (/safety|unsafe|injury|accident|spill|wet floor|outage|system down|register down|pos down|food safety|temperature|cooler down|freezer down|staffing crisis|short staffed|call out|alone|incident|security|police|medical/.test(text)) return "Urgent";
+  if (/safety|unsafe|injury|accident|spill|wet floor|outage|system down|register down|pos down|food safety|temperature|cooler down|freezer down|staffing crisis|short staffed|call out|alone|incident|security|police|medical/.test(text)) return "Red";
   if (d.unfinished.length) return "Watch";
   return "Clear";
 }
@@ -141,11 +121,10 @@ function renderV2() {
   const d = data();
   const shell = document.querySelector("#store-pilot-v2");
   shell.innerHTML = `
-    <header class="v2-top"><button class="v2-menu" type="button" aria-label="Menu">☰</button><div><p>CASEY'S</p><h1>Store Pilot</h1></div><span class="${priorityLabel(d).toLowerCase()}">${priorityLabel(d)}</span></header>
-    <section class="v2-shifts" aria-label="Shift selector">${V2_ORDER.map((shift) => `<button class="${shift === activeShift() ? "active" : ""}" data-v2-shift="${shift}" type="button">${V2_SHIFT_LABELS[shift]}</button>`).join("")}</section>
+    <header class="v2-top"><button class="v2-menu" type="button">☰</button><div><p>CASEY'S</p><h1>Store Pilot</h1></div><span>${priorityLabel(d)}</span></header>
+    <section class="v2-shifts">${V2_ORDER.map((shift) => `<button class="${shift === activeShift() ? "active" : ""}" data-v2-shift="${shift}" type="button">${V2_SHIFT_LABELS[shift]}</button>`).join("")}</section>
     <section class="v2-stage">${v2Screen === "now" ? nowHTML(d) : v2Screen === "tasks" ? tasksHTML(d) : v2Screen === "handoff" ? handoffHTML(d) : incidentHTML(d)}</section>
-    <nav class="v2-nav">${[["now","Now"],["tasks","Tasks"],["handoff","Handoff"],["incident","Incident"]].map(([id,label]) => `<button class="${v2Screen === id ? "active" : ""}" data-v2-screen="${id}" type="button">${label}</button>`).join("")}</nav>
-    ${noteModalHTML()}`;
+    <nav class="v2-nav">${[["now","Now"],["tasks","Tasks"],["handoff","Handoff"],["incident","Incident"]].map(([id,label]) => `<button class="${v2Screen === id ? "active" : ""}" data-v2-screen="${id}" type="button">${label}</button>`).join("")}</nav>`;
   bindV2();
 }
 
@@ -155,15 +134,14 @@ function nowHTML(d) {
     <div class="v2-kicker"><span>${V2_SHIFT_LABELS[activeShift()]} Shift</span><b>${priorityLabel(d)}</b></div>
     <h2>${escape(next?.title || "Ready for handoff")}</h2>
     <p>${escape(taskWhy(next))}</p>
-    <div class="v2-actions">${next ? `<button class="primary" data-v2-done="${next.id}">Done</button><button data-v2-delay="${next.id}">Delay</button><button data-v2-carry="${next.id}">Carry</button>` : `<button class="primary" data-v2-screen="handoff">Review Handoff</button>`}</div>
+    <div class="v2-actions">${next ? `<button data-v2-done="${next.id}">Done</button><button data-v2-delay="${next.id}">Delay</button><button data-v2-carry="${next.id}">Carry</button>` : `<button data-v2-screen="handoff">Review Handoff</button>`}</div>
     <div class="v2-progress"><span>${progressText(d)}</span></div>
   </article>`;
 }
 
 function taskItem(task, status, d) {
   const note = d.states[task.id]?.reason;
-  const statusClass = status.toLowerCase();
-  return `<article class="v2-task"><div><strong>${escape(task.title)}</strong><span>${escape(task.area)} · ${task.minutes} min${task.due ? ` · ${escape(task.due)}` : ""}${note ? ` · ${escape(note)}` : ""}</span></div><em class="${statusClass}">${status}</em><div>${status === "Done" ? `<button data-v2-reopen="${task.id}">Reopen</button>` : `<button class="primary" data-v2-done="${task.id}">Done</button><button data-v2-delay="${task.id}">Delay</button><button data-v2-carry="${task.id}">Carry</button>`}</div></article>`;
+  return `<article class="v2-task"><div><strong>${escape(task.title)}</strong><span>${escape(task.area)} · ${task.minutes} min${note ? ` · ${escape(note)}` : ""}</span></div><em>${status}</em><div>${status === "Done" ? `<button data-v2-reopen="${task.id}">Reopen</button>` : `<button data-v2-done="${task.id}">Done</button><button data-v2-delay="${task.id}">Delay</button><button data-v2-carry="${task.id}">Carry</button>`}</div></article>`;
 }
 
 function group(title, items, status, d) {
@@ -175,17 +153,11 @@ function tasksHTML(d) {
 }
 
 function handoffHTML(d) {
-  return `<article class="v2-handoff"><h2>Daily handoff</h2><div class="v2-stats"><b>${d.completed.length}<span>done</span></b><b>${d.delayed.length}<span>delayed</span></b><b>${d.carried.length}<span>carried</span></b><b>${d.active.length}<span>open</span></b></div><textarea id="v2-message">${escape(buildMessage(d))}</textarea><div class="v2-actions"><button class="primary" id="v2-share">Text / Share</button><button id="v2-copy">Copy</button><button id="v2-version">New Version</button></div></article>`;
+  return `<article class="v2-handoff"><h2>Daily handoff</h2><div class="v2-stats"><b>${d.completed.length}<span>done</span></b><b>${d.delayed.length}<span>delayed</span></b><b>${d.carried.length}<span>carried</span></b><b>${d.active.length}<span>open</span></b></div><textarea id="v2-message">${escape(buildMessage(d))}</textarea><div class="v2-actions"><button id="v2-share">Text / Share</button><button id="v2-copy">Copy</button><button id="v2-version">New Version</button></div></article>`;
 }
 
 function incidentHTML() {
-  return `<form class="v2-incident" id="v2-incident-form"><h2>Incident note</h2><label><span>What happened</span><textarea name="what" placeholder="Power outage, short staffed, tech support call..."></textarea></label><label><span>Who was notified</span><input name="who" placeholder="Loretta, Richard, IT, maintenance..." /></label><label><span>What got delayed</span><textarea name="delayed" placeholder="Dates, cleaning, truck, customer-facing reset, etc."></textarea></label><button class="primary" type="submit">Save incident note</button></form>`;
-}
-
-function noteModalHTML() {
-  if (!v2NoteModal) return "";
-  const action = v2NoteModal.type === "carry" ? "Carry forward" : "Delay task";
-  return `<aside class="v2-note-modal" role="dialog" aria-modal="true" aria-label="${escape(action)}"><section><p>${escape(action)}</p><h2>${escape(v2NoteModal.taskTitle)}</h2><label><span>${escape(v2NoteModal.title)}</span><textarea id="v2-note-input" placeholder="${escape(v2NoteModal.placeholder)}"></textarea></label><div><button class="primary" id="v2-note-save" type="button">Save note</button><button id="v2-note-cancel" type="button">Cancel</button></div></section></aside>`;
+  return `<form class="v2-incident" id="v2-incident-form"><h2>Incident note</h2><label>What happened<textarea name="what" placeholder="Power outage, short staffed, tech support call..."></textarea></label><label>Who was notified<input name="who" placeholder="Loretta, Richard, IT, maintenance..." /></label><label>What got delayed<textarea name="delayed" placeholder="Bookwork, dates, cleaning, truck, etc."></textarea></label><button type="submit">Save incident note</button></form>`;
 }
 
 function bindV2() {
@@ -195,9 +167,6 @@ function bindV2() {
   document.querySelectorAll("[data-v2-delay]").forEach((b) => b.addEventListener("click", () => markDelay(b.dataset.v2Delay)));
   document.querySelectorAll("[data-v2-carry]").forEach((b) => b.addEventListener("click", () => markCarry(b.dataset.v2Carry)));
   document.querySelectorAll("[data-v2-reopen]").forEach((b) => b.addEventListener("click", () => reopen(b.dataset.v2Reopen)));
-  document.querySelector("#v2-note-save")?.addEventListener("click", saveNoteModal);
-  document.querySelector("#v2-note-cancel")?.addEventListener("click", closeNoteModal);
-  document.querySelector(".v2-note-modal")?.addEventListener("click", (event) => { if (event.target.classList.contains("v2-note-modal")) closeNoteModal(); });
   document.querySelector("#v2-version")?.addEventListener("click", () => { v2MessageVariant += 1; renderV2(); });
   document.querySelector("#v2-copy")?.addEventListener("click", async () => { await navigator.clipboard?.writeText(document.querySelector("#v2-message")?.value || ""); });
   document.querySelector("#v2-share")?.addEventListener("click", async () => {
@@ -220,10 +189,7 @@ function bindV2() {
 function installV2() {
   document.documentElement.classList.add("v2-clean-active");
   const style = document.createElement("style");
-  style.id = "v2-production-ui-style";
-  style.textContent = `
-    html.v2-clean-active body{background:#f8fafc!important;color:#0f172a!important;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important}html.v2-clean-active .app-shell{display:none!important}#store-pilot-v2{width:min(100%,760px);min-height:100dvh;margin:0 auto;padding:calc(env(safe-area-inset-top) + 12px) 12px calc(env(safe-area-inset-bottom) + 92px);box-sizing:border-box;color:#0f172a}.v2-top{display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:10px;margin-bottom:10px}.v2-top button{height:42px;border:1px solid #e2e8f0;border-radius:14px;background:#fff;color:#334155;font-weight:900}.v2-top p{margin:0;text-align:center;color:#64748b;font-size:.62rem;font-weight:900;letter-spacing:.16em}.v2-top h1{margin:0;text-align:center;color:#0f172a;font-size:1.22rem;line-height:1;text-transform:uppercase;letter-spacing:.06em}.v2-top span{padding:8px 11px;border:1px solid #e2e8f0;border-radius:999px;background:#fff;color:#334155;font-weight:900;font-size:.72rem}.v2-top span.urgent{background:#fef2f2;border-color:#fecaca;color:#991b1b}.v2-top span.watch{background:#fffbeb;border-color:#fde68a;color:#92400e}.v2-top span.clear{background:#ecfdf5;border-color:#bbf7d0;color:#065f46}.v2-shifts{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;margin-bottom:12px;border:1px solid #e2e8f0;border-radius:16px;background:#fff}.v2-shifts button,.v2-nav button{min-height:40px;border:0;border-radius:12px;background:transparent;color:#64748b;font-weight:850;transition:transform .14s ease,background .14s ease,color .14s ease}.v2-shifts button:active,.v2-nav button:active{transform:scale(.97)}.v2-shifts button.active,.v2-nav button.active{background:#0f172a;color:#fff}.v2-stage{display:grid;gap:12px}.v2-now,.v2-handoff,.v2-incident,.v2-group{padding:16px;border:1px solid #e2e8f0;border-radius:16px;background:#fff;box-shadow:none}.v2-kicker{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#64748b;font-weight:900;text-transform:uppercase;font-size:.68rem;letter-spacing:.08em}.v2-kicker b{padding:6px 9px;border:1px solid #e2e8f0;border-radius:999px;background:#f8fafc;color:#334155}.v2-now h2,.v2-handoff h2,.v2-incident h2{margin:14px 0 8px;color:#0f172a;font-size:1.75rem;line-height:1;letter-spacing:-.04em}.v2-now p{margin:0;color:#475569;font-size:.98rem;line-height:1.4}.v2-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}.v2-actions button,.v2-task button,.v2-incident button,.v2-note-modal button{min-height:44px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;color:#334155;font-weight:900}.v2-actions button.primary,.v2-task button.primary,.v2-incident button.primary,.v2-note-modal button.primary,.v2-actions button:first-child:not([id=v2-copy]):not([id=v2-version]){border-color:#047857;background:#047857;color:white}.v2-progress{margin-top:14px;padding:11px 12px;border:1px solid #dbeafe;border-radius:14px;background:#eff6ff;color:#1e3a8a;font-weight:850}.v2-group h3{margin:0 0 10px;color:#0f172a;font-size:.82rem;text-transform:uppercase;letter-spacing:.1em}.v2-task{display:grid;gap:10px;padding:13px;border:1px solid #e2e8f0;border-radius:14px;background:#fff;margin-top:9px}.v2-task strong{display:block;color:#0f172a;font-size:1rem;line-height:1.15;font-weight:900}.v2-task span{display:block;margin-top:4px;color:#64748b;font-size:.84rem;line-height:1.25}.v2-task em{width:max-content;padding:5px 9px;border:1px solid #e2e8f0;border-radius:999px;background:#f8fafc;color:#475569;font-style:normal;font-weight:900;font-size:.68rem;text-transform:uppercase;letter-spacing:.05em}.v2-task em.done{background:#ecfdf5;border-color:#bbf7d0;color:#047857}.v2-task em.documented{background:#fffbeb;border-color:#fde68a;color:#92400e}.v2-task em.open{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}.v2-task div:last-child{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.v2-empty{margin:0;color:#64748b}.v2-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}.v2-stats b{display:grid;place-items:center;padding:11px 7px;border:1px solid #e2e8f0;border-radius:14px;background:#f8fafc;color:#0f172a;font-size:1.22rem}.v2-stats span{font-size:.62rem;text-transform:uppercase;color:#64748b;letter-spacing:.06em}#v2-message,.v2-incident textarea,.v2-incident input,.v2-note-modal textarea{width:100%;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:14px;background:#fff;color:#0f172a;padding:13px;font:inherit;line-height:1.42;outline:none}#v2-message:focus,.v2-incident textarea:focus,.v2-incident input:focus,.v2-note-modal textarea:focus{border-color:#059669;box-shadow:0 0 0 3px rgba(5,150,105,.16)}#v2-message{min-height:260px}.v2-incident{display:grid;gap:12px}.v2-incident label,.v2-note-modal label{display:grid;gap:7px;color:#0f172a;font-weight:900}.v2-incident label span,.v2-note-modal label span{font-size:.76rem;text-transform:uppercase;letter-spacing:.07em;color:#475569}.v2-nav{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 12px);transform:translateX(-50%);width:min(calc(100% - 24px),720px);display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:4px;border:1px solid #e2e8f0;border-radius:18px;background:rgba(255,255,255,.92);backdrop-filter:blur(18px);z-index:999}.v2-note-modal{position:fixed;inset:0;z-index:2800;display:grid;place-items:end center;padding:14px;background:rgba(15,23,42,.42)}.v2-note-modal section{width:min(100%,520px);padding:16px;border:1px solid #e2e8f0;border-radius:18px;background:#fff;box-shadow:0 24px 60px rgba(15,23,42,.25)}.v2-note-modal p{margin:0 0 4px;color:#047857;font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em}.v2-note-modal h2{margin:0 0 14px;color:#0f172a;font-size:1.25rem;line-height:1.1}.v2-note-modal textarea{min-height:92px}.v2-note-modal section>div{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}@media(max-width:430px){#store-pilot-v2{padding-left:10px;padding-right:10px}.v2-now h2,.v2-handoff h2,.v2-incident h2{font-size:1.45rem}.v2-actions{gap:7px}.v2-stats{gap:7px}.v2-stats b{padding:9px 6px;font-size:1.05rem}.v2-task div:last-child{grid-template-columns:1fr 1fr 1fr}.v2-actions button,.v2-task button,.v2-incident button{min-height:41px;font-size:.78rem}}
-  `;
+  style.textContent = `html.v2-clean-active body{background:linear-gradient(180deg,#fff9ef,#efe5d5)!important}html.v2-clean-active .app-shell{display:none!important}#store-pilot-v2{width:min(100%,760px);min-height:100dvh;margin:0 auto;padding:calc(env(safe-area-inset-top) + 12px) 14px calc(env(safe-area-inset-bottom) + 92px);color:#17221c;font-family:Inter,system-ui,sans-serif}.v2-top{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:10px;margin-bottom:12px}.v2-top button{height:44px;border:0;border-radius:16px;background:#fffaf1;color:#073f2f;font-weight:1000;box-shadow:0 8px 22px rgba(44,31,16,.08)}.v2-top p{margin:0;text-align:center;color:#073f2f;font-size:.64rem;font-weight:1000;letter-spacing:.18em}.v2-top h1{margin:0;text-align:center;color:#073f2f;font-size:1.45rem;line-height:1;text-transform:uppercase}.v2-top span{padding:10px 13px;border-radius:999px;background:#e8eee3;color:#073f2f;font-weight:950;font-size:.78rem}.v2-shifts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:9px;margin-bottom:12px;border:1px solid rgba(63,48,31,.12);border-radius:22px;background:rgba(255,250,241,.9);box-shadow:0 14px 34px rgba(44,31,16,.1)}.v2-shifts button,.v2-nav button{min-height:44px;border:0;border-radius:16px;background:transparent;color:#6d675e;font-weight:950}.v2-shifts button.active,.v2-nav button.active{background:linear-gradient(180deg,#0f513d,#073f2f);color:#fff}.v2-stage{display:grid;gap:12px}.v2-now,.v2-handoff,.v2-incident,.v2-group{padding:20px;border:1px solid rgba(63,48,31,.12);border-radius:26px;background:rgba(255,250,241,.94);box-shadow:0 18px 46px rgba(44,31,16,.13)}.v2-kicker{display:flex;justify-content:space-between;gap:10px;color:#8b4e1f;font-weight:950;text-transform:uppercase;font-size:.72rem;letter-spacing:.08em}.v2-now h2,.v2-handoff h2,.v2-incident h2{margin:18px 0 8px;color:#073f2f;font-size:2rem;line-height:.98;letter-spacing:-.05em}.v2-now p{margin:0;color:#6d675e;font-size:1rem;line-height:1.35}.v2-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}.v2-actions button,.v2-task button,.v2-incident button{min-height:48px;border:0;border-radius:16px;background:#e9eee6;color:#073f2f;font-weight:1000}.v2-actions button:first-child,.v2-incident button{background:linear-gradient(180deg,#d29352,#b87336);color:white}.v2-progress{margin-top:16px;padding:13px;border-radius:18px;background:#eef2e9;color:#073f2f;font-weight:950}.v2-group h3{margin:0 0 12px;color:#073f2f}.v2-task{display:grid;gap:10px;padding:14px;border:1px solid rgba(63,48,31,.1);border-radius:18px;background:#fffdf8;margin-top:10px}.v2-task strong{display:block;color:#17221c}.v2-task span{display:block;margin-top:3px;color:#6d675e;font-size:.84rem}.v2-task em{width:max-content;padding:6px 10px;border-radius:999px;background:#eef2e9;color:#073f2f;font-style:normal;font-weight:950;font-size:.72rem}.v2-task div:last-child{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.v2-empty{color:#6d675e}.v2-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}.v2-stats b{display:grid;place-items:center;padding:14px;border-radius:18px;background:#fffdf8;color:#073f2f;font-size:1.45rem}.v2-stats span{font-size:.68rem;text-transform:uppercase;color:#6d675e}#v2-message,.v2-incident textarea,.v2-incident input{width:100%;border:1px solid rgba(63,48,31,.14);border-radius:18px;background:#fffdf8;color:#17221c;padding:14px;font:inherit;line-height:1.42}#v2-message{min-height:280px}.v2-incident{display:grid;gap:12px}.v2-incident label{display:grid;gap:7px;color:#073f2f;font-weight:950}.v2-nav{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 12px);transform:translateX(-50%);width:min(calc(100% - 24px),720px);display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:8px;border:1px solid rgba(63,48,31,.12);border-radius:26px 26px 18px 18px;background:rgba(255,250,241,.94);box-shadow:0 14px 40px rgba(44,31,16,.18);backdrop-filter:blur(18px);z-index:999}@media(max-width:430px){#store-pilot-v2{padding-left:12px;padding-right:12px}.v2-now h2,.v2-handoff h2,.v2-incident h2{font-size:1.65rem}.v2-actions{gap:8px}.v2-stats{gap:8px}.v2-stats b{padding:11px 8px;font-size:1.2rem}}`;
   document.head.appendChild(style);
   const root = document.createElement("main");
   root.id = "store-pilot-v2";
