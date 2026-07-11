@@ -190,12 +190,9 @@
     line-height: 1.05 !important;
   }
 
-  body:has(.nav-button[data-screen="next"].active) #screen-card {
-    display: none !important;
-  }
-
+  body:has(.nav-button[data-screen="next"].active) #screen-card,
   body:has(.nav-button[data-screen="next"].active) .quick-capture-stack {
-    bottom: calc(env(safe-area-inset-bottom) + 57px) !important;
+    display: none !important;
   }
 }
 
