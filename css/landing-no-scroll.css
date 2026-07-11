@@ -84,18 +84,19 @@
   }
 
   body:has(.nav-button[data-screen="next"].active) .dashboard-grid {
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     min-height: 0 !important;
     display: grid !important;
     grid-template-columns: minmax(0, 1fr) !important;
-    grid-template-rows: minmax(0, 1fr) 58px !important;
+    grid-template-rows: minmax(220px, 31dvh) 54px !important;
     gap: 6px !important;
     overflow: hidden;
   }
 
   body:has(.nav-button[data-screen="next"].active) .hero-card {
     min-height: 0 !important;
-    height: 100% !important;
+    height: auto !important;
+    max-height: 255px !important;
     display: flex !important;
     flex-direction: column;
     padding: 12px !important;
@@ -104,14 +105,14 @@
 
   body:has(.nav-button[data-screen="next"].active) .hero-meta {
     flex: 0 0 auto;
-    margin-bottom: 6px !important;
-    font-size: 0.66rem !important;
+    margin-bottom: 5px !important;
+    font-size: 0.64rem !important;
   }
 
   body:has(.nav-button[data-screen="next"].active) .hero-card > .eyebrow {
     flex: 0 0 auto;
     margin-bottom: 4px !important;
-    font-size: 0.6rem !important;
+    font-size: 0.58rem !important;
   }
 
   body:has(.nav-button[data-screen="next"].active) .hero-card h2 {
@@ -119,9 +120,9 @@
     display: -webkit-box;
     overflow: hidden;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 4;
-    font-size: clamp(1.14rem, 6.2vw, 1.52rem) !important;
-    line-height: 1.02 !important;
+    -webkit-line-clamp: 3;
+    font-size: clamp(1.16rem, 6.4vw, 1.54rem) !important;
+    line-height: 1.03 !important;
   }
 
   body:has(.nav-button[data-screen="next"].active) .hero-card p:not(.eyebrow) {
@@ -132,7 +133,7 @@
     -webkit-line-clamp: 2;
     margin-top: 7px !important;
     font-size: 0.72rem !important;
-    line-height: 1.25 !important;
+    line-height: 1.24 !important;
   }
 
   body:has(.nav-button[data-screen="next"].active) .hero-actions {
@@ -148,23 +149,23 @@
   }
 
   body:has(.nav-button[data-screen="next"].active) .progress-card {
-    min-height: 58px !important;
-    height: 58px !important;
-    grid-template-columns: 44px minmax(0, 1fr) !important;
+    min-height: 54px !important;
+    height: 54px !important;
+    grid-template-columns: 40px minmax(0, 1fr) !important;
     grid-template-areas:
       "ring label"
       "ring track"
       "ring copy" !important;
-    gap: 2px 8px !important;
-    padding: 6px 9px !important;
+    gap: 1px 8px !important;
+    padding: 5px 9px !important;
     overflow: hidden;
   }
 
   body:has(.nav-button[data-screen="next"].active) .progress-ring {
-    width: 44px !important;
-    height: 44px !important;
-    min-width: 44px !important;
-    min-height: 44px !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
     border-width: 5px !important;
   }
 
@@ -174,11 +175,11 @@
   }
 
   body:has(.nav-button[data-screen="next"].active) #progress-ring-text {
-    font-size: 0.72rem !important;
+    font-size: 0.68rem !important;
   }
 
   body:has(.nav-button[data-screen="next"].active) .progress-card .eyebrow {
-    font-size: 0.56rem !important;
+    font-size: 0.54rem !important;
   }
 
   body:has(.nav-button[data-screen="next"].active) .progress-track {
@@ -186,11 +187,88 @@
   }
 
   body:has(.nav-button[data-screen="next"].active) #progress-subtext {
-    font-size: 0.58rem !important;
+    font-size: 0.57rem !important;
     line-height: 1.05 !important;
   }
 
-  body:has(.nav-button[data-screen="next"].active) #screen-card,
+  body:has(.nav-button[data-screen="next"].active) #screen-card {
+    flex: 1 1 auto;
+    min-height: 0 !important;
+    display: block !important;
+    margin-top: 6px !important;
+    padding: 8px !important;
+    overflow: hidden !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) #screen-card > .screen-header,
+  body:has(.nav-button[data-screen="next"].active) .command-decision-card,
+  body:has(.nav-button[data-screen="next"].active) .command-rescue {
+    display: none !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) #screen-content,
+  body:has(.nav-button[data-screen="next"].active) .command-center-screen {
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .command-coming-card {
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 9px !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .command-section-head {
+    margin-bottom: 6px !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .command-section-head p {
+    font-size: 0.54rem !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .command-section-head h3 {
+    font-size: 0.86rem !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .command-section-head button {
+    min-height: 28px !important;
+    padding: 0 8px !important;
+    font-size: 0.63rem !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .command-coming-list {
+    display: grid !important;
+    gap: 5px !important;
+    overflow: hidden !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .command-coming-row {
+    min-height: 0 !important;
+    padding: 6px 7px !important;
+    gap: 7px !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .command-coming-row > span {
+    width: 22px !important;
+    height: 22px !important;
+    font-size: 0.62rem !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .command-coming-row strong {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.74rem !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .command-coming-row small {
+    font-size: 0.6rem !important;
+  }
+
   body:has(.nav-button[data-screen="next"].active) .quick-capture-stack {
     display: none !important;
   }
@@ -202,30 +280,31 @@
     display: none !important;
   }
 
-  body:has(.nav-button[data-screen="next"].active) .top-bar {
-    margin-bottom: 4px !important;
-  }
-
+  body:has(.nav-button[data-screen="next"].active) .top-bar,
   body:has(.nav-button[data-screen="next"].active) .shift-card,
   body:has(.nav-button[data-screen="next"].active) .shift-command-context {
     margin-bottom: 4px !important;
   }
 
   body:has(.nav-button[data-screen="next"].active) .dashboard-grid {
-    grid-template-rows: minmax(0, 1fr) 50px !important;
+    grid-template-rows: 200px 48px !important;
     gap: 4px !important;
   }
 
   body:has(.nav-button[data-screen="next"].active) .progress-card {
-    height: 50px !important;
-    min-height: 50px !important;
-    grid-template-columns: 38px minmax(0, 1fr) !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    grid-template-columns: 36px minmax(0, 1fr) !important;
   }
 
   body:has(.nav-button[data-screen="next"].active) .progress-ring {
-    width: 38px !important;
-    height: 38px !important;
-    min-width: 38px !important;
-    min-height: 38px !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .command-coming-row:nth-child(n+3) {
+    display: none !important;
   }
 }
