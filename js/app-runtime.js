@@ -11,6 +11,7 @@ import "./shift-command-center.js?v=command-center-7";
 import "./loretta-inbox.js?v=command-center-7";
 import "./loretta-ui-fix.js?v=command-center-7";
 import "./interruption-timer.js?v=command-center-7";
+import "./interruption-shift-guard.js?v=command-center-7";
 
 window.StorePilotRuntime = {
   version: "command-center-7",
@@ -28,6 +29,7 @@ window.StorePilotRuntime = {
     "shift-command-center",
     "loretta-inbox",
     "loretta-ui-fix",
-    "interruption-timer"
+    "interruption-timer",
+    "interruption-shift-guard"
   ]
 };
