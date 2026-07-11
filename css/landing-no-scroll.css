@@ -1,0 +1,234 @@
+@media (max-width: 700px) {
+  body:has(.nav-button[data-screen="next"].active) {
+    height: 100dvh;
+    overflow: hidden !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .app-shell,
+  html.loretta-ui-ready body:has(.nav-button[data-screen="next"].active) .app-shell {
+    height: 100dvh;
+    min-height: 0 !important;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden !important;
+    padding-top: calc(env(safe-area-inset-top) + 7px) !important;
+    padding-bottom: calc(env(safe-area-inset-bottom) + 62px) !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .top-bar {
+    flex: 0 0 auto;
+    margin-bottom: 6px !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .brand-lockup h1 {
+    font-size: 1.16rem !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .status-pill {
+    padding: 6px 9px !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .shift-card {
+    flex: 0 0 auto;
+    margin-bottom: 6px !important;
+    padding: 6px !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .shift-card > .eyebrow {
+    display: none !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .shift-toggle {
+    gap: 4px !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .shift-button {
+    min-height: 36px !important;
+    padding: 0 7px !important;
+    font-size: 0.78rem !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .shift-command-context {
+    flex: 0 0 auto;
+    margin-bottom: 6px !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .command-context-summary {
+    padding: 7px 9px !important;
+    gap: 8px !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .command-context-summary p {
+    margin-bottom: 2px !important;
+    font-size: 0.54rem !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .command-context-summary strong {
+    font-size: 0.8rem !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .command-context-summary span:not(.command-context-alert) {
+    display: none !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .command-context-alert {
+    margin-top: 2px !important;
+    font-size: 0.62rem !important;
+    line-height: 1.15 !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .command-context-edit {
+    min-height: 30px !important;
+    padding: 0 9px !important;
+    font-size: 0.68rem !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .dashboard-grid {
+    flex: 1 1 auto;
+    min-height: 0 !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: minmax(0, 1fr) 58px !important;
+    gap: 6px !important;
+    overflow: hidden;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .hero-card {
+    min-height: 0 !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column;
+    padding: 12px !important;
+    overflow: hidden !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .hero-meta {
+    flex: 0 0 auto;
+    margin-bottom: 6px !important;
+    font-size: 0.66rem !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .hero-card > .eyebrow {
+    flex: 0 0 auto;
+    margin-bottom: 4px !important;
+    font-size: 0.6rem !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .hero-card h2 {
+    flex: 0 1 auto;
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    font-size: clamp(1.14rem, 6.2vw, 1.52rem) !important;
+    line-height: 1.02 !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .hero-card p:not(.eyebrow) {
+    flex: 0 1 auto;
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    margin-top: 7px !important;
+    font-size: 0.72rem !important;
+    line-height: 1.25 !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .hero-actions {
+    flex: 0 0 auto;
+    margin-top: auto !important;
+    padding-top: 8px;
+    gap: 6px !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .hero-actions button {
+    min-height: 38px !important;
+    font-size: 0.74rem !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .progress-card {
+    min-height: 58px !important;
+    height: 58px !important;
+    grid-template-columns: 44px minmax(0, 1fr) !important;
+    grid-template-areas:
+      "ring label"
+      "ring track"
+      "ring copy" !important;
+    gap: 2px 8px !important;
+    padding: 6px 9px !important;
+    overflow: hidden;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .progress-ring {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    border-width: 5px !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .progress-ring::after {
+    inset: -5px !important;
+    border-width: 5px !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) #progress-ring-text {
+    font-size: 0.72rem !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .progress-card .eyebrow {
+    font-size: 0.56rem !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .progress-track {
+    height: 5px !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) #progress-subtext {
+    font-size: 0.58rem !important;
+    line-height: 1.05 !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) #screen-card {
+    display: none !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .quick-capture-stack {
+    bottom: calc(env(safe-area-inset-bottom) + 57px) !important;
+  }
+}
+
+@media (max-width: 700px) and (max-height: 700px) {
+  body:has(.nav-button[data-screen="next"].active) .brand-lockup .eyebrow,
+  body:has(.nav-button[data-screen="next"].active) .hero-meta {
+    display: none !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .top-bar {
+    margin-bottom: 4px !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .shift-card,
+  body:has(.nav-button[data-screen="next"].active) .shift-command-context {
+    margin-bottom: 4px !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .dashboard-grid {
+    grid-template-rows: minmax(0, 1fr) 50px !important;
+    gap: 4px !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .progress-card {
+    height: 50px !important;
+    min-height: 50px !important;
+    grid-template-columns: 38px minmax(0, 1fr) !important;
+  }
+
+  body:has(.nav-button[data-screen="next"].active) .progress-ring {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
+  }
+}
