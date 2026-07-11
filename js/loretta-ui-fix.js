@@ -1,14 +1,20 @@
 const LORETTA_STYLE_ID = "loretta-consistency-style";
+const MOBILE_STYLE_ID = "store-pilot-mobile-density-style";
 let fixedRecognition = null;
 let speechBaseText = "";
 
-function ensureLorettaStyle() {
-  if (document.querySelector(`#${LORETTA_STYLE_ID}`)) return;
+function ensureStyle(id, href) {
+  if (document.querySelector(`#${id}`)) return;
   const link = document.createElement("link");
-  link.id = LORETTA_STYLE_ID;
+  link.id = id;
   link.rel = "stylesheet";
-  link.href = "./css/loretta-consistency.css?v=command-center-3";
+  link.href = href;
   document.head.appendChild(link);
+}
+
+function ensureLorettaStyle() {
+  ensureStyle(LORETTA_STYLE_ID, "./css/loretta-consistency.css?v=command-center-4");
+  ensureStyle(MOBILE_STYLE_ID, "./css/mobile-density.css?v=command-center-4");
   document.documentElement.classList.add("loretta-ui-ready");
 }
 
