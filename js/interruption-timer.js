@@ -12,13 +12,11 @@ const INTERRUPTION_TYPES = [
 
 let interruptionTick = null;
 let interruptionObserver = null;
+let contextRenderQueued = false;
 
 function readJSON(key, fallback) {
-  try {
-    return JSON.parse(localStorage.getItem(key)) ?? fallback;
-  } catch {
-    return fallback;
-  }
+  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+  catch { return fallback; }
 }
 
 function writeJSON(key, value) {
@@ -27,11 +25,7 @@ function writeJSON(key, value) {
 
 function escapeHTML(value) {
   return String(value ?? "").replace(/[&<>'"]/g, (char) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    "'": "&#39;",
-    '"': "&quot;"
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
   }[char]));
 }
 
@@ -66,11 +60,8 @@ function todaysInterruptions() {
 }
 
 function currentTask() {
-  try {
-    return window.StorePilotCommandCenter?.analyze?.().next || null;
-  } catch {
-    return null;
-  }
+  try { return window.StorePilotCommandCenter?.analyze?.().next || null; }
+  catch { return null; }
 }
 
 function elapsedMs(item, now = Date.now()) {
@@ -90,8 +81,7 @@ function formatClock(ms) {
 }
 
 function formatMinutes(ms) {
-  const minutes = Math.max(1, Math.round(ms / 60000));
-  return `${minutes} min`;
+  return `${Math.max(1, Math.round(ms / 60000))} min`;
 }
 
 function formatTime(value) {
@@ -109,7 +99,6 @@ function setStatus(text) {
 function ensureInterruptionSheet() {
   let sheet = document.querySelector("#interruption-sheet");
   if (sheet) return sheet;
-
   sheet = document.createElement("section");
   sheet.id = "interruption-sheet";
   sheet.className = "interruption-sheet";
@@ -126,11 +115,9 @@ function historyHTML() {
   const items = todaysInterruptions();
   const completed = items.filter((item) => item.status === "ended");
   const totalMs = completed.reduce((sum, item) => sum + elapsedMs(item), 0);
-
   if (!items.length) {
     return `<section class="interruption-history"><div class="interruption-history-head"><strong>Today</strong><span>No interruptions logged</span></div></section>`;
   }
-
   return `
     <section class="interruption-history">
       <div class="interruption-history-head">
@@ -160,9 +147,7 @@ function renderStartView(card) {
     <p class="interruption-helper">The timer records the lost time and remembers what you were doing.</p>
     <form id="interruption-start-form" class="interruption-form">
       <label>Reason
-        <select name="type">
-          ${INTERRUPTION_TYPES.map((type) => `<option>${escapeHTML(type)}</option>`).join("")}
-        </select>
+        <select name="type">${INTERRUPTION_TYPES.map((type) => `<option>${escapeHTML(type)}</option>`).join("")}</select>
       </label>
       <label>Quick note <span>optional</span>
         <textarea name="note" rows="2" placeholder="Register line, vendor arrived, Loretta called, system issue..."></textarea>
@@ -174,7 +159,6 @@ function renderStartView(card) {
       <button class="interruption-start-button" type="submit">Start interruption</button>
     </form>
     ${historyHTML()}`;
-
   card.querySelector("#interruption-start-form")?.addEventListener("submit", startInterruption);
 }
 
@@ -195,7 +179,6 @@ function renderActiveView(card, active) {
     </div>
     <button class="interruption-end-button" type="button" data-interruption-end>End interruption</button>
     ${historyHTML()}`;
-
   card.querySelector("[data-interruption-end]")?.addEventListener("click", endInterruption);
 }
 
@@ -225,11 +208,7 @@ function closeInterruptionSheet() {
 
 function startInterruption(event) {
   event.preventDefault();
-  if (activeInterruption()) {
-    renderInterruptionSheet();
-    return;
-  }
-
+  if (activeInterruption()) return renderInterruptionSheet();
   const values = new FormData(event.currentTarget);
   const task = currentTask();
   const item = {
@@ -245,11 +224,9 @@ function startInterruption(event) {
     pausedTaskTitle: task?.title || "",
     createdAt: new Date().toISOString()
   };
-
   saveInterruptions([item, ...allInterruptions()]);
   closeInterruptionSheet();
   setStatus("Interruption timer started");
-  renderContextAction();
   updateLiveUI();
 }
 
@@ -257,22 +234,23 @@ function endInterruption() {
   const active = activeInterruption();
   if (!active) return;
   const endedAt = new Date().toISOString();
+  const ended = { ...active, endedAt };
   const items = allInterruptions().map((item) => item.id === active.id
-    ? { ...item, status: "ended", endedAt, durationMs: elapsedMs({ ...item, endedAt }) }
+    ? { ...item, status: "ended", endedAt, durationMs: elapsedMs(ended) }
     : item);
   saveInterruptions(items);
   closeInterruptionSheet();
-  setStatus(`Interruption ended · ${formatMinutes(elapsedMs({ ...active, endedAt }))}`);
-  renderContextAction();
-  showResumeBanner({ ...active, endedAt });
+  setStatus(`Interruption ended · ${formatMinutes(elapsedMs(ended))}`);
+  updateLiveUI();
+  showResumeBanner(ended);
   window.StorePilotCommandCenter?.render?.();
 }
 
 function navigateToPausedTask(item) {
   document.querySelector('[data-screen="tasks"]')?.click();
   setTimeout(() => {
-    const taskButton = item.pausedTaskId ? document.querySelector(`[data-task="${CSS.escape(item.pausedTaskId)}"]`) : null;
-    taskButton?.closest("article")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    const button = item.pausedTaskId ? document.querySelector(`[data-task="${CSS.escape(item.pausedTaskId)}"]`) : null;
+    button?.closest("article")?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, 220);
 }
 
@@ -305,7 +283,6 @@ function renderContextAction() {
   const summary = document.querySelector(".command-context-summary");
   const edit = summary?.querySelector(".command-context-edit");
   if (!summary || !edit) return;
-
   let actions = summary.querySelector(".command-context-actions");
   if (!actions) {
     actions = document.createElement("div");
@@ -313,7 +290,6 @@ function renderContextAction() {
     edit.replaceWith(actions);
     actions.appendChild(edit);
   }
-
   let button = actions.querySelector("[data-interruption-open]");
   if (!button) {
     button = document.createElement("button");
@@ -322,23 +298,38 @@ function renderContextAction() {
     button.addEventListener("click", openInterruptionSheet);
     actions.insertBefore(button, edit);
   }
-
   const active = activeInterruption();
-  button.className = `interruption-context-button${active ? " active" : ""}`;
-  button.textContent = active ? `End ${formatClock(elapsedMs(active))}` : "Pulled away";
-  button.setAttribute("aria-label", active ? `Interruption active for ${formatClock(elapsedMs(active))}` : "Start an interruption timer");
+  const elapsed = active ? formatClock(elapsedMs(active)) : "";
+  const label = active ? `End ${elapsed}` : "Pulled away";
+  const aria = active ? `Interruption active for ${elapsed}` : "Start an interruption timer";
+  const className = `interruption-context-button${active ? " active" : ""}`;
+  if (button.className !== className) button.className = className;
+  if (button.textContent !== label) button.textContent = label;
+  if (button.getAttribute("aria-label") !== aria) button.setAttribute("aria-label", aria);
+}
+
+function queueContextRender() {
+  if (contextRenderQueued) return;
+  contextRenderQueued = true;
+  requestAnimationFrame(() => {
+    contextRenderQueued = false;
+    renderContextAction();
+  });
 }
 
 function updateLiveUI() {
   const active = activeInterruption();
   const live = document.querySelector("#interruption-live-time");
-  if (live && active) live.textContent = formatClock(elapsedMs(active));
+  if (live && active) {
+    const next = formatClock(elapsedMs(active));
+    if (live.textContent !== next) live.textContent = next;
+  }
   renderContextAction();
 }
 
 function observeContextCard() {
   if (interruptionObserver) return;
-  interruptionObserver = new MutationObserver(() => renderContextAction());
+  interruptionObserver = new MutationObserver(queueContextRender);
   interruptionObserver.observe(document.body, { childList: true, subtree: true });
 }
 
