@@ -3,29 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#073f2f" />
-  <meta name="description" content="A calm mobile Store Pilot for running a retail shift." />
+  <meta name="theme-color" content="#0b4a38" />
+  <meta name="description" content="A practical mobile Store Pilot for running a retail shift." />
   <meta name="mobile-web-app-capable" content="yes" />
   <title>Store Pilot</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=context-open-1" />
-  <link rel="icon" href="./icons/store-pilot-icon.svg?v=context-open-1" type="image/svg+xml" />
-  <link rel="stylesheet" href="./css/style.css?v=context-open-1" />
-  <link rel="stylesheet" href="./css/handoff.css?v=context-open-1" />
-  <link rel="stylesheet" href="./css/followups.css?v=context-open-1" />
-  <link rel="stylesheet" href="./css/review.css?v=context-open-1" />
-  <link rel="stylesheet" href="./css/templates.css?v=context-open-1" />
-  <link rel="stylesheet" href="./css/polish.css?v=context-open-1" />
-  <link rel="stylesheet" href="./css/manager-mode.css?v=context-open-1" />
-  <link rel="stylesheet" href="./css/pwa.css?v=context-open-1" />
-  <link rel="stylesheet" href="./css/production-tools.css?v=context-open-1" />
-  <link rel="stylesheet" href="./css/task-states.css?v=context-open-1" />
-  <link rel="stylesheet" href="./css/feedback.css?v=context-open-1" />
-  <link rel="stylesheet" href="./css/smart-brain.css?v=context-open-1" />
-  <link rel="stylesheet" href="./css/visual-polish.css?v=context-open-1" />
-  <link rel="stylesheet" href="./css/smart-context.css?v=context-open-1" />
-  <link rel="stylesheet" href="./css/smart-alerts.css?v=context-open-1" />
-  <link rel="stylesheet" href="./css/command-hierarchy.css?v=context-open-1" />
-  <link rel="stylesheet" href="./css/home-density.css?v=context-open-1" />
+  <link rel="manifest" href="./manifest.webmanifest?v=command-center-1" />
+  <link rel="icon" href="./icons/store-pilot-icon.svg?v=command-center-1" type="image/svg+xml" />
+  <link rel="stylesheet" href="./css/style.css?v=command-center-1" />
+  <link rel="stylesheet" href="./css/handoff.css?v=command-center-1" />
+  <link rel="stylesheet" href="./css/followups.css?v=command-center-1" />
+  <link rel="stylesheet" href="./css/review.css?v=command-center-1" />
+  <link rel="stylesheet" href="./css/templates.css?v=command-center-1" />
+  <link rel="stylesheet" href="./css/polish.css?v=command-center-1" />
+  <link rel="stylesheet" href="./css/manager-mode.css?v=command-center-1" />
+  <link rel="stylesheet" href="./css/pwa.css?v=command-center-1" />
+  <link rel="stylesheet" href="./css/production-tools.css?v=command-center-1" />
+  <link rel="stylesheet" href="./css/task-states.css?v=command-center-1" />
+  <link rel="stylesheet" href="./css/feedback.css?v=command-center-1" />
+  <link rel="stylesheet" href="./css/smart-brain.css?v=command-center-1" />
+  <link rel="stylesheet" href="./css/visual-polish.css?v=command-center-1" />
+  <link rel="stylesheet" href="./css/shift-command-center.css?v=command-center-1" />
 </head>
 <body>
   <main class="app-shell">
@@ -58,7 +55,7 @@
         <p id="next-copy">Finding the cleanest next move for this shift.</p>
         <div class="hero-actions">
           <button class="primary-action" id="complete-next" type="button">Start Task</button>
-          <button class="secondary-action" id="open-report" type="button">Report</button>
+          <button class="secondary-action" id="open-report" type="button">Report Incident</button>
         </div>
       </section>
 
@@ -103,17 +100,16 @@
     <nav class="bottom-nav" aria-label="Store Pilot navigation">
       <button class="nav-button active" type="button" data-screen="next">Next</button>
       <button class="nav-button" type="button" data-screen="tasks">Tasks</button>
-      <button class="nav-button" type="button" data-screen="report">Report</button>
+      <button class="nav-button" type="button" data-screen="report">Incident</button>
       <button class="nav-button" type="button" data-screen="log">Log</button>
       <button class="nav-button primary" type="button" data-screen="voice">Voice</button>
     </nav>
   </main>
 
-  <script type="module" src="./js/main-v8.js?v=context-open-1"></script>
-  <script type="module" src="./js/review-layer.js?v=context-open-1"></script>
-  <script type="module" src="./js/voice-commands.js?v=context-open-1"></script>
-  <script type="module" src="./js/app-runtime.js?v=context-open-1"></script>
-  <script type="module" src="./js/risk-tuning.js?v=context-open-1"></script>
-  <script type="module" src="./js/pwa.js?v=context-open-1"></script>
+  <script type="module" src="./js/main-v8.js?v=command-center-1"></script>
+  <script type="module" src="./js/review-layer.js?v=command-center-1"></script>
+  <script type="module" src="./js/voice-commands.js?v=command-center-1"></script>
+  <script type="module" src="./js/app-runtime.js?v=command-center-1"></script>
+  <script type="module" src="./js/pwa.js?v=command-center-1"></script>
 </body>
 </html>
