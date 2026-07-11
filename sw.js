@@ -1,4 +1,4 @@
-const CACHE_NAME = "store-pilot-context-open-1";
+const CACHE_NAME = "store-pilot-command-center-1";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -17,17 +17,18 @@ const APP_SHELL = [
   "./css/feedback.css",
   "./css/smart-brain.css",
   "./css/visual-polish.css",
-  "./css/smart-context.css",
-  "./css/smart-alerts.css",
-  "./css/command-hierarchy.css",
-  "./css/home-density.css",
+  "./css/shift-command-center.css",
   "./js/main-v8.js",
   "./js/review-layer.js",
   "./js/voice-commands.js",
   "./js/app-runtime.js",
-  "./js/risk-tuning.js",
+  "./js/shift-command-center.js",
   "./js/pwa.js"
 ];
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
+});
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -50,6 +51,7 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     fetch(event.request, { cache: "no-store" })
       .then((response) => {
+        if (!response || response.status !== 200 || response.type === "opaque") return response;
         const copy = response.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
         return response;
