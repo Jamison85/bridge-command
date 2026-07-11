@@ -1,0 +1,206 @@
+html.loretta-ui-ready .app-shell {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 170px) !important;
+}
+
+html.loretta-ui-ready .quick-capture-stack {
+  position: fixed;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom) + 78px);
+  transform: translateX(-50%);
+  z-index: 22;
+  width: min(calc(100% - 24px), 720px);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid var(--command-line, #dfe5e2);
+  border-radius: var(--command-radius, 14px);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 10px 28px rgba(23, 33, 29, 0.12);
+  backdrop-filter: blur(16px);
+  pointer-events: auto;
+}
+
+html.loretta-ui-ready .quick-capture-stack button {
+  pointer-events: auto;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  box-shadow: none;
+  font-size: 0.74rem;
+  font-weight: 950;
+  letter-spacing: 0.01em;
+}
+
+html.loretta-ui-ready .quick-capture-stack button:first-child {
+  border: 1px solid var(--command-line, #dfe5e2);
+  background: #f8faf9;
+  color: var(--command-green, #0b4a38);
+}
+
+html.loretta-ui-ready .quick-capture-stack .loretta-button {
+  border: 0;
+  background: var(--command-green, #0b4a38);
+  color: #ffffff;
+}
+
+html.loretta-ui-ready:has(.loretta-capture-sheet.open) .quick-capture-stack {
+  opacity: 0;
+  pointer-events: none;
+}
+
+html.loretta-ui-ready .loretta-capture-sheet {
+  padding: 12px;
+  background: rgba(15, 23, 20, 0.38);
+}
+
+html.loretta-ui-ready .loretta-capture-card {
+  width: min(100%, 720px);
+  max-height: min(88dvh, 760px);
+  padding: 15px;
+  border: 1px solid var(--command-line, #dfe5e2);
+  border-radius: var(--command-radius, 14px);
+  background: var(--command-card, #ffffff);
+  color: var(--command-ink, #17211d);
+  box-shadow: 0 24px 60px rgba(15, 23, 20, 0.22);
+}
+
+html.loretta-ui-ready .loretta-capture-head p,
+html.loretta-ui-ready .loretta-screen-head p {
+  color: var(--command-copper, #a9632d);
+  letter-spacing: 0.1em;
+}
+
+html.loretta-ui-ready .loretta-capture-head h2,
+html.loretta-ui-ready .loretta-screen-head h3,
+html.loretta-ui-ready .loretta-note-head strong {
+  color: var(--command-ink, #17211d);
+}
+
+html.loretta-ui-ready .loretta-capture-head h2 {
+  font-size: 1.08rem;
+}
+
+html.loretta-ui-ready .loretta-capture-head > button,
+html.loretta-ui-ready .loretta-note-head > button {
+  border: 1px solid var(--command-line, #dfe5e2);
+  border-radius: 9px;
+  background: #f8faf9;
+  color: var(--command-green, #0b4a38);
+}
+
+html.loretta-ui-ready .loretta-capture-tabs {
+  margin-top: 13px;
+  border-color: var(--command-line, #dfe5e2);
+  background: var(--command-bg, #f4f6f5);
+}
+
+html.loretta-ui-ready .loretta-capture-tabs button.active {
+  background: var(--command-green, #0b4a38);
+  color: #ffffff;
+}
+
+html.loretta-ui-ready .loretta-helper,
+html.loretta-ui-ready .loretta-tip,
+html.loretta-ui-ready .loretta-note-card > p,
+html.loretta-ui-ready .loretta-empty {
+  color: var(--command-muted, #68756f);
+}
+
+html.loretta-ui-ready #loretta-capture-text {
+  min-height: 118px;
+  padding: 11px;
+  border-radius: 10px;
+  background: #fbfcfb;
+  color: var(--command-ink, #17211d);
+}
+
+html.loretta-ui-ready .loretta-date-preview > div,
+html.loretta-ui-ready .loretta-date-preview > p {
+  border-color: #e3e9e6;
+  background: #f8faf9;
+}
+
+html.loretta-ui-ready .loretta-date-preview span,
+html.loretta-ui-ready .loretta-date-preview p {
+  color: var(--command-green, #0b4a38);
+}
+
+html.loretta-ui-ready .loretta-capture-actions {
+  gap: 8px;
+}
+
+html.loretta-ui-ready .loretta-capture-actions button,
+html.loretta-ui-ready .loretta-screen-actions button {
+  min-height: 42px;
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+html.loretta-ui-ready .loretta-mic-button {
+  border: 1px solid var(--command-line, #dfe5e2);
+  background: var(--command-green-soft, #e9f2ee);
+  color: var(--command-green, #0b4a38);
+}
+
+html.loretta-ui-ready .loretta-mic-button.listening {
+  border-color: var(--command-green, #0b4a38);
+  background: var(--command-green, #0b4a38);
+  color: #ffffff;
+}
+
+html.loretta-ui-ready .loretta-save-button,
+html.loretta-ui-ready .loretta-screen-actions button:first-child {
+  border: 0;
+  background: var(--command-green, #0b4a38);
+  color: #ffffff;
+}
+
+html.loretta-ui-ready .loretta-screen-actions button:last-child {
+  border: 1px solid var(--command-line, #dfe5e2);
+  background: #f8faf9;
+  color: var(--command-green, #0b4a38);
+}
+
+html.loretta-ui-ready .loretta-screen-head,
+html.loretta-ui-ready .loretta-note-card {
+  border-color: var(--command-line, #dfe5e2);
+  border-radius: var(--command-radius, 14px);
+  background: var(--command-card, #ffffff);
+  box-shadow: 0 5px 16px rgba(23, 33, 29, 0.05);
+}
+
+html.loretta-ui-ready .loretta-screen-head > span,
+html.loretta-ui-ready .loretta-note-dates span {
+  border-color: #d5e4dc;
+  background: var(--command-green-soft, #e9f2ee);
+  color: var(--command-green, #0b4a38);
+}
+
+html.loretta-ui-ready .loretta-empty {
+  border-color: var(--command-line, #dfe5e2);
+  border-radius: var(--command-radius, 14px);
+  background: #fafbfa;
+}
+
+@media (max-width: 420px) {
+  html.loretta-ui-ready .quick-capture-stack {
+    width: calc(100% - 20px);
+    bottom: calc(env(safe-area-inset-bottom) + 76px);
+  }
+
+  html.loretta-ui-ready .quick-capture-stack button {
+    padding: 0 8px;
+    font-size: 0.69rem;
+  }
+
+  html.loretta-ui-ready .loretta-capture-sheet {
+    padding: 8px;
+  }
+
+  html.loretta-ui-ready .loretta-capture-card {
+    max-height: 92dvh;
+    padding: 13px;
+  }
+}
