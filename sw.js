@@ -32,6 +32,7 @@ const APP_SHELL = [
   "./js/loretta-inbox.js",
   "./js/loretta-ui-fix.js",
   "./js/interruption-timer.js",
+  "./js/interruption-shift-guard.js",
   "./js/pwa.js"
 ];
 
