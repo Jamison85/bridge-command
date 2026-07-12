@@ -3,7 +3,7 @@ let compactBriefingQueued = false;
 
 function compactBriefingCard() {
   const card = document.querySelector(".shift-briefing-card");
-  if (!card || card.dataset.compactBriefing === "true") return;
+  if (!card) return;
 
   const headsUp = card.querySelector(".shift-briefing-section.heads-up");
   if (headsUp) {
@@ -30,16 +30,13 @@ function compactBriefingCard() {
     headsUp.replaceWith(details);
   }
 
-  const facts = card.querySelectorAll(".shift-briefing-facts span");
-  facts.forEach((fact) => {
+  card.querySelectorAll(".shift-briefing-facts span").forEach((fact) => {
     const value = fact.textContent?.trim() || "";
-    if (/^0\s+(deadline|loretta)/i.test(value)) fact.hidden = true;
+    fact.hidden = /^0\s+(deadline|loretta)/i.test(value);
   });
 
   const startButton = card.querySelector("[data-briefing-start]");
-  if (startButton) startButton.textContent = "Start shift";
-
-  card.dataset.compactBriefing = "true";
+  if (startButton && startButton.textContent !== "Start shift") startButton.textContent = "Start shift";
 }
 
 function queueCompactBriefing() {
