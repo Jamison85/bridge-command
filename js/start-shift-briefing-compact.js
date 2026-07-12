@@ -1,5 +1,25 @@
+const NATIVE_BRIEFING_RELEASE = "command-center-10";
+const NATIVE_PREVIEW_KEY = `storePilot.briefingNativePreview.${NATIVE_BRIEFING_RELEASE}`;
 let nativeBriefingObserver = null;
 let nativeBriefingQueued = false;
+
+function nativeDateKey(date = new Date()) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function resetSeenBriefingForPreview() {
+  const shift = JSON.parse(localStorage.getItem("storePilot.shift.v6") || '"morning"');
+  const shiftKey = `${nativeDateKey()}:${shift}`;
+  if (localStorage.getItem(NATIVE_PREVIEW_KEY) === shiftKey) return;
+  try {
+    const seen = JSON.parse(localStorage.getItem("storePilot.shiftBriefings.v1") || "{}");
+    delete seen[shiftKey];
+    localStorage.setItem("storePilot.shiftBriefings.v1", JSON.stringify(seen));
+    localStorage.setItem(NATIVE_PREVIEW_KEY, shiftKey);
+  } catch {
+    localStorage.setItem(NATIVE_PREVIEW_KEY, shiftKey);
+  }
+}
 
 function nativeEscape(value) {
   return String(value ?? "").replace(/[&<>'"]/g, (char) => ({
@@ -130,6 +150,7 @@ function observeNativeBriefing() {
   nativeBriefingObserver.observe(document.body, { childList: true, subtree: true });
 }
 
+resetSeenBriefingForPreview();
 setTimeout(() => {
   observeNativeBriefing();
   rebuildBriefingCard();
