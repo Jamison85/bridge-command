@@ -1,4 +1,4 @@
-const CACHE_NAME = "store-pilot-command-center-13";
+const CACHE_NAME = "store-pilot-command-center-14";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -42,7 +42,7 @@ const APP_SHELL = [
   "./js/start-shift-briefing-compact.js",
   "./js/loretta-away-mode.js",
   "./js/loretta-away-mode-guard.js",
-  "./js/task-completion-fix.js",
+  "./js/task-completion-hard-fix.js",
   "./js/pwa.js"
 ];
 
