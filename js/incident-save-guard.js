@@ -20,6 +20,14 @@
     localStorage.setItem(key, JSON.stringify(value));
   }
 
+  function asRecord(value) {
+    return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  }
+
+  function asArray(value) {
+    return Array.isArray(value) ? value : [];
+  }
+
   function dateKey(date = new Date()) {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
   }
@@ -46,9 +54,13 @@
     return values;
   }
 
+  function draftStore() {
+    return asRecord(readJSON(KEYS.drafts, {}));
+  }
+
   function saveDraft(form) {
-    if (!form) return;
-    const drafts = readJSON(KEYS.drafts, {});
+    if (!form || saving) return;
+    const drafts = draftStore();
     drafts[shiftKey()] = {
       ...formValues(form),
       shift: currentShift(),
@@ -62,25 +74,31 @@
 
   function scheduleDraft(form) {
     clearTimeout(draftTimer);
-    draftTimer = setTimeout(() => saveDraft(form), 120);
+    draftTimer = setTimeout(() => {
+      draftTimer = null;
+      saveDraft(form);
+    }, 120);
   }
 
   function getDraft() {
-    return readJSON(KEYS.drafts, {})[shiftKey()] || null;
+    return draftStore()[shiftKey()] || null;
   }
 
   function clearDraft() {
-    const drafts = readJSON(KEYS.drafts, {});
+    clearTimeout(draftTimer);
+    draftTimer = null;
+    const drafts = draftStore();
     delete drafts[shiftKey()];
     writeJSON(KEYS.drafts, drafts);
   }
 
   function ensureDraftHint(form, text = "Draft saves while you type") {
-    if (form.querySelector(".incident-draft-hint")) {
-      form.querySelector(".incident-draft-hint").textContent = text;
+    let hint = form.querySelector(".incident-draft-hint");
+    if (hint) {
+      hint.textContent = text;
       return;
     }
-    const hint = document.createElement("div");
+    hint = document.createElement("div");
     hint.className = "incident-draft-hint";
     hint.textContent = text;
     const head = form.querySelector(".command-section-head");
@@ -92,19 +110,14 @@
     if (!form || form.dataset.incidentDraftHydrated === "true") return;
     const draft = getDraft();
     ensureDraftHint(form);
-    if (!draft) {
-      form.dataset.incidentDraftHydrated = "true";
-      return;
+    if (draft) {
+      FIELDS.forEach((name) => {
+        const control = form.elements?.namedItem(name);
+        if (control && draft[name] !== undefined) control.value = draft[name];
+      });
+      ensureDraftHint(form, "Draft restored and still saving");
     }
-
-    FIELDS.forEach((name) => {
-      const control = form.elements?.namedItem(name);
-      if (!control || draft[name] === undefined) return;
-      control.value = draft[name];
-      control.dispatchEvent(new Event("change", { bubbles: false }));
-    });
     form.dataset.incidentDraftHydrated = "true";
-    ensureDraftHint(form, "Draft restored and still saving");
   }
 
   function hydrateForms() {
@@ -182,9 +195,11 @@
   function saveIncidentDirect(form, status) {
     if (saving || !form) return;
     saving = true;
+    clearTimeout(draftTimer);
+    draftTimer = null;
     try {
       const data = new FormData(form);
-      const incidents = readJSON(KEYS.incidents, []);
+      const incidents = asArray(readJSON(KEYS.incidents, []));
       const requestedId = String(data.get("incidentId") || form.dataset.savedIncidentId || "");
       const existingIndex = incidents.findIndex((item) => item.id === requestedId);
       const existing = existingIndex >= 0 ? incidents[existingIndex] : null;
@@ -196,7 +211,7 @@
         shiftKey: shiftKey(),
         type: String(data.get("type") || "Other"),
         status,
-        startedAt: existing?.startedAt || localDateTime(String(data.get("started") || ""), now),
+        startedAt: localDateTime(String(data.get("started") || ""), existing?.startedAt ? new Date(existing.startedAt) : now),
         endedAt: status === "resolved" ? localDateTime(String(data.get("ended") || ""), now) : "",
         summary: String(data.get("summary") || "").trim(),
         impact: String(data.get("impact") || "").trim(),
@@ -212,12 +227,12 @@
       else incidents.unshift(incident);
       writeJSON(KEYS.incidents, incidents.slice(0, 50));
 
-      const reports = readJSON(KEYS.reports, []);
+      const reports = asArray(readJSON(KEYS.reports, []));
       reports.push(incidentSummary(incident));
       writeJSON(KEYS.reports, reports.slice(-50));
 
-      const contexts = readJSON(KEYS.context, {});
-      const current = contexts[shiftKey()] || {};
+      const contexts = asRecord(readJSON(KEYS.context, {}));
+      const current = asRecord(contexts[shiftKey()]);
       contexts[shiftKey()] = {
         ...current,
         mode: modeForIncident(incident, current.mode),
