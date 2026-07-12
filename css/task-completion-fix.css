@@ -1,13 +1,30 @@
-#complete-next {
+.hero-card::after {
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+.hero-card > * {
   position: relative;
-  z-index: 4;
-  pointer-events: auto !important;
-  touch-action: manipulation;
+  z-index: 1;
 }
 
 .hero-actions {
   position: relative;
-  z-index: 3;
+  z-index: 5 !important;
+  pointer-events: auto !important;
+}
+
+#complete-next {
+  position: relative;
+  z-index: 6 !important;
+  pointer-events: auto !important;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#complete-next:active {
+  transform: translateY(1px) scale(0.995);
 }
 
 #complete-next.task-completion-confirmed {
