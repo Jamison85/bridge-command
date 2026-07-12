@@ -1,24 +1,24 @@
-import "./state-polish.js?v=command-center-11";
-import "./production-tools.js?v=command-center-11";
-import "./final-nav.js?v=command-center-11";
-import "./final-task-highlight.js?v=command-center-11";
-import "./review-layer-variety.js?v=command-center-11";
-import "./runtime-clean-bridge.js?v=command-center-11";
-import "./shift-brain.js?v=command-center-11";
-import "./task-state-clarity.js?v=command-center-11";
-import "./feedback-layer.js?v=command-center-11";
-import "./shift-command-center.js?v=command-center-11";
-import "./loretta-inbox.js?v=command-center-11";
-import "./loretta-ui-fix.js?v=command-center-11";
-import "./interruption-timer.js?v=command-center-11";
-import "./interruption-shift-guard.js?v=command-center-11";
-import "./start-shift-briefing.js?v=command-center-11";
-import "./start-shift-briefing-compact.js?v=command-center-11";
-import "./loretta-away-mode.js?v=command-center-11";
-import "./loretta-away-mode-guard.js?v=command-center-11";
+import "./state-polish.js?v=command-center-12";
+import "./production-tools.js?v=command-center-12";
+import "./final-nav.js?v=command-center-12";
+import "./final-task-highlight.js?v=command-center-12";
+import "./review-layer-variety.js?v=command-center-12";
+import "./runtime-clean-bridge.js?v=command-center-12";
+import "./shift-brain.js?v=command-center-12";
+import "./task-state-clarity.js?v=command-center-12";
+import "./feedback-layer.js?v=command-center-12";
+import "./shift-command-center.js?v=command-center-12";
+import "./loretta-inbox.js?v=command-center-12";
+import "./loretta-ui-fix.js?v=command-center-12";
+import "./interruption-timer.js?v=command-center-12";
+import "./interruption-shift-guard.js?v=command-center-12";
+import "./start-shift-briefing.js?v=command-center-12";
+import "./start-shift-briefing-compact.js?v=command-center-12";
+import "./loretta-away-mode.js?v=command-center-12";
+import "./loretta-away-mode-guard.js?v=command-center-12";
 
 window.StorePilotRuntime = {
-  version: "command-center-11",
+  version: "command-center-12",
   loadedAt: new Date().toISOString(),
   modules: [
     "state-polish",
