@@ -1,0 +1,505 @@
+.loretta-away-panel-holder {
+  min-width: 0;
+}
+
+.loretta-away-panel-holder > .loretta-away-panel {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--command-line, #dfe5e2);
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 5px 16px rgba(23, 33, 29, 0.05);
+}
+
+.loretta-away-panel-holder > .loretta-away-panel.active {
+  border-color: #c9ddd3;
+  background: linear-gradient(180deg, #ffffff, #f6faf8);
+}
+
+.loretta-away-panel-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+}
+
+.loretta-away-panel-head > div {
+  min-width: 0;
+}
+
+.loretta-away-panel-head p {
+  margin: 0 0 3px;
+  color: var(--command-copper, #a9632d);
+  font-size: 0.6rem;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.loretta-away-panel-head h3 {
+  margin: 0;
+  color: var(--command-ink, #17211d);
+  font-size: 0.94rem;
+  line-height: 1.15;
+}
+
+.loretta-away-panel-head span:not(.loretta-away-live) {
+  display: block;
+  margin-top: 4px;
+  color: var(--command-muted, #68756f);
+  font-size: 0.68rem;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.loretta-away-live {
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: var(--command-green-soft, #e9f2ee);
+  color: var(--command-green, #0b4a38);
+  font-size: 0.6rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.loretta-away-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.loretta-away-metrics span {
+  display: grid;
+  place-items: center;
+  min-height: 42px;
+  padding: 6px 4px;
+  border: 1px solid #e2e8e5;
+  border-radius: 9px;
+  background: #f8faf9;
+  color: var(--command-muted, #68756f);
+  font-size: 0.6rem;
+  font-weight: 850;
+  text-align: center;
+}
+
+.loretta-away-metrics b {
+  color: var(--command-green, #0b4a38);
+  font-size: 0.86rem;
+}
+
+.loretta-away-panel-actions,
+.loretta-away-summary-actions,
+.loretta-away-board-footer {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.loretta-away-panel-actions button,
+.loretta-away-setup-button {
+  min-height: 40px;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 950;
+}
+
+.loretta-away-panel-actions button:first-child,
+.loretta-away-setup-button {
+  border: 0;
+  background: var(--command-green, #0b4a38);
+  color: #ffffff;
+}
+
+.loretta-away-panel-actions button:last-child {
+  border: 1px solid var(--command-line, #dfe5e2);
+  background: #f8faf9;
+  color: var(--command-green, #0b4a38);
+}
+
+.loretta-away-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding: calc(env(safe-area-inset-top) + 10px) 10px calc(env(safe-area-inset-bottom) + 10px);
+  overflow-y: auto;
+  background: var(--command-bg, #f4f7f5);
+}
+
+.loretta-away-sheet.open {
+  display: flex;
+}
+
+.loretta-away-card {
+  width: min(100%, 720px);
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 12px !important;
+  border: 1px solid var(--command-line, #dfe5e2) !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  box-shadow: var(--command-shadow, 0 10px 28px rgba(20, 35, 29, 0.08)) !important;
+}
+
+.loretta-away-sheet-head {
+  margin-bottom: 10px !important;
+}
+
+.loretta-away-setup-form {
+  display: grid;
+  gap: 12px;
+}
+
+.loretta-away-setup-form > p {
+  margin: 0;
+  color: var(--command-muted, #68756f);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.loretta-away-date-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.loretta-away-date-grid label,
+.loretta-away-delay-form label,
+.loretta-away-note-controls label {
+  display: grid;
+  gap: 6px;
+  color: var(--command-ink, #17211d);
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+.loretta-away-date-grid input,
+.loretta-away-delay-form input,
+.loretta-away-note-controls select {
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 10px;
+  border: 1px solid #d7dfdb;
+  border-radius: 10px;
+  background: #fbfcfb;
+  color: var(--command-ink, #17211d);
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.loretta-away-board-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid #d9e5df;
+  border-radius: 11px;
+  background: var(--command-green-soft, #e9f2ee);
+}
+
+.loretta-away-board-summary > div {
+  display: grid;
+  gap: 2px;
+}
+
+.loretta-away-board-summary strong {
+  color: var(--command-green, #0b4a38);
+  font-size: 0.78rem;
+}
+
+.loretta-away-board-summary span {
+  color: var(--command-muted, #68756f);
+  font-size: 0.64rem;
+  font-weight: 800;
+}
+
+.loretta-away-board-summary button {
+  min-height: 32px;
+  padding: 0 9px;
+  border: 1px solid #c7d9d0;
+  border-radius: 9px;
+  background: #ffffff;
+  color: var(--command-green, #0b4a38);
+  font-size: 0.64rem;
+  font-weight: 900;
+}
+
+.loretta-away-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 9px;
+  padding: 4px;
+  border: 1px solid var(--command-line, #dfe5e2);
+  border-radius: 11px;
+  background: #f4f6f5;
+}
+
+.loretta-away-tabs button {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--command-muted, #68756f);
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+.loretta-away-tabs button.active {
+  background: var(--command-green, #0b4a38);
+  color: #ffffff;
+}
+
+.loretta-away-tabs span {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 0.58rem;
+}
+
+.loretta-away-note-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 9px;
+}
+
+.loretta-away-note {
+  padding: 10px;
+  border: 1px solid var(--command-line, #dfe5e2);
+  border-radius: 11px;
+  background: #ffffff;
+}
+
+.loretta-away-note[data-status="done"] {
+  background: #f7faf8;
+}
+
+.loretta-away-note[data-status="delayed"] {
+  border-color: #ead8bc;
+  background: #fffaf2;
+}
+
+.loretta-away-note-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 9px;
+}
+
+.loretta-away-note-head strong {
+  color: var(--command-ink, #17211d);
+  font-size: 0.78rem;
+  line-height: 1.3;
+}
+
+.loretta-away-note-head > span {
+  padding: 5px 7px;
+  border-radius: 999px;
+  background: #f0f4f2;
+  color: var(--command-muted, #68756f);
+  font-size: 0.56rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.loretta-away-note[data-status="done"] .loretta-away-note-head > span {
+  background: var(--command-green-soft, #e9f2ee);
+  color: var(--command-green, #0b4a38);
+}
+
+.loretta-away-note[data-status="delayed"] .loretta-away-note-head > span {
+  background: #fff0d9;
+  color: var(--command-watch, #9a5b12);
+}
+
+.loretta-away-note-dates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 7px;
+}
+
+.loretta-away-note-dates span {
+  padding: 4px 6px;
+  border: 1px solid #dce6e1;
+  border-radius: 7px;
+  background: #f8faf9;
+  color: var(--command-green, #0b4a38);
+  font-size: 0.58rem;
+  font-weight: 850;
+}
+
+.loretta-away-delay-reason {
+  margin: 8px 0 0;
+  color: #7c5a3b;
+  font-size: 0.66rem;
+  line-height: 1.35;
+}
+
+.loretta-away-note-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 8px;
+  margin-top: 9px;
+}
+
+.loretta-away-status-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.loretta-away-status-actions button,
+.loretta-away-delay-form button,
+.loretta-away-empty button {
+  min-height: 34px;
+  padding: 0 9px;
+  border: 1px solid var(--command-line, #dfe5e2);
+  border-radius: 9px;
+  background: #f8faf9;
+  color: var(--command-green, #0b4a38);
+  font-size: 0.64rem;
+  font-weight: 900;
+}
+
+.loretta-away-status-actions button:first-child,
+.loretta-away-delay-form button:first-child {
+  border-color: var(--command-green, #0b4a38);
+  background: var(--command-green, #0b4a38);
+  color: #ffffff;
+}
+
+.loretta-away-delay-form {
+  display: grid;
+  gap: 7px;
+  margin-top: 9px;
+  padding: 9px;
+  border: 1px solid #ead8bc;
+  border-radius: 10px;
+  background: #fff8ef;
+}
+
+.loretta-away-delay-form > div {
+  display: flex;
+  gap: 6px;
+}
+
+.loretta-away-empty {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 18px;
+  border: 1px dashed #d7dfdb;
+  border-radius: 11px;
+  background: #fafbfa;
+  text-align: center;
+}
+
+.loretta-away-empty strong {
+  color: var(--command-ink, #17211d);
+  font-size: 0.76rem;
+}
+
+.loretta-away-empty span {
+  color: var(--command-muted, #68756f);
+  font-size: 0.66rem;
+  line-height: 1.35;
+}
+
+.loretta-away-board-footer,
+.loretta-away-summary-actions {
+  margin-top: 10px;
+}
+
+.loretta-away-summary-card {
+  padding: 10px;
+  border: 1px solid var(--command-line, #dfe5e2);
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.loretta-away-summary-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.loretta-away-summary-meta strong {
+  color: var(--command-green, #0b4a38);
+  font-size: 0.76rem;
+}
+
+.loretta-away-summary-meta span {
+  color: var(--command-muted, #68756f);
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.loretta-away-summary-card pre {
+  margin: 0;
+  padding: 10px;
+  overflow-x: auto;
+  border-radius: 10px;
+  background: #f8faf9;
+  color: var(--command-ink, #17211d);
+  font-family: inherit;
+  font-size: 0.7rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+body.loretta-away-open {
+  overflow: hidden !important;
+}
+
+@media (max-width: 700px) {
+  .loretta-away-sheet {
+    padding: calc(env(safe-area-inset-top) + 8px) 8px calc(env(safe-area-inset-bottom) + 8px);
+  }
+
+  .loretta-away-card {
+    padding: 10px !important;
+  }
+
+  .loretta-away-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .loretta-away-note-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .loretta-away-status-actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 420px) {
+  .loretta-away-date-grid,
+  .loretta-away-panel-actions,
+  .loretta-away-summary-actions,
+  .loretta-away-board-footer {
+    grid-template-columns: 1fr;
+  }
+
+  .loretta-away-tabs button {
+    padding: 0 3px;
+    font-size: 0.62rem;
+  }
+}
