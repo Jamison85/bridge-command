@@ -1,5 +1,5 @@
 const installHintKey = "storePilot.installHintSeen.v1";
-const reloadGuardKey = "storePilot.pwaReloaded.command-center-9";
+const reloadGuardKey = "storePilot.pwaReloaded.command-center-10";
 let deferredInstallPrompt = null;
 let refreshingForUpdate = false;
 
@@ -46,7 +46,7 @@ function activateWaitingWorker(registration) {
 
 async function registerServiceWorker() {
   try {
-    const registration = await navigator.serviceWorker.register("./sw.js?v=command-center-9", { updateViaCache: "none" });
+    const registration = await navigator.serviceWorker.register("./sw.js?v=command-center-10", { updateViaCache: "none" });
     await registration.update();
     activateWaitingWorker(registration);
 
