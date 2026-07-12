@@ -1,24 +1,24 @@
-import "./state-polish.js?v=command-center-14";
-import "./production-tools.js?v=command-center-14";
-import "./final-nav.js?v=command-center-14";
-import "./final-task-highlight.js?v=command-center-14";
-import "./review-layer-variety.js?v=command-center-14";
-import "./runtime-clean-bridge.js?v=command-center-14";
-import "./shift-brain.js?v=command-center-14";
-import "./task-state-clarity.js?v=command-center-14";
-import "./feedback-layer.js?v=command-center-14";
-import "./shift-command-center.js?v=command-center-14";
-import "./loretta-inbox.js?v=command-center-14";
-import "./loretta-ui-fix.js?v=command-center-14";
-import "./interruption-timer.js?v=command-center-14";
-import "./interruption-shift-guard.js?v=command-center-14";
-import "./start-shift-briefing.js?v=command-center-14";
-import "./start-shift-briefing-compact.js?v=command-center-14";
-import "./loretta-away-mode.js?v=command-center-14";
-import "./loretta-away-mode-guard.js?v=command-center-14";
+import "./state-polish.js?v=command-center-15";
+import "./production-tools.js?v=command-center-15";
+import "./final-nav.js?v=command-center-15";
+import "./final-task-highlight.js?v=command-center-15";
+import "./review-layer-variety.js?v=command-center-15";
+import "./runtime-clean-bridge.js?v=command-center-15";
+import "./shift-brain.js?v=command-center-15";
+import "./task-state-clarity.js?v=command-center-15";
+import "./feedback-layer.js?v=command-center-15";
+import "./shift-command-center.js?v=command-center-15";
+import "./loretta-inbox.js?v=command-center-15";
+import "./loretta-ui-fix.js?v=command-center-15";
+import "./interruption-timer.js?v=command-center-15";
+import "./interruption-shift-guard.js?v=command-center-15";
+import "./start-shift-briefing.js?v=command-center-15";
+import "./start-shift-briefing-compact.js?v=command-center-15";
+import "./loretta-away-mode.js?v=command-center-15";
+import "./loretta-away-mode-guard.js?v=command-center-15";
 
 window.StorePilotRuntime = {
-  version: "command-center-14",
+  version: "command-center-15",
   loadedAt: new Date().toISOString(),
   modules: [
     "state-polish",
@@ -39,6 +39,7 @@ window.StorePilotRuntime = {
     "start-shift-briefing-compact",
     "loretta-away-mode",
     "loretta-away-mode-guard",
-    "task-completion-hard-fix"
+    "task-completion-hard-fix",
+    "incident-save-guard"
   ]
 };

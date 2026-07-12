@@ -1,0 +1,86 @@
+.incident-draft-hint {
+  margin: -2px 0 10px;
+  color: var(--command-muted, #68756f);
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.incident-save-confirmation {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 10px 11px;
+  border: 1px solid rgba(11, 74, 56, 0.18);
+  border-radius: 12px;
+  background: rgba(236, 253, 245, 0.94);
+  box-shadow: 0 8px 18px rgba(15, 23, 20, 0.08);
+}
+
+.incident-save-check {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--command-green, #0b4a38);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 950;
+}
+
+.incident-save-copy {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.incident-save-copy span {
+  color: var(--command-green, #0b4a38);
+  font-size: 0.56rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+
+.incident-save-copy strong {
+  overflow: hidden;
+  color: var(--command-ink, #17211d);
+  font-size: 0.82rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.incident-save-copy p {
+  margin: 0;
+  color: var(--command-muted, #68756f);
+  font-size: 0.68rem;
+  line-height: 1.25;
+}
+
+.incident-save-confirmation button {
+  min-height: 34px;
+  padding: 0 9px;
+  border: 1px solid rgba(11, 74, 56, 0.16);
+  border-radius: 9px;
+  background: #ffffff;
+  color: var(--command-green, #0b4a38);
+  font-size: 0.64rem;
+  font-weight: 900;
+}
+
+@media (max-width: 700px) {
+  .incident-save-confirmation {
+    grid-template-columns: 30px minmax(0, 1fr);
+  }
+
+  .incident-save-check {
+    width: 30px;
+    height: 30px;
+  }
+
+  .incident-save-confirmation button {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}
