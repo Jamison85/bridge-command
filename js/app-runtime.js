@@ -1,22 +1,22 @@
-import "./state-polish.js?v=command-center-9";
-import "./production-tools.js?v=command-center-9";
-import "./final-nav.js?v=command-center-9";
-import "./final-task-highlight.js?v=command-center-9";
-import "./review-layer-variety.js?v=command-center-9";
-import "./runtime-clean-bridge.js?v=command-center-9";
-import "./shift-brain.js?v=command-center-9";
-import "./task-state-clarity.js?v=command-center-9";
-import "./feedback-layer.js?v=command-center-9";
-import "./shift-command-center.js?v=command-center-9";
-import "./loretta-inbox.js?v=command-center-9";
-import "./loretta-ui-fix.js?v=command-center-9";
-import "./interruption-timer.js?v=command-center-9";
-import "./interruption-shift-guard.js?v=command-center-9";
-import "./start-shift-briefing.js?v=command-center-9";
-import "./start-shift-briefing-compact.js?v=command-center-9";
+import "./state-polish.js?v=command-center-10";
+import "./production-tools.js?v=command-center-10";
+import "./final-nav.js?v=command-center-10";
+import "./final-task-highlight.js?v=command-center-10";
+import "./review-layer-variety.js?v=command-center-10";
+import "./runtime-clean-bridge.js?v=command-center-10";
+import "./shift-brain.js?v=command-center-10";
+import "./task-state-clarity.js?v=command-center-10";
+import "./feedback-layer.js?v=command-center-10";
+import "./shift-command-center.js?v=command-center-10";
+import "./loretta-inbox.js?v=command-center-10";
+import "./loretta-ui-fix.js?v=command-center-10";
+import "./interruption-timer.js?v=command-center-10";
+import "./interruption-shift-guard.js?v=command-center-10";
+import "./start-shift-briefing.js?v=command-center-10";
+import "./start-shift-briefing-compact.js?v=command-center-10";
 
 window.StorePilotRuntime = {
-  version: "command-center-9",
+  version: "command-center-10",
   loadedAt: new Date().toISOString(),
   modules: [
     "state-polish",

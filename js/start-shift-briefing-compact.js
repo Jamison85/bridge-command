@@ -1,60 +1,157 @@
-let compactBriefingObserver = null;
-let compactBriefingQueued = false;
+const NATIVE_BRIEFING_RELEASE = "command-center-10";
+const NATIVE_PREVIEW_KEY = `storePilot.briefingNativePreview.${NATIVE_BRIEFING_RELEASE}`;
+let nativeBriefingObserver = null;
+let nativeBriefingQueued = false;
 
-function compactBriefingCard() {
-  const card = document.querySelector(".shift-briefing-card");
-  if (!card) return;
+function nativeDateKey(date = new Date()) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
 
-  const headsUp = card.querySelector(".shift-briefing-section.heads-up");
-  if (headsUp) {
-    const alerts = headsUp.querySelectorAll(".briefing-alert");
-    const list = headsUp.querySelector(".briefing-alert-list");
-    const hasCritical = Boolean(headsUp.querySelector('[data-tone="critical"]'));
-    const hasWatch = Boolean(headsUp.querySelector('[data-tone="watch"]'));
-    const details = document.createElement("details");
-    details.className = "briefing-heads-up-toggle";
-    if (hasCritical) details.dataset.tone = "critical";
-    else if (hasWatch) details.dataset.tone = "watch";
-    else details.dataset.tone = "normal";
-
-    details.innerHTML = `
-      <summary>
-        <span>
-          <strong>Heads Up</strong>
-          <small>${alerts.length ? `${alerts.length} item${alerts.length === 1 ? "" : "s"} can change the plan` : "No major warnings"}</small>
-        </span>
-        <b>${alerts.length}</b>
-      </summary>`;
-
-    if (list) details.appendChild(list);
-    headsUp.replaceWith(details);
+function resetSeenBriefingForPreview() {
+  const shift = JSON.parse(localStorage.getItem("storePilot.shift.v6") || '"morning"');
+  const shiftKey = `${nativeDateKey()}:${shift}`;
+  if (localStorage.getItem(NATIVE_PREVIEW_KEY) === shiftKey) return;
+  try {
+    const seen = JSON.parse(localStorage.getItem("storePilot.shiftBriefings.v1") || "{}");
+    delete seen[shiftKey];
+    localStorage.setItem("storePilot.shiftBriefings.v1", JSON.stringify(seen));
+    localStorage.setItem(NATIVE_PREVIEW_KEY, shiftKey);
+  } catch {
+    localStorage.setItem(NATIVE_PREVIEW_KEY, shiftKey);
   }
-
-  card.querySelectorAll(".shift-briefing-facts span").forEach((fact) => {
-    const value = fact.textContent?.trim() || "";
-    fact.hidden = /^0\s+(deadline|loretta)/i.test(value);
-  });
-
-  const startButton = card.querySelector("[data-briefing-start]");
-  if (startButton && startButton.textContent !== "Start shift") startButton.textContent = "Start shift";
 }
 
-function queueCompactBriefing() {
-  if (compactBriefingQueued) return;
-  compactBriefingQueued = true;
+function nativeEscape(value) {
+  return String(value ?? "").replace(/[&<>'"]/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "'": "&#39;",
+    '"': "&quot;"
+  }[char]));
+}
+
+function collectBriefingModel(card) {
+  const title = card.querySelector("#shift-briefing-title")?.textContent?.trim() || "Shift briefing";
+  const lead = card.querySelector(".shift-briefing-lead")?.textContent?.trim() || "Review the shift and start with the highest-impact task.";
+  const risk = card.querySelector(".shift-briefing-head-actions > span")?.textContent?.trim() || "Controlled";
+  const facts = [...card.querySelectorAll(".shift-briefing-facts span")]
+    .map((node) => node.textContent?.trim() || "")
+    .filter((value) => value && !/^0\s+(deadline|loretta)/i.test(value));
+  const priorities = [...card.querySelectorAll(".briefing-priority-row")].map((row) => ({
+    title: row.querySelector("strong")?.textContent?.trim() || "Shift task",
+    meta: row.querySelector("small")?.textContent?.trim() || "Shift"
+  }));
+  const alerts = [...card.querySelectorAll(".briefing-alert")].map((alert) => ({
+    tone: alert.dataset.tone || "normal",
+    title: alert.querySelector("strong")?.textContent?.trim() || "Heads up",
+    detail: alert.querySelector("span")?.textContent?.trim() || ""
+  }));
+  const context = {
+    title: card.querySelector(".shift-briefing-context-line strong")?.textContent?.trim() || "Normal · Manager",
+    detail: card.querySelector(".shift-briefing-context-line span")?.textContent?.trim() || "Normal staffing"
+  };
+  return { title, lead, risk, facts, priorities, alerts, context };
+}
+
+function priorityRows(model) {
+  if (!model.priorities.length) {
+    return `<div class="command-empty"><strong>No active priorities.</strong><span>Review documented items and protect the handoff.</span></div>`;
+  }
+  return model.priorities.map((item, index) => `
+    <article class="command-coming-row briefing-native-row${index === 0 ? " active" : ""}">
+      <span>${index + 1}</span>
+      <div>
+        <strong>${nativeEscape(item.title)}</strong>
+        <small>${nativeEscape(item.meta)}</small>
+      </div>
+    </article>`).join("");
+}
+
+function alertRows(model) {
+  if (!model.alerts.length) {
+    return `<div class="command-empty"><strong>No major warnings.</strong><span>No active incidents, deadlines, dated notes, or carryover found.</span></div>`;
+  }
+  return model.alerts.map((item) => `
+    <article class="briefing-native-alert" data-tone="${nativeEscape(item.tone)}">
+      <strong>${nativeEscape(item.title)}</strong>
+      ${item.detail ? `<span>${nativeEscape(item.detail)}</span>` : ""}
+    </article>`).join("");
+}
+
+function rebuildBriefingCard() {
+  const card = document.querySelector(".shift-briefing-card");
+  if (!card || card.querySelector(".briefing-native-shell")) return;
+
+  const model = collectBriefingModel(card);
+  const riskKey = /attention|critical/i.test(model.risk) ? "critical" : /watch/i.test(model.risk) ? "watch" : "controlled";
+  card.className = "shift-briefing-card screen-card briefing-native-card";
+  card.innerHTML = `
+    <div class="briefing-native-shell">
+      <header class="screen-header briefing-native-header">
+        <div>
+          <p class="eyebrow">SHIFT BRIEFING</p>
+          <h2 id="shift-briefing-title">${nativeEscape(model.title)}</h2>
+        </div>
+        <button class="text-button" type="button" data-native-briefing-close>Close</button>
+      </header>
+
+      <section class="hero-card briefing-native-hero" data-risk="${riskKey}">
+        <div class="hero-meta"><span>START HERE</span><span>${nativeEscape(model.risk)}</span></div>
+        <h2>${nativeEscape(model.lead)}</h2>
+        <div class="command-metrics briefing-native-facts">
+          ${model.facts.map((fact) => `<span>${nativeEscape(fact)}</span>`).join("")}
+        </div>
+      </section>
+
+      <section class="command-coming-card briefing-native-priorities">
+        <div class="command-section-head">
+          <div><p>PRIORITIES</p><h3>First three moves</h3></div>
+          <button type="button" data-native-briefing-tasks>All tasks</button>
+        </div>
+        <div class="command-coming-list">${priorityRows(model)}</div>
+      </section>
+
+      <details class="command-rescue briefing-native-heads-up" ${riskKey === "critical" ? "open" : ""}>
+        <summary><span>HEADS UP</span><strong>${model.alerts.length ? `${model.alerts.length} item${model.alerts.length === 1 ? "" : "s"} can change the plan` : "Nothing major waiting"}</strong></summary>
+        <div class="briefing-native-alert-list">${alertRows(model)}</div>
+      </details>
+
+      <div class="command-context-summary briefing-native-context">
+        <div><p>SHIFT CONTEXT</p><strong>${nativeEscape(model.context.title)}</strong><span>${nativeEscape(model.context.detail)}</span></div>
+      </div>
+
+      <div class="command-inline-actions briefing-native-actions">
+        <button class="primary-action" type="button" data-native-briefing-start>Start shift</button>
+        <button class="secondary-action command-light-button" type="button" data-native-briefing-tasks>View tasks</button>
+      </div>
+    </div>`;
+
+  card.querySelector("[data-native-briefing-close]")?.addEventListener("click", () => window.StorePilotShiftBriefing?.close?.(true));
+  card.querySelector("[data-native-briefing-start]")?.addEventListener("click", () => window.StorePilotShiftBriefing?.close?.(true));
+  card.querySelectorAll("[data-native-briefing-tasks]").forEach((button) => button.addEventListener("click", () => {
+    window.StorePilotShiftBriefing?.close?.(true);
+    document.querySelector('[data-screen="tasks"]')?.click();
+  }));
+}
+
+function queueNativeBriefing() {
+  if (nativeBriefingQueued) return;
+  nativeBriefingQueued = true;
   requestAnimationFrame(() => {
-    compactBriefingQueued = false;
-    compactBriefingCard();
+    nativeBriefingQueued = false;
+    rebuildBriefingCard();
   });
 }
 
-function observeCompactBriefing() {
-  if (compactBriefingObserver) return;
-  compactBriefingObserver = new MutationObserver(queueCompactBriefing);
-  compactBriefingObserver.observe(document.body, { childList: true, subtree: true });
+function observeNativeBriefing() {
+  if (nativeBriefingObserver) return;
+  nativeBriefingObserver = new MutationObserver(queueNativeBriefing);
+  nativeBriefingObserver.observe(document.body, { childList: true, subtree: true });
 }
 
+resetSeenBriefingForPreview();
 setTimeout(() => {
-  observeCompactBriefing();
-  compactBriefingCard();
+  observeNativeBriefing();
+  rebuildBriefingCard();
 }, 360);
