@@ -1,0 +1,17 @@
+#complete-next {
+  position: relative;
+  z-index: 4;
+  pointer-events: auto !important;
+  touch-action: manipulation;
+}
+
+.hero-actions {
+  position: relative;
+  z-index: 3;
+}
+
+#complete-next.task-completion-confirmed {
+  background: #0b4a38 !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
+}
