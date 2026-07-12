@@ -1,0 +1,404 @@
+.command-context-actions {
+  grid-template-columns: auto auto auto !important;
+}
+
+.shift-briefing-context-button {
+  min-height: 34px;
+  padding: 0 9px;
+  border: 1px solid #d5e4dc;
+  border-radius: 9px;
+  background: var(--command-green-soft, #e9f2ee);
+  color: var(--command-green, #0b4a38);
+  font-size: 0.68rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.shift-briefing-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 12px;
+  background: rgba(15, 23, 20, 0.42);
+  backdrop-filter: blur(5px);
+}
+
+.shift-briefing-sheet.open {
+  display: flex;
+}
+
+.shift-briefing-card {
+  width: min(100%, 720px);
+  max-height: min(92dvh, 820px);
+  overflow-y: auto;
+  padding: 15px;
+  border: 1px solid var(--command-line, #dfe5e2);
+  border-radius: 16px;
+  background: #ffffff;
+  color: var(--command-ink, #17211d);
+  box-shadow: 0 26px 68px rgba(15, 23, 20, 0.26);
+}
+
+.shift-briefing-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+}
+
+.shift-briefing-head p,
+.shift-briefing-section-head p {
+  margin: 0 0 3px;
+  color: var(--command-copper, #a9632d);
+  font-size: 0.6rem;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.shift-briefing-head h2 {
+  margin: 0;
+  color: var(--command-ink, #17211d);
+  font-size: 1.18rem;
+  line-height: 1.08;
+}
+
+.shift-briefing-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.shift-briefing-head-actions > span {
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: var(--command-green-soft, #e9f2ee);
+  color: var(--command-green, #0b4a38);
+  font-size: 0.62rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.shift-briefing-head-actions > span[data-risk="watch"] {
+  background: var(--command-watch-soft, #fff6e7);
+  color: var(--command-watch, #9a5b12);
+}
+
+.shift-briefing-head-actions > span[data-risk="critical"] {
+  background: var(--command-red-soft, #fff0f0);
+  color: var(--command-red, #9b2c2c);
+}
+
+.shift-briefing-head-actions button {
+  min-height: 32px;
+  padding: 0 9px;
+  border: 1px solid var(--command-line, #dfe5e2);
+  border-radius: 9px;
+  background: #f8faf9;
+  color: var(--command-green, #0b4a38);
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+.shift-briefing-lead {
+  margin: 12px 0 0;
+  padding: 11px 12px;
+  border-left: 4px solid var(--command-green, #0b4a38);
+  border-radius: 0 11px 11px 0;
+  background: #f5f9f7;
+  color: var(--command-ink, #17211d);
+  font-size: 0.86rem;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.shift-briefing-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.shift-briefing-facts span {
+  display: grid;
+  place-items: center;
+  min-height: 34px;
+  padding: 5px;
+  border: 1px solid #e2e8e5;
+  border-radius: 9px;
+  background: #fbfcfb;
+  color: var(--command-muted, #68756f);
+  font-size: 0.64rem;
+  font-weight: 900;
+  text-align: center;
+}
+
+.shift-briefing-section {
+  margin-top: 12px;
+  padding: 11px;
+  border: 1px solid var(--command-line, #dfe5e2);
+  border-radius: 13px;
+  background: #ffffff;
+}
+
+.shift-briefing-section.heads-up {
+  background: #fbfcfb;
+}
+
+.shift-briefing-section-head h3 {
+  margin: 0;
+  color: var(--command-ink, #17211d);
+  font-size: 0.88rem;
+  line-height: 1.15;
+}
+
+.briefing-priority-list,
+.briefing-alert-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.briefing-priority-row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding: 8px 9px;
+  border: 1px solid #e3e9e6;
+  border-radius: 10px;
+  background: #f8faf9;
+}
+
+.briefing-priority-row.first {
+  border-color: #c9ddd3;
+  background: var(--command-green-soft, #e9f2ee);
+}
+
+.briefing-priority-row > span {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: var(--command-green, #0b4a38);
+  font-size: 0.72rem;
+  font-weight: 950;
+}
+
+.briefing-priority-row div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.briefing-priority-row strong {
+  overflow: hidden;
+  color: var(--command-ink, #17211d);
+  font-size: 0.78rem;
+  line-height: 1.18;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.briefing-priority-row small {
+  overflow: hidden;
+  color: var(--command-muted, #68756f);
+  font-size: 0.64rem;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.briefing-alert {
+  display: grid;
+  gap: 2px;
+  padding: 8px 9px;
+  border: 1px solid #e2e8e5;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.briefing-alert[data-tone="watch"] {
+  border-color: #ecd8b9;
+  background: #fffaf2;
+}
+
+.briefing-alert[data-tone="critical"] {
+  border-color: #efcaca;
+  background: #fff5f5;
+}
+
+.briefing-alert strong {
+  color: var(--command-ink, #17211d);
+  font-size: 0.72rem;
+}
+
+.briefing-alert[data-tone="watch"] strong {
+  color: var(--command-watch, #9a5b12);
+}
+
+.briefing-alert[data-tone="critical"] strong {
+  color: var(--command-red, #9b2c2c);
+}
+
+.briefing-alert span {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--command-muted, #68756f);
+  font-size: 0.66rem;
+  font-weight: 700;
+  line-height: 1.3;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.briefing-empty,
+.briefing-clear {
+  display: grid;
+  gap: 3px;
+  padding: 9px;
+  border: 1px dashed #d7dfdb;
+  border-radius: 10px;
+  background: #fafbfa;
+}
+
+.briefing-empty strong,
+.briefing-clear strong {
+  color: var(--command-ink, #17211d);
+  font-size: 0.76rem;
+}
+
+.briefing-empty span,
+.briefing-clear span {
+  color: var(--command-muted, #68756f);
+  font-size: 0.66rem;
+  line-height: 1.3;
+}
+
+.shift-briefing-context-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #f5f7f6;
+}
+
+.shift-briefing-context-line strong {
+  color: var(--command-green, #0b4a38);
+  font-size: 0.72rem;
+}
+
+.shift-briefing-context-line span {
+  color: var(--command-muted, #68756f);
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.shift-briefing-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.shift-briefing-actions button {
+  min-height: 44px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 950;
+}
+
+.briefing-start-button {
+  border: 0;
+  background: var(--command-green, #0b4a38);
+  color: #ffffff;
+}
+
+.briefing-tasks-button {
+  border: 1px solid var(--command-line, #dfe5e2);
+  background: #f8faf9;
+  color: var(--command-green, #0b4a38);
+}
+
+body.shift-briefing-open {
+  overflow: hidden !important;
+}
+
+@media (max-width: 700px) {
+  .command-context-actions {
+    grid-template-columns: auto auto auto !important;
+    gap: 3px !important;
+  }
+
+  .shift-briefing-context-button,
+  .interruption-context-button,
+  .command-context-actions .command-context-edit {
+    min-height: 29px !important;
+    padding: 0 6px !important;
+    font-size: 0.57rem !important;
+  }
+
+  .shift-briefing-sheet {
+    padding: 8px;
+  }
+
+  .shift-briefing-card {
+    max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 14px);
+    padding: 13px;
+  }
+
+  .shift-briefing-head-actions > span {
+    display: none;
+  }
+
+  .shift-briefing-facts {
+    gap: 4px;
+  }
+
+  .shift-briefing-facts span {
+    min-height: 31px;
+    padding: 4px 2px;
+    font-size: 0.58rem;
+  }
+
+  .shift-briefing-section {
+    margin-top: 9px;
+    padding: 9px;
+  }
+
+  .briefing-priority-list,
+  .briefing-alert-list {
+    gap: 5px;
+    margin-top: 6px;
+  }
+
+  .briefing-priority-row,
+  .briefing-alert {
+    padding: 7px 8px;
+  }
+}
+
+@media (max-width: 380px) {
+  .shift-briefing-context-button,
+  .interruption-context-button,
+  .command-context-actions .command-context-edit {
+    padding: 0 5px !important;
+    font-size: 0.54rem !important;
+  }
+
+  .shift-briefing-facts span:last-child {
+    display: none;
+  }
+
+  .shift-briefing-facts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
