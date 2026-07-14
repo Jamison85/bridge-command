@@ -1,4 +1,4 @@
-const CACHE_NAME = "store-pilot-command-center-16";
+const CACHE_NAME = "store-pilot-command-center-17";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -31,6 +31,7 @@ const APP_SHELL = [
   "./css/task-completion-fix.css",
   "./css/incident-save-guard.css",
   "./css/proof-of-work-pack.css",
+  "./css/backup-restore.css",
   "./js/main-v8.js",
   "./js/review-layer.js",
   "./js/voice-commands.js",
@@ -47,6 +48,7 @@ const APP_SHELL = [
   "./js/task-completion-hard-fix.js",
   "./js/incident-save-guard.js",
   "./js/proof-of-work-pack.js",
+  "./js/backup-restore.js",
   "./js/pwa.js"
 ];
 
