@@ -90,6 +90,22 @@
     }, 60);
   }
 
+  function needsChecklist(task) {
+    return task?.checklistType === "manager-photo-checkin"
+      || (Array.isArray(task?.checklistItems) && task.checklistItems.length > 0);
+  }
+
+  function openRequiredChecklist(task) {
+    document.querySelector('[data-screen="tasks"]')?.click();
+    setStatus("Open the required checklist");
+    setTimeout(() => {
+      const selector = `[data-photo-checklist="${CSS.escape(String(task.id || ""))}"]`;
+      const checklist = document.querySelector(selector);
+      checklist?.scrollIntoView({ behavior: "smooth", block: "center" });
+      checklist?.querySelector("input:not(:checked)")?.focus();
+    }, 180);
+  }
+
   function completeCurrentTask(button) {
     if (locked) return;
 
@@ -98,6 +114,11 @@
 
     if (!task || !analysis?.data?.key) {
       setStatus("Task data not ready");
+      return;
+    }
+
+    if (needsChecklist(task)) {
+      openRequiredChecklist(task);
       return;
     }
 
