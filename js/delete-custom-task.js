@@ -92,7 +92,7 @@ function enhanceCustomTaskRows() {
   document.querySelectorAll("#screen-content .task-row, #screen-content .walk-card").forEach((row) => {
     const taskId = rowTaskId(row);
     if (!taskId || !customTasks.has(taskId)) return;
-    if (row.querySelector(`[data-delete-custom-task="${CSS.escape(taskId)}"]`)) return;
+    if (row.querySelector("[data-delete-custom-task]")) return;
 
     const group = ensureTaskActionGroup(row);
     if (!group) return;
