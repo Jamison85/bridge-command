@@ -1,0 +1,28 @@
+#screen-content .custom-task-row .task-actions,
+#screen-content .custom-task-row > .action-row {
+  flex-wrap: wrap;
+}
+
+#screen-content .custom-task-delete {
+  border-color: rgba(145, 37, 37, 0.18) !important;
+  background: rgba(255, 247, 247, 0.96) !important;
+  color: #8f2525 !important;
+}
+
+#screen-content .custom-task-delete:active {
+  background: rgba(252, 231, 231, 0.98) !important;
+  transform: translateY(1px);
+}
+
+#screen-content .custom-task-row.done .custom-task-action-group {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+@media (max-width: 520px) {
+  #screen-content .custom-task-delete {
+    min-width: 54px;
+  }
+}
