@@ -59,8 +59,6 @@ const MANAGER_WISDOM = {
 
 let guidanceObserver = null;
 let guidanceQueued = false;
-let guidanceInstalled = false;
-let guidanceWasActive = false;
 
 function guidanceRead(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
@@ -139,7 +137,6 @@ function installAnalyzeGuidance() {
   api.analyze = () => applyOpeningPriority(originalAnalyze());
   api.__morningGuidanceRelease = MORNING_GUIDANCE_RELEASE;
   api.__morningGuidanceOriginalAnalyze = originalAnalyze;
-  guidanceInstalled = true;
   return true;
 }
 
@@ -152,35 +149,39 @@ function comingRows(tasks) {
     </article>`).join("");
 }
 
+function setTextIfChanged(node, value) {
+  if (node && node.textContent !== value) node.textContent = value;
+}
+
+function setHTMLIfChanged(node, value) {
+  if (node && node.innerHTML !== value) node.innerHTML = value;
+}
+
 function patchMorningDashboard() {
   if (!installAnalyzeGuidance()) return;
   let analysis;
   try { analysis = window.StorePilotCommandCenter.analyze(); }
   catch { return; }
   const bookwork = openingBookwork(analysis);
-  if (!bookwork) {
-    guidanceWasActive = false;
-    return;
-  }
-  guidanceWasActive = true;
+  if (!bookwork) return;
 
   const title = document.querySelector("#next-title");
   const copy = document.querySelector("#next-copy");
   const button = document.querySelector("#complete-next");
-  if (title) title.textContent = bookwork.title;
-  if (copy) copy.textContent = `${Number(bookwork.minutes || 10)} min · finish opening bookwork before the 8:00 AM manager photo check-in.`;
-  if (button && !button.disabled) button.textContent = "Mark done";
+  setTextIfChanged(title, bookwork.title);
+  setTextIfChanged(copy, `${Number(bookwork.minutes || 10)} min · finish opening bookwork before the 8:00 AM manager photo check-in.`);
+  if (button && !button.disabled) setTextIfChanged(button, "Mark done");
 
   const decision = document.querySelector(".command-decision-card");
   const decisionTitle = decision?.querySelector(".command-decision-head strong");
   const reason = decision?.querySelector(":scope > p:not(.command-waits)");
   const waits = decision?.querySelector(".command-waits");
-  if (decisionTitle) decisionTitle.textContent = bookwork.title;
-  if (reason) reason.textContent = analysis.reason;
-  if (waits) waits.innerHTML = `<b>If it waits:</b> ${guidanceEscape(analysis.waits)}`;
+  setTextIfChanged(decisionTitle, bookwork.title);
+  setTextIfChanged(reason, analysis.reason);
+  setHTMLIfChanged(waits, `<b>If it waits:</b> ${guidanceEscape(analysis.waits)}`);
 
   const coming = document.querySelector("#command-center-screen .command-coming-list");
-  if (coming) coming.innerHTML = comingRows(analysis.coming || []);
+  setHTMLIfChanged(coming, comingRows(analysis.coming || []));
 }
 
 function stringHash(value) {
@@ -286,7 +287,10 @@ function startMorningGuidance() {
 window.StorePilotMorningManagerGuidance = {
   version: MORNING_GUIDANCE_RELEASE,
   wisdom: wisdomForToday,
-  analyze: () => applyOpeningPriority(window.StorePilotCommandCenter?.__morningGuidanceOriginalAnalyze?.() || window.StorePilotCommandCenter?.analyze?.())
+  analyze: () => {
+    const original = window.StorePilotCommandCenter?.__morningGuidanceOriginalAnalyze;
+    return applyOpeningPriority(original ? original() : window.StorePilotCommandCenter?.analyze?.());
+  }
 };
 
 document.documentElement.dataset.morningManagerGuidance = MORNING_GUIDANCE_RELEASE;
