@@ -1,0 +1,223 @@
+.loretta-win-card {
+  position: relative;
+  overflow: hidden;
+  padding: 15px;
+  border: 1px solid rgba(154, 104, 48, 0.2);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(210, 147, 82, 0.16), transparent 38%),
+    linear-gradient(180deg, rgba(255, 251, 243, 0.98), rgba(247, 242, 231, 0.96));
+  box-shadow: 0 8px 20px rgba(63, 48, 31, 0.07);
+}
+
+.loretta-win-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: linear-gradient(180deg, #c78a4c, #0b4a38);
+}
+
+.loretta-win-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.loretta-win-head p {
+  margin: 0 0 3px;
+  color: #8a5528;
+  font-size: 0.64rem;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.loretta-win-head h3 {
+  margin: 0;
+  color: var(--forest, #073f2f);
+  font-size: 1rem;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+.loretta-win-head > span {
+  flex: 0 0 auto;
+  max-width: 126px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: rgba(184, 115, 54, 0.11);
+  color: #875022;
+  font-size: 0.64rem;
+  font-weight: 900;
+  line-height: 1.15;
+  text-align: center;
+}
+
+.loretta-win-task {
+  margin-top: 12px;
+}
+
+.loretta-win-task > strong {
+  display: block;
+  color: var(--ink, #17221c);
+  font-size: 0.93rem;
+  line-height: 1.25;
+}
+
+.loretta-win-task > p {
+  margin: 6px 0 0;
+  color: var(--muted, #6d675e);
+  font-size: 0.79rem;
+  line-height: 1.4;
+}
+
+.loretta-win-task > small {
+  display: block;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(63, 48, 31, 0.09);
+  color: var(--soft, #867d71);
+  font-size: 0.71rem;
+  line-height: 1.35;
+}
+
+.loretta-win-task > small b {
+  color: var(--forest, #073f2f);
+}
+
+.loretta-win-actions {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.loretta-win-actions button {
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid rgba(7, 63, 47, 0.12);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--forest, #073f2f);
+  font-size: 0.76rem;
+  font-weight: 950;
+}
+
+.loretta-win-actions .loretta-win-done {
+  border-color: transparent;
+  background: var(--forest, #073f2f);
+  color: #ffffff;
+  box-shadow: 0 7px 16px rgba(7, 63, 47, 0.16);
+}
+
+.loretta-win-card.done {
+  border-color: rgba(7, 104, 70, 0.18);
+  background: linear-gradient(180deg, rgba(239, 249, 243, 0.98), rgba(247, 251, 248, 0.96));
+}
+
+.loretta-win-card.done::before {
+  background: #0b6a49;
+}
+
+.loretta-win-card.done .loretta-win-head > span {
+  background: rgba(7, 104, 70, 0.11);
+  color: #076846;
+}
+
+.loretta-win-complete {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  margin-top: 11px;
+  padding: 9px;
+  border-radius: 11px;
+  background: rgba(7, 104, 70, 0.075);
+}
+
+.loretta-win-complete > span {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #076846;
+  color: #ffffff;
+  font-weight: 1000;
+}
+
+.loretta-win-complete b,
+.loretta-win-complete small {
+  display: block;
+}
+
+.loretta-win-complete b {
+  color: #07583d;
+  font-size: 0.79rem;
+}
+
+.loretta-win-complete small {
+  margin-top: 2px;
+  color: var(--muted, #6d675e);
+  font-size: 0.67rem;
+  line-height: 1.3;
+}
+
+.loretta-win-card.done .loretta-win-actions {
+  grid-template-columns: 1fr;
+}
+
+.loretta-win-card.compact {
+  padding: 12px;
+  border-radius: 13px;
+}
+
+.loretta-win-card.compact .loretta-win-head h3 {
+  font-size: 0.9rem;
+}
+
+.loretta-win-card.compact .loretta-win-task {
+  margin-top: 9px;
+}
+
+.loretta-win-card.compact .loretta-win-task > strong {
+  font-size: 0.84rem;
+}
+
+.loretta-win-card.compact .loretta-win-task > p {
+  font-size: 0.72rem;
+  line-height: 1.33;
+}
+
+.loretta-win-card.compact .loretta-win-actions {
+  margin-top: 9px;
+}
+
+.loretta-win-card.compact .loretta-win-actions button {
+  min-height: 36px;
+  font-size: 0.7rem;
+}
+
+.briefing-native-shell .loretta-win-card,
+.shift-briefing-card .loretta-win-card {
+  margin-top: 9px;
+}
+
+@media (max-width: 520px) {
+  .loretta-win-card {
+    padding: 13px;
+    border-radius: 13px;
+  }
+
+  .loretta-win-head > span {
+    max-width: 105px;
+    font-size: 0.59rem;
+  }
+
+  .loretta-win-actions button {
+    min-height: 38px;
+    padding-inline: 8px;
+  }
+}
