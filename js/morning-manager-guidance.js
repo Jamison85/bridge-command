@@ -110,6 +110,10 @@ function openingBookwork(analysis) {
   return (analysis.data?.active || []).find(isBookworkTask) || null;
 }
 
+function openingLead(bookwork) {
+  return `Start with ${bookwork.title}. Protect the quiet opening window before the 8:00 AM manager photo check-in.`;
+}
+
 function applyOpeningPriority(analysis) {
   const bookwork = openingBookwork(analysis);
   if (!bookwork) return analysis;
@@ -182,6 +186,8 @@ function patchMorningDashboard() {
 
   const coming = document.querySelector("#command-center-screen .command-coming-list");
   setHTMLIfChanged(coming, comingRows(analysis.coming || []));
+  setTextIfChanged(document.querySelector(".shift-briefing-lead"), openingLead(bookwork));
+  setTextIfChanged(document.querySelector(".briefing-native-hero h2"), openingLead(bookwork));
 }
 
 function stringHash(value) {
@@ -227,6 +233,13 @@ function insertMorningWisdom() {
   }
   const shell = document.querySelector(".briefing-native-shell");
   if (!shell) return;
+
+  let analysis = null;
+  try { analysis = window.StorePilotCommandCenter?.analyze?.() || null; }
+  catch {}
+  const bookwork = openingBookwork(analysis);
+  if (bookwork) setTextIfChanged(shell.querySelector(".briefing-native-hero h2"), openingLead(bookwork));
+
   const wisdom = wisdomForToday();
   const key = `${guidanceDateKey()}:${wisdom.category}`;
   if (existing?.dataset.managerWisdom === key) return;
