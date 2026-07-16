@@ -1,4 +1,4 @@
-const CACHE_NAME = "store-pilot-command-center-22";
+const CACHE_NAME = "store-pilot-command-center-23";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -36,6 +36,7 @@ const APP_SHELL = [
   "./css/daily-scratchpad.css",
   "./css/morning-manager-guidance.css",
   "./css/delete-custom-task.css",
+  "./css/loretta-win.css",
   "./js/main-v8.js",
   "./js/review-layer.js",
   "./js/voice-commands.js",
@@ -52,6 +53,7 @@ const APP_SHELL = [
   "./js/start-shift-briefing.js",
   "./js/start-shift-briefing-compact.js",
   "./js/morning-manager-guidance.js",
+  "./js/loretta-win.js",
   "./js/loretta-away-mode.js",
   "./js/loretta-away-mode-guard.js",
   "./js/task-completion-hard-fix.js",
