@@ -112,8 +112,9 @@ function removeHandoffTasks({ refresh = true } = {}) {
 
     const removedIds = new Set(HANDOFF_TASK_IDS);
     removed.forEach((task) => removedIds.add(String(task.id || "")));
-    const recordChanged = cleanCompletedRecords(removedIds) || cleanTaskStateRecords(removedIds);
-    const changed = templateChanged || recordChanged;
+    const completedChanged = cleanCompletedRecords(removedIds);
+    const statesChanged = cleanTaskStateRecords(removedIds);
+    const changed = templateChanged || completedChanged || statesChanged;
 
     if (!changed) return [];
     window.dispatchEvent(new CustomEvent("storepilot:handoff-tasks-removed", { detail: { removed } }));
