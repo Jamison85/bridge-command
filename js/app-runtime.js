@@ -14,6 +14,8 @@ import "./delete-custom-task.js?v=command-center-27";
 import "./loretta-inbox.js?v=command-center-27";
 import "./loretta-ui-fix.js?v=command-center-27";
 import "./daily-scratchpad.js?v=command-center-27";
+import "./notes-screen-style.js?v=command-center-27";
+import "./notes-screen-controller.js?v=command-center-27";
 import "./interruption-timer.js?v=command-center-27";
 import "./interruption-shift-guard.js?v=command-center-27";
 import "./start-shift-briefing.js?v=command-center-27";
@@ -49,6 +51,8 @@ window.StorePilotRuntime = {
     "loretta-inbox",
     "loretta-ui-fix",
     "daily-scratchpad",
+    "notes-screen-style",
+    "notes-screen-controller",
     "interruption-timer",
     "interruption-shift-guard",
     "start-shift-briefing",
