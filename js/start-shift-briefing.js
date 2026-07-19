@@ -1,3 +1,4 @@
+const BRIEFING_RELEASE = "command-center-27";
 const BRIEFING_KEYS = {
   seen: "storePilot.shiftBriefings.v1",
   shift: "storePilot.shift.v6",
@@ -9,11 +10,12 @@ const BRIEFING_KEYS = {
   interruptions: "storePilot.interruptions.v1"
 };
 
-const BRIEFING_VERSION = 1;
+const BRIEFING_VERSION = 2;
 const SHIFT_LABELS = { morning: "Morning", mid: "Mid", close: "Close" };
 let briefingObserver = null;
 let briefingButtonQueued = false;
 let autoOpenAttempts = 0;
+let returnFocus = null;
 
 function briefingRead(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
@@ -25,9 +27,9 @@ function briefingWrite(key, value) {
 }
 
 function briefingEscape(value) {
-  return String(value ?? "").replace(/[&<>'"]/g, (char) => ({
+  return String(value ?? "").replace(/[&<>'"]/g, (character) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
-  }[char]));
+  }[character]));
 }
 
 function briefingDateKey(date = new Date()) {
@@ -58,8 +60,7 @@ function formatMinutes(minutes) {
 }
 
 function formatDuration(ms) {
-  const minutes = Math.max(1, Math.round(Number(ms || 0) / 60000));
-  return formatMinutes(minutes);
+  return formatMinutes(Math.max(1, Math.round(Number(ms || 0) / 60000)));
 }
 
 function formatDue(value) {
@@ -80,8 +81,13 @@ function parseDue(value) {
 }
 
 function analysisNow() {
-  try { return window.StorePilotCommandCenter?.analyze?.() || null; }
-  catch { return null; }
+  try {
+    return window.StorePilotMorningManagerGuidance?.analyze?.()
+      || window.StorePilotCommandCenter?.analyze?.()
+      || null;
+  } catch {
+    return null;
+  }
 }
 
 function todaysLorettaNotes() {
@@ -94,11 +100,11 @@ function deadlineTasks(analysis) {
   return (analysis?.data?.active || [])
     .filter((task) => task.due)
     .map((task) => ({ task, dueAt: parseDue(task.due) }))
-    .sort((a, b) => {
-      if (!a.dueAt && !b.dueAt) return 0;
-      if (!a.dueAt) return 1;
-      if (!b.dueAt) return -1;
-      return a.dueAt - b.dueAt;
+    .sort((left, right) => {
+      if (!left.dueAt && !right.dueAt) return 0;
+      if (!left.dueAt) return 1;
+      if (!right.dueAt) return -1;
+      return left.dueAt - right.dueAt;
     });
 }
 
@@ -107,7 +113,7 @@ function latestActiveIncident(analysis) {
   const cutoff = Date.now() - 36 * 60 * 60 * 1000;
   return briefingRead(BRIEFING_KEYS.incidents, [])
     .filter((incident) => incident.status === "active" && new Date(incident.updatedAt || incident.createdAt || 0).getTime() >= cutoff)
-    .sort((a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0))[0] || null;
+    .sort((left, right) => new Date(right.updatedAt || right.createdAt || 0) - new Date(left.updatedAt || left.createdAt || 0))[0] || null;
 }
 
 function previousShiftRef() {
@@ -192,9 +198,6 @@ function buildBriefing() {
     ? `Start with ${priorities[0].title}.`
     : "The active list is clear. Review the shift and protect the handoff.";
   if (incident) lead = `${incident.type} is still active. Stabilize operations before normal task flow.`;
-  else if (context.staffing === "short") lead = `You are short staffed. Protect coverage, deadlines, and the quickest visible wins.`;
-  else if (deadlines[0]) lead = `Protect ${deadlines[0].task.title} by ${formatDue(deadlines[0].task.due)}.`;
-  else if (notes.length) lead = `Loretta left ${notes.length} dated instruction${notes.length === 1 ? "" : "s"} for this shift.`;
 
   return {
     analysis,
@@ -215,12 +218,16 @@ function riskLabel(risk) {
   return risk === "critical" ? "Needs attention" : risk === "watch" ? "Watch" : "Controlled";
 }
 
+function riskKey(risk) {
+  return risk === "critical" ? "critical" : risk === "watch" ? "watch" : "controlled";
+}
+
 function priorityRowsHTML(briefing) {
   if (!briefing.priorities.length) {
-    return `<div class="briefing-empty"><strong>No active priorities.</strong><span>Review documented items and prepare the handoff.</span></div>`;
+    return `<div class="command-empty"><strong>No active priorities.</strong><span>Review documented items and protect the handoff.</span></div>`;
   }
   return briefing.priorities.map((task, index) => `
-    <article class="briefing-priority-row ${index === 0 ? "first" : ""}">
+    <article class="command-coming-row briefing-native-row${index === 0 ? " active" : ""}">
       <span>${index + 1}</span>
       <div>
         <strong>${briefingEscape(task.title)}</strong>
@@ -231,13 +238,98 @@ function priorityRowsHTML(briefing) {
 
 function headsUpHTML(briefing) {
   if (!briefing.headsUp.length) {
-    return `<div class="briefing-clear"><strong>No major warnings.</strong><span>No active incidents, deadlines, dated Loretta notes, or carryover found.</span></div>`;
+    return `<div class="command-empty"><strong>No major warnings.</strong><span>No active incidents, deadlines, dated notes, or carryover found.</span></div>`;
   }
   return briefing.headsUp.map((item) => `
-    <article class="briefing-alert" data-tone="${briefingEscape(item.tone)}">
+    <article class="briefing-native-alert" data-tone="${briefingEscape(item.tone)}">
       <strong>${briefingEscape(item.label)}</strong>
-      <span>${briefingEscape(item.detail)}</span>
+      ${item.detail ? `<span>${briefingEscape(item.detail)}</span>` : ""}
     </article>`).join("");
+}
+
+function wisdomLabel(category) {
+  return ({
+    normal: "Opening judgment",
+    short: "Short-staffed judgment",
+    "truck-day": "Truck-day judgment",
+    "busy-rush": "Rush judgment",
+    "manager-coverage": "Coverage judgment",
+    "leadership-visit": "Walkthrough judgment",
+    "incident-recovery": "Recovery judgment",
+    "kitchen-prep": "Prep judgment"
+  })[category] || "Manager judgment";
+}
+
+function managerWisdomHTML(briefing) {
+  if (briefing.shift !== "morning") return "";
+  let wisdom = null;
+  try { wisdom = window.StorePilotMorningManagerGuidance?.wisdom?.() || null; }
+  catch { wisdom = null; }
+  if (!wisdom?.text) return "";
+  const key = `${briefingDateKey()}:${wisdom.category || "normal"}`;
+  return `
+    <section class="briefing-manager-wisdom" data-manager-wisdom="${briefingEscape(key)}">
+      <div class="briefing-manager-wisdom-head">
+        <div><p>YEARS ON THE FLOOR</p><h3>Manager note for today</h3></div>
+        <span>${briefingEscape(wisdomLabel(wisdom.category))}</span>
+      </div>
+      <p>${briefingEscape(wisdom.text)}</p>
+    </section>`;
+}
+
+function lorettaWinCategoryLabel(category) {
+  return ({
+    normal: "Extra-mile judgment",
+    short: "Short-staffed win",
+    "truck-day": "Truck-day win",
+    "busy-rush": "Rush win",
+    "manager-coverage": "Coverage win",
+    "leadership-visit": "Walkthrough win",
+    "incident-recovery": "Recovery win",
+    "kitchen-prep": "Prep win",
+    away: "Loretta-away win"
+  })[category] || "Leadership win";
+}
+
+function lorettaWinTime(value) {
+  const date = new Date(value || 0);
+  if (Number.isNaN(date.getTime())) return "this shift";
+  return date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+}
+
+function lorettaWinHTML() {
+  let record = null;
+  try { record = window.StorePilotLorettaWin?.current?.() || null; }
+  catch { record = null; }
+  if (!record?.suggestion) return "";
+  const done = record.status === "done";
+  const suggestion = record.suggestion;
+  return `
+    <section class="loretta-win-card${done ? " done" : ""} compact" data-loretta-win-card data-loretta-win-key="${briefingEscape(record.shiftKey)}">
+      <div class="loretta-win-head">
+        <div><p>OPTIONAL LEADERSHIP WIN</p><h3>Make Loretta's day easier</h3></div>
+        <span>${done ? "Completed" : briefingEscape(lorettaWinCategoryLabel(record.category))}</span>
+      </div>
+      <div class="loretta-win-task">
+        <strong>${briefingEscape(suggestion.title)}</strong>
+        <p>${briefingEscape(suggestion.action)}</p>
+      </div>
+      ${done ? `
+        <div class="loretta-win-complete"><span>✓</span><div><b>Leadership win recorded</b><small>Completed at ${briefingEscape(lorettaWinTime(record.completedAt))}. This does not change required shift progress.</small></div></div>
+        <div class="loretta-win-actions"><button type="button" data-loretta-win-undo>Undo</button></div>` : `
+        <div class="loretta-win-actions">
+          <button type="button" class="loretta-win-done" data-loretta-win-done>Mark done</button>
+          <button type="button" data-loretta-win-swap>Swap idea</button>
+        </div>`}
+    </section>`;
+}
+
+function factsHTML(briefing) {
+  const facts = [`${briefing.analysis.data.active.length} open`];
+  if (briefing.deadlines.length) facts.push(`${briefing.deadlines.length} deadline${briefing.deadlines.length === 1 ? "" : "s"}`);
+  if (briefing.notes.length) facts.push(`${briefing.notes.length} Loretta`);
+  facts.push(`${formatMinutes(briefing.analysis.minutesLeft)} left`);
+  return facts.map((fact) => `<span>${briefingEscape(fact)}</span>`).join("");
 }
 
 function ensureBriefingSheet() {
@@ -247,12 +339,26 @@ function ensureBriefingSheet() {
   sheet.id = "shift-briefing-sheet";
   sheet.className = "shift-briefing-sheet";
   sheet.setAttribute("aria-hidden", "true");
-  sheet.innerHTML = `<div class="shift-briefing-card" role="dialog" aria-modal="true" aria-labelledby="shift-briefing-title"></div>`;
-  sheet.addEventListener("click", (event) => {
-    if (event.target === sheet || event.target.closest("[data-briefing-close]")) closeBriefing(true);
-  });
+  sheet.innerHTML = `<div class="shift-briefing-card screen-card briefing-native-card" role="dialog" aria-modal="true" aria-labelledby="shift-briefing-title"></div>`;
+  sheet.addEventListener("click", handleBriefingClick);
   document.body.appendChild(sheet);
   return sheet;
+}
+
+function handleBriefingClick(event) {
+  const sheet = event.currentTarget;
+  if (event.target === sheet || event.target.closest("[data-native-briefing-close]")) {
+    closeBriefing(true);
+    return;
+  }
+  if (event.target.closest("[data-native-briefing-start]")) {
+    closeBriefing(true);
+    return;
+  }
+  if (event.target.closest("[data-native-briefing-tasks]")) {
+    closeBriefing(true);
+    document.querySelector('[data-screen="tasks"]')?.click();
+  }
 }
 
 function renderBriefing() {
@@ -263,40 +369,47 @@ function renderBriefing() {
   const mode = titleCase(briefing.context.mode || "normal");
   const role = titleCase(briefing.context.role || "manager");
   const staffing = briefing.context.staffing === "short" ? "Short staffed" : "Normal staffing";
-  card.innerHTML = `
-    <header class="shift-briefing-head">
-      <div><p>START SHIFT</p><h2 id="shift-briefing-title">${briefingEscape(SHIFT_LABELS[briefing.shift])} briefing</h2></div>
-      <div class="shift-briefing-head-actions">
-        <span data-risk="${briefingEscape(briefing.analysis.risk)}">${briefingEscape(riskLabel(briefing.analysis.risk))}</span>
-        <button type="button" data-briefing-close aria-label="Close briefing">Close</button>
-      </div>
-    </header>
-    <p class="shift-briefing-lead">${briefingEscape(briefing.lead)}</p>
-    <div class="shift-briefing-facts">
-      <span>${briefing.analysis.data.active.length} open</span>
-      <span>${briefing.deadlines.length} deadline${briefing.deadlines.length === 1 ? "" : "s"}</span>
-      <span>${briefing.notes.length} Loretta</span>
-      <span>${formatMinutes(briefing.analysis.minutesLeft)} left</span>
-    </div>
-    <section class="shift-briefing-section">
-      <div class="shift-briefing-section-head"><p>PRIORITIES</p><h3>First three moves</h3></div>
-      <div class="briefing-priority-list">${priorityRowsHTML(briefing)}</div>
-    </section>
-    <section class="shift-briefing-section heads-up">
-      <div class="shift-briefing-section-head"><p>HEADS UP</p><h3>What can change the plan</h3></div>
-      <div class="briefing-alert-list">${headsUpHTML(briefing)}</div>
-    </section>
-    <div class="shift-briefing-context-line"><strong>${briefingEscape(mode)} · ${briefingEscape(role)}</strong><span>${briefingEscape(staffing)}</span></div>
-    <div class="shift-briefing-actions">
-      <button type="button" class="briefing-start-button" data-briefing-start>Start shift</button>
-      <button type="button" class="briefing-tasks-button" data-briefing-tasks>View tasks</button>
-    </div>`;
+  const currentRisk = riskKey(briefing.analysis.risk);
 
-  card.querySelector("[data-briefing-start]")?.addEventListener("click", () => closeBriefing(true));
-  card.querySelector("[data-briefing-tasks]")?.addEventListener("click", () => {
-    closeBriefing(true);
-    document.querySelector('[data-screen="tasks"]')?.click();
-  });
+  card.className = "shift-briefing-card screen-card briefing-native-card";
+  card.innerHTML = `
+    <div class="briefing-native-shell" data-briefing-owner="${BRIEFING_RELEASE}">
+      <header class="screen-header briefing-native-header">
+        <div><p class="eyebrow">SHIFT BRIEFING</p><h2 id="shift-briefing-title">${briefingEscape(SHIFT_LABELS[briefing.shift])} briefing</h2></div>
+        <button class="text-button" type="button" data-native-briefing-close>Close</button>
+      </header>
+
+      <section class="hero-card briefing-native-hero" data-risk="${currentRisk}">
+        <div class="hero-meta"><span>START HERE</span><span>${briefingEscape(riskLabel(briefing.analysis.risk))}</span></div>
+        <h2>${briefingEscape(briefing.lead)}</h2>
+        <div class="command-metrics briefing-native-facts">${factsHTML(briefing)}</div>
+      </section>
+
+      <section class="command-coming-card briefing-native-priorities">
+        <div class="command-section-head">
+          <div><p>PRIORITIES</p><h3>First three moves</h3></div>
+          <button type="button" data-native-briefing-tasks>All tasks</button>
+        </div>
+        <div class="command-coming-list">${priorityRowsHTML(briefing)}</div>
+      </section>
+
+      <details class="command-rescue briefing-native-heads-up" ${currentRisk === "critical" ? "open" : ""}>
+        <summary><span>HEADS UP</span><strong>${briefing.headsUp.length ? `${briefing.headsUp.length} item${briefing.headsUp.length === 1 ? "" : "s"} can change the plan` : "Nothing major waiting"}</strong></summary>
+        <div class="briefing-native-alert-list">${headsUpHTML(briefing)}</div>
+      </details>
+
+      ${managerWisdomHTML(briefing)}
+      ${lorettaWinHTML()}
+
+      <div class="command-context-summary briefing-native-context">
+        <div><p>SHIFT CONTEXT</p><strong>${briefingEscape(mode)} · ${briefingEscape(role)}</strong><span>${briefingEscape(staffing)}</span></div>
+      </div>
+
+      <div class="command-inline-actions briefing-native-actions">
+        <button class="primary-action" type="button" data-native-briefing-start>Start shift</button>
+        <button class="secondary-action command-light-button" type="button" data-native-briefing-tasks>View tasks</button>
+      </div>
+    </div>`;
   return true;
 }
 
@@ -304,9 +417,11 @@ function openBriefing() {
   if (window.StorePilotInterruptions?.getActive?.()) return window.StorePilotInterruptions.open();
   if (!renderBriefing()) return;
   const sheet = ensureBriefingSheet();
+  returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   sheet.classList.add("open");
   sheet.setAttribute("aria-hidden", "false");
   document.body.classList.add("shift-briefing-open");
+  requestAnimationFrame(() => sheet.querySelector("[data-native-briefing-close]")?.focus());
 }
 
 function markBriefingSeen() {
@@ -321,6 +436,8 @@ function closeBriefing(markSeen = true) {
   sheet?.setAttribute("aria-hidden", "true");
   document.body.classList.remove("shift-briefing-open");
   if (markSeen) markBriefingSeen();
+  if (returnFocus?.isConnected) returnFocus.focus();
+  returnFocus = null;
 }
 
 function hasSeenCurrentBriefing() {
@@ -373,10 +490,15 @@ function queueBriefingButton() {
   });
 }
 
+function rerenderOpenBriefing() {
+  if (document.querySelector(".shift-briefing-sheet.open")) renderBriefing();
+}
+
 function observeBriefingButton() {
   if (briefingObserver) return;
+  const root = document.querySelector(".app-shell") || document.body;
   briefingObserver = new MutationObserver(queueBriefingButton);
-  briefingObserver.observe(document.body, { childList: true, subtree: true });
+  briefingObserver.observe(root, { childList: true, subtree: true });
 }
 
 function initShiftBriefing() {
@@ -387,8 +509,10 @@ function initShiftBriefing() {
 }
 
 window.StorePilotShiftBriefing = {
+  version: BRIEFING_RELEASE,
   open: openBriefing,
   close: closeBriefing,
+  render: renderBriefing,
   build: buildBriefing,
   resetCurrent: () => {
     const seen = briefingRead(BRIEFING_KEYS.seen, {});
@@ -397,19 +521,23 @@ window.StorePilotShiftBriefing = {
   }
 };
 
+document.documentElement.dataset.shiftBriefingOwner = BRIEFING_RELEASE;
 document.addEventListener("click", (event) => {
   if (!event.target.closest(".shift-button")) return;
   autoOpenAttempts = 0;
   setTimeout(maybeAutoOpen, 360);
 });
-window.addEventListener("storage", () => {
-  if (document.querySelector(".shift-briefing-sheet.open")) renderBriefing();
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && document.querySelector(".shift-briefing-sheet.open")) closeBriefing(true);
 });
-window.addEventListener("storepilot:interruptions-changed", () => {
-  if (document.querySelector(".shift-briefing-sheet.open")) renderBriefing();
-});
+window.addEventListener("storage", rerenderOpenBriefing);
+window.addEventListener("storepilot:interruptions-changed", rerenderOpenBriefing);
+window.addEventListener("storepilot:tasks-changed", rerenderOpenBriefing);
+window.addEventListener("storepilot:incident-saved", rerenderOpenBriefing);
+window.addEventListener("storepilot:leadership-win-changed", rerenderOpenBriefing);
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden) setTimeout(maybeAutoOpen, 180);
 });
 
-setTimeout(initShiftBriefing, 320);
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initShiftBriefing, { once: true });
+else initShiftBriefing();

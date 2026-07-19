@@ -32,9 +32,9 @@ function enhanceHandoffControls() {
   options.appendChild(topButton);
 }
 
-import("./log-page-css.js?v=command-center-26").catch((error) => console.warn("Store Pilot log style failed", error));
-import("./log-page-fixes.js?v=command-center-26").catch((error) => console.warn("Store Pilot log page fixes failed", error));
-import("./log-final-polish.js?v=command-center-26").catch((error) => console.warn("Store Pilot final log polish failed", error));
+import("./log-page-css.js?v=command-center-27").catch((error) => console.warn("Store Pilot log style failed", error));
+import("./log-page-fixes.js?v=command-center-27").catch((error) => console.warn("Store Pilot log page fixes failed", error));
+import("./log-final-polish.js?v=command-center-27").catch((error) => console.warn("Store Pilot final log polish failed", error));
 
 document.addEventListener("click", () => setTimeout(enhanceHandoffControls, 80));
 document.addEventListener("change", () => setTimeout(enhanceHandoffControls, 80));

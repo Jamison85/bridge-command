@@ -6,9 +6,9 @@ import {
   removeTaskArtifacts,
   reopenTaskRecords,
   setTaskStateRecord
-} from "./task-action-model.js?v=command-center-26";
+} from "./task-action-model.js?v=command-center-27";
 
-const TASK_ACTION_RELEASE = "command-center-26";
+const TASK_ACTION_RELEASE = "command-center-27";
 const TASK_ACTION_KEYS = {
   completed: "storePilot.completed.v6",
   customTasks: "storePilot.customTasks.v6",
