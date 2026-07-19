@@ -1,3 +1,2 @@
-import "./review-template-aware.js?v=handoff-26";
-import "./active-task.js";
-import "./followup-cleanup.js";
+import "./active-task.js?v=command-center-28";
+import "./followup-cleanup.js?v=command-center-28";
