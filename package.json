@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node scripts/verify-javascript-syntax.mjs && node scripts/verify-static.mjs && node scripts/verify-storage-fixture.mjs && node scripts/verify-task-actions.mjs && node scripts/verify-incident-actions.mjs && node scripts/verify-briefing-owner.mjs && node scripts/verify-notes-owner.mjs",
+    "test": "node scripts/verify-javascript-syntax.mjs && node scripts/verify-static.mjs && node scripts/verify-storage-fixture.mjs && node scripts/verify-task-actions.mjs && node scripts/verify-incident-actions.mjs && node scripts/verify-briefing-owner.mjs && node scripts/verify-notes-owner.mjs && node scripts/verify-log-owner.mjs",
     "check": "npm test"
   }
 }

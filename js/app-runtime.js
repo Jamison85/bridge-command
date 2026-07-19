@@ -2,9 +2,6 @@ import "./state-polish.js?v=command-center-28";
 import "./production-tools.js?v=command-center-28";
 import "./final-nav.js?v=command-center-28";
 import "./final-task-highlight.js?v=command-center-28";
-import "./review-layer-variety.js?v=command-center-28";
-import "./runtime-clean-bridge.js?v=command-center-28";
-import "./shift-brain.js?v=command-center-28";
 import "./task-state-clarity.js?v=command-center-28";
 import "./feedback-layer.js?v=command-center-28";
 import "./manager-photo-checkin.js?v=command-center-28";
@@ -24,6 +21,7 @@ import "./loretta-win.js?v=command-center-28";
 import "./loretta-away-mode.js?v=command-center-28";
 import "./loretta-away-mode-guard.js?v=command-center-28";
 import "./proof-of-work-pack.js?v=command-center-28";
+import "./log-screen-controller.js?v=command-center-28";
 import "./backup-restore.js?v=command-center-28";
 import "./diagnostics.js?v=command-center-28";
 
@@ -39,9 +37,6 @@ window.StorePilotRuntime = {
     "production-tools",
     "final-nav",
     "final-task-highlight",
-    "review-layer-variety",
-    "runtime-clean-bridge",
-    "shift-brain",
     "task-state-clarity",
     "feedback-layer",
     "manager-photo-checkin",
@@ -61,6 +56,8 @@ window.StorePilotRuntime = {
     "loretta-away-mode",
     "loretta-away-mode-guard",
     "proof-of-work-pack",
+    "log-state-model",
+    "log-screen-controller",
     "backup-restore",
     "diagnostics"
   ]
