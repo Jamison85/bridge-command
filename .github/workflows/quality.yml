@@ -21,4 +21,14 @@ jobs:
         with:
           node-version: 22
       - name: Run static and storage checks
-        run: npm test
+        shell: bash
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee quality-report.txt
+      - name: Upload quality report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: store-pilot-quality-report
+          path: quality-report.txt
+          retention-days: 7
