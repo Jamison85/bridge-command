@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const RELEASE = "command-center-24";
+  const RELEASE = "command-center-25";
   const EXPECTED_CACHE = `store-pilot-${RELEASE}`;
   const PREFIX = "storePilot.";
   const KEYS = {
@@ -18,7 +18,8 @@
   };
   const CORE_JSON_KEYS = Object.values(KEYS);
   const SHIFT_LABELS = { morning: "Morning", mid: "Mid", close: "Close" };
-  let panelObserver = null;
+
+  let observer = null;
   let renderQueued = false;
   let renderSequence = 0;
   let latestSnapshot = null;
@@ -55,8 +56,8 @@
   function storedDate(key) {
     const raw = localStorage.getItem(key);
     if (!raw) return null;
-    const value = safeParse(raw, raw);
-    const date = new Date(value);
+    const parsed = safeParse(raw, raw);
+    const date = new Date(parsed);
     return Number.isNaN(date.getTime()) ? null : date;
   }
 
@@ -71,7 +72,11 @@
   function formatDateTime(date) {
     if (!date) return "Never";
     return new Intl.DateTimeFormat(undefined, {
-      month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit"
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
     }).format(date);
   }
 
@@ -91,18 +96,17 @@
       bytes += byteSize(key) + byteSize(value);
     }
 
+    const invalid = Symbol("invalid");
     const parseErrors = CORE_JSON_KEYS.filter((key) => {
       const raw = localStorage.getItem(key);
-      if (raw === null) return false;
-      return safeParse(raw, Symbol.for("invalid")) === Symbol.for("invalid");
+      return raw !== null && safeParse(raw, invalid) === invalid;
     });
-
+    const key = currentShiftKey();
     const completed = safeParse(localStorage.getItem(KEYS.completed), {}) || {};
     const customTasks = safeParse(localStorage.getItem(KEYS.customTasks), {}) || {};
     const states = safeParse(localStorage.getItem(KEYS.states), {}) || {};
     const incidents = safeParse(localStorage.getItem(KEYS.incidents), []) || [];
     const scratchpad = safeParse(localStorage.getItem(KEYS.scratchpad), {}) || {};
-    const key = currentShiftKey();
 
     return {
       groups: keys.length,
@@ -120,22 +124,22 @@
     const supported = "serviceWorker" in navigator;
     let registration = null;
     let cacheNames = [];
-    try {
-      registration = supported ? await navigator.serviceWorker.getRegistration() : null;
-    } catch {
-      registration = null;
-    }
-    try {
-      cacheNames = "caches" in window ? await caches.keys() : [];
-    } catch {
-      cacheNames = [];
-    }
+    try { registration = supported ? await navigator.serviceWorker.getRegistration() : null; }
+    catch { registration = null; }
+    try { cacheNames = "caches" in window ? await caches.keys() : []; }
+    catch { cacheNames = []; }
+
     return {
       supported,
       controlled: Boolean(navigator.serviceWorker?.controller),
-      workerState: registration?.waiting ? "waiting" : registration?.installing ? "installing" : registration?.active ? "active" : "none",
+      workerState: registration?.waiting
+        ? "waiting"
+        : registration?.installing
+          ? "installing"
+          : registration?.active
+            ? "active"
+            : "none",
       cacheReady: cacheNames.includes(EXPECTED_CACHE),
-      cacheNames,
       standalone: window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true,
       online: navigator.onLine
     };
@@ -149,7 +153,13 @@
     const lastBackup = storedDate(KEYS.lastBackup);
     const lastRestore = storedDate(KEYS.lastRestore);
     const hardFailure = runtimeVersion !== RELEASE || storage.parseErrors.length > 0;
-    const updatePending = pwa.supported && (!pwa.controlled || !pwa.cacheReady || pwa.workerState === "waiting" || pwa.workerState === "installing");
+    const updatePending = pwa.supported && (
+      !pwa.controlled
+      || !pwa.cacheReady
+      || pwa.workerState === "waiting"
+      || pwa.workerState === "installing"
+    );
+
     return {
       release: RELEASE,
       runtimeVersion,
@@ -180,13 +190,16 @@
   function offlineLabel(snapshot) {
     if (!snapshot.pwa.supported) return "Unavailable";
     if (snapshot.pwa.cacheReady && snapshot.pwa.controlled) return "Ready";
-    if (snapshot.pwa.workerState === "waiting" || snapshot.pwa.workerState === "installing") return "Updating";
+    if (["waiting", "installing"].includes(snapshot.pwa.workerState)) return "Updating";
     return "Pending";
   }
 
   function panelHTML(snapshot) {
     const backupShort = relativeDate(snapshot.lastBackup, "None");
-    const coreStorage = snapshot.storage.parseErrors.length ? `${snapshot.storage.parseErrors.length} parse error${snapshot.storage.parseErrors.length === 1 ? "" : "s"}` : "Valid";
+    const coreStorage = snapshot.storage.parseErrors.length
+      ? `${snapshot.storage.parseErrors.length} parse error${snapshot.storage.parseErrors.length === 1 ? "" : "s"}`
+      : "Valid";
+
     return `
       <div class="diagnostics-head">
         <div><p>APP HEALTH</p><h3>Diagnostics</h3><span>Technical status only. No note or incident contents are shown.</span></div>
@@ -315,8 +328,8 @@
   function start() {
     const content = document.querySelector("#screen-content");
     if (content) {
-      panelObserver = new MutationObserver(() => queueRender(false));
-      panelObserver.observe(content, { childList: true, subtree: true });
+      observer = new MutationObserver(() => queueRender(false));
+      observer.observe(content, { childList: true, subtree: true });
     }
 
     document.addEventListener("click", (event) => {
@@ -333,7 +346,9 @@
         return;
       }
       if (event.target.closest?.("[data-screen], .icon-button")) setTimeout(() => queueRender(false), 40);
-      if (event.target.closest?.("[data-download-store-backup], [data-confirm-store-restore]")) setTimeout(() => renderDiagnostics(true), 500);
+      if (event.target.closest?.("[data-download-store-backup], [data-confirm-store-restore]")) {
+        setTimeout(() => renderDiagnostics(true), 500);
+      }
     });
 
     window.addEventListener("storage", () => renderDiagnostics(true));
