@@ -1,4 +1,4 @@
-const CACHE_NAME = "store-pilot-command-center-27";
+const CACHE_NAME = "store-pilot-command-center-28";
 const APP_SHELL = [
   "./",
   "./index.html",

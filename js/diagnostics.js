@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const RELEASE = "command-center-27";
+  const RELEASE = "command-center-28";
   const EXPECTED_CACHE = `store-pilot-${RELEASE}`;
   const PREFIX = "storePilot.";
   const KEYS = {

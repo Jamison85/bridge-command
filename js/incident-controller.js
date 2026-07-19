@@ -6,9 +6,9 @@ import {
   updateIncidentContext,
   upsertIncident,
   upsertIncidentReport
-} from "./incident-state-model.js?v=command-center-27";
+} from "./incident-state-model.js?v=command-center-28";
 
-const INCIDENT_RELEASE = "command-center-27";
+const INCIDENT_RELEASE = "command-center-28";
 const KEYS = {
   drafts: "storePilot.incidentDrafts.v1",
   incidents: "storePilot.incidents.v2",

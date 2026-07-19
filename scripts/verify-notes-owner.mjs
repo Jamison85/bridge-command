@@ -8,8 +8,8 @@ const scratchpad = read("js/daily-scratchpad.js");
 const shell = read("sw.js");
 
 const failures = [];
-if (!runtime.includes('import "./notes-screen-controller.js?v=command-center-27"')) failures.push("Notes owner is not loaded by app-runtime.");
-if (!runtime.includes('import "./notes-screen-style.js?v=command-center-27"')) failures.push("Notes owner style loader is not loaded.");
+if (!runtime.includes('import "./notes-screen-controller.js?v=command-center-28"')) failures.push("Notes owner is not loaded by app-runtime.");
+if (!runtime.includes('import "./notes-screen-style.js?v=command-center-28"')) failures.push("Notes owner style loader is not loaded.");
 if (!owner.includes("data-notes-owner")) failures.push("Notes owner marker is missing.");
 if (!owner.includes('id="loretta-notes-screen"')) failures.push("Notes owner must preserve the legacy screen ID.");
 if (!owner.includes('id="daily-scratchpad"')) failures.push("Notes owner must render the Daily Scratchpad directly.");

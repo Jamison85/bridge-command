@@ -1,4 +1,4 @@
-const BRIEFING_RELEASE = "command-center-27";
+const BRIEFING_RELEASE = "command-center-28";
 const BRIEFING_KEYS = {
   seen: "storePilot.shiftBriefings.v1",
   shift: "storePilot.shift.v6",
