@@ -7,6 +7,7 @@ import "./feedback-layer.js?v=command-center-28";
 import "./manager-photo-checkin.js?v=command-center-28";
 import "./remove-handoff-task.js?v=command-center-28";
 import "./shift-command-center.js?v=command-center-28";
+import "./app-shell-controller.js?v=command-center-28";
 import "./delete-custom-task.js?v=command-center-28";
 import "./loretta-inbox.js?v=command-center-28";
 import "./loretta-ui-fix.js?v=command-center-28";
@@ -42,6 +43,8 @@ window.StorePilotRuntime = {
     "manager-photo-checkin",
     "remove-handoff-task",
     "shift-command-center",
+    "app-shell-state-model",
+    "app-shell-controller",
     "delete-custom-task",
     "loretta-inbox",
     "loretta-ui-fix",
