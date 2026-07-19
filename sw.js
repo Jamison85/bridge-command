@@ -75,6 +75,8 @@ const APP_SHELL = [
   "./js/loretta-away-mode.js",
   "./js/loretta-away-mode-guard.js",
   "./js/proof-of-work-pack.js",
+  "./js/log-state-model.js",
+  "./js/log-screen-controller.js",
   "./js/backup-restore.js",
   "./js/diagnostics.js",
   "./js/review-template-aware.js",
