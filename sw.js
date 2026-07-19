@@ -1,4 +1,4 @@
-const CACHE_NAME = "store-pilot-command-center-23";
+const CACHE_NAME = "store-pilot-command-center-24";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -32,6 +32,7 @@ const APP_SHELL = [
   "./css/incident-save-guard.css",
   "./css/proof-of-work-pack.css",
   "./css/backup-restore.css",
+  "./css/diagnostics.css",
   "./css/manager-photo-checkin.css",
   "./css/daily-scratchpad.css",
   "./css/morning-manager-guidance.css",
@@ -41,6 +42,18 @@ const APP_SHELL = [
   "./js/review-layer.js",
   "./js/voice-commands.js",
   "./js/app-runtime.js",
+  "./js/incident-save-guard.js",
+  "./js/task-completion-hard-fix.js",
+  "./js/pwa.js",
+  "./js/state-polish.js",
+  "./js/production-tools.js",
+  "./js/final-nav.js",
+  "./js/final-task-highlight.js",
+  "./js/review-layer-variety.js",
+  "./js/runtime-clean-bridge.js",
+  "./js/shift-brain.js",
+  "./js/task-state-clarity.js",
+  "./js/feedback-layer.js",
   "./js/manager-photo-checkin.js",
   "./js/remove-handoff-task.js",
   "./js/shift-command-center.js",
@@ -56,11 +69,15 @@ const APP_SHELL = [
   "./js/loretta-win.js",
   "./js/loretta-away-mode.js",
   "./js/loretta-away-mode-guard.js",
-  "./js/task-completion-hard-fix.js",
-  "./js/incident-save-guard.js",
   "./js/proof-of-work-pack.js",
   "./js/backup-restore.js",
-  "./js/pwa.js"
+  "./js/diagnostics.js",
+  "./js/review-template-aware.js",
+  "./js/active-task.js",
+  "./js/followup-cleanup.js",
+  "./js/log-page-css.js",
+  "./js/log-page-fixes.js",
+  "./js/log-final-polish.js"
 ];
 
 self.addEventListener("message", (event) => {
