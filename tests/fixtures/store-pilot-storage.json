@@ -1,0 +1,24 @@
+{
+  "format": "store-pilot-storage-fixture",
+  "schemaVersion": 1,
+  "shiftKey": "2026-07-18:morning",
+  "storage": {
+    "storePilot.shift.v6": "\"morning\"",
+    "storePilot.templates.v7": "{\"morning\":[{\"id\":\"bookwork\",\"title\":\"Bookwork / SmartSafe match\",\"area\":\"Opening\",\"minutes\":18,\"priority\":1,\"detail\":\"Verify opening records.\"},{\"id\":\"lto\",\"title\":\"Manager photo check-in to Loretta\",\"area\":\"Manager\",\"minutes\":8,\"priority\":2,\"due\":\"8:00 AM\",\"detail\":\"Complete the six-photo check-in.\",\"checklistType\":\"manager-photo-checkin\",\"checklistItems\":[\"Soda cooler\",\"Beer cooler\",\"Pizza warmers\",\"Sandwich warmers\",\"Ice vaults\",\"Bathrooms\"]}],\"mid\":[{\"id\":\"mid-walk\",\"title\":\"Mid-shift floor reset walk\",\"area\":\"Walk\",\"minutes\":10,\"priority\":1,\"detail\":\"Review customer-facing areas.\"}],\"close\":[{\"id\":\"close-walk\",\"title\":\"Closing walk and recovery\",\"area\":\"Walk\",\"minutes\":12,\"priority\":1,\"detail\":\"Complete the closing walk.\"}]}",
+    "storePilot.completed.v6": "{\"2026-07-18:morning\":[\"bookwork\"]}",
+    "storePilot.customTasks.v6": "{\"2026-07-18:morning\":[{\"id\":\"custom-fixture\",\"title\":\"Check receipt paper\",\"area\":\"Added\",\"minutes\":8,\"priority\":40,\"detail\":\"Fixture task.\"}]}",
+    "storePilot.taskStates.v6": "{\"2026-07-18:morning\":{\"custom-fixture\":{\"type\":\"delayed\",\"reason\":\"Register coverage\",\"updatedAt\":\"2026-07-18T14:30:00.000Z\"}}}",
+    "storePilot.shiftContext.v2": "{\"2026-07-18:morning\":{\"mode\":\"normal\",\"role\":\"manager\",\"staffing\":\"normal\",\"shiftStart\":\"06:00\",\"shiftEnd\":\"14:00\",\"coverageUntil\":\"\",\"constraint\":\"\",\"activeIncidentId\":\"\"}}",
+    "storePilot.incidents.v2": "[{\"id\":\"incident-fixture\",\"shift\":\"morning\",\"shiftKey\":\"2026-07-18:morning\",\"type\":\"System outage\",\"status\":\"resolved\",\"startedAt\":\"2026-07-18T12:00:00.000Z\",\"endedAt\":\"2026-07-18T12:20:00.000Z\",\"summary\":\"Fixture incident\",\"impact\":\"Brief register interruption\",\"notified\":\"Loretta\",\"actions\":\"Restarted system\",\"delayed\":\"Bookwork\",\"resolution\":\"Restored\",\"createdAt\":\"2026-07-18T12:00:00.000Z\",\"updatedAt\":\"2026-07-18T12:20:00.000Z\"}]",
+    "storePilot.incidentDrafts.v1": "{}",
+    "storePilot.reports.v6": "[\"Fixture incident report\"]",
+    "storePilot.dailyScratchpad.v1": "{\"2026-07-18:morning\":{\"text\":\"Call maintenance\\n\\u2022 Check cooler sign\",\"updatedAt\":\"2026-07-18T13:00:00.000Z\"}}",
+    "storePilot.taskChecklists.v1": "{\"2026-07-18:morning\":{\"lto\":[true,true,false,false,false,false]}}",
+    "storePilot.lorettaNotes.v1": "[{\"id\":\"loretta-fixture\",\"text\":\"Check the display tomorrow\",\"scheduledDates\":[\"2026-07-19\"],\"taskRefs\":[],\"source\":\"Loretta\",\"status\":\"open\",\"createdAt\":\"2026-07-18T13:10:00.000Z\",\"updatedAt\":\"2026-07-18T13:10:00.000Z\"}]",
+    "storePilot.interruptions.v1": "[{\"id\":\"interruption-fixture\",\"shiftKey\":\"2026-07-18:morning\",\"minutes\":12,\"reason\":\"Register coverage\",\"createdAt\":\"2026-07-18T13:20:00.000Z\"}]",
+    "storePilot.proofPacks.v1": "[{\"id\":\"proof-fixture\",\"shiftKey\":\"2026-07-18:morning\",\"createdAt\":\"2026-07-18T14:00:00.000Z\",\"summary\":{\"done\":1,\"documented\":1,\"open\":1}}]",
+    "storePilot.lorettaWin.v1": "{\"2026-07-18:morning\":{\"index\":0,\"completed\":false,\"updatedAt\":\"2026-07-18T13:30:00.000Z\"}}",
+    "storePilot.lorettaAway.v1": "{\"periods\":[]}",
+    "storePilot.lastBackupAt.v1": "\"2026-07-18T14:05:00.000Z\""
+  }
+}

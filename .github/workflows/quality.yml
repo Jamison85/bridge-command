@@ -1,0 +1,34 @@
+name: Store Pilot quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run static and storage checks
+        shell: bash
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee quality-report.txt
+      - name: Upload quality report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: store-pilot-quality-report
+          path: quality-report.txt
+          retention-days: 7
