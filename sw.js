@@ -41,6 +41,7 @@ const APP_SHELL = [
   "./js/main-v8.js",
   "./js/review-layer.js",
   "./js/voice-commands.js",
+  "./js/voice-template-aware.js",
   "./js/app-runtime.js",
   "./js/incident-save-guard.js",
   "./js/task-completion-hard-fix.js",
