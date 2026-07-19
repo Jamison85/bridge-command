@@ -1,4 +1,4 @@
-const NOTES_SCREEN_RELEASE = "command-center-27";
+const NOTES_SCREEN_RELEASE = "command-center-28";
 const NOTES_KEYS = {
   notes: "storePilot.lorettaNotes.v1",
   scratchpad: "storePilot.dailyScratchpad.v1",

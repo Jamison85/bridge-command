@@ -1,34 +1,34 @@
-import "./state-polish.js?v=command-center-27";
-import "./production-tools.js?v=command-center-27";
-import "./final-nav.js?v=command-center-27";
-import "./final-task-highlight.js?v=command-center-27";
-import "./review-layer-variety.js?v=command-center-27";
-import "./runtime-clean-bridge.js?v=command-center-27";
-import "./shift-brain.js?v=command-center-27";
-import "./task-state-clarity.js?v=command-center-27";
-import "./feedback-layer.js?v=command-center-27";
-import "./manager-photo-checkin.js?v=command-center-27";
-import "./remove-handoff-task.js?v=command-center-27";
-import "./shift-command-center.js?v=command-center-27";
-import "./delete-custom-task.js?v=command-center-27";
-import "./loretta-inbox.js?v=command-center-27";
-import "./loretta-ui-fix.js?v=command-center-27";
-import "./daily-scratchpad.js?v=command-center-27";
-import "./notes-screen-style.js?v=command-center-27";
-import "./notes-screen-controller.js?v=command-center-27";
-import "./interruption-timer.js?v=command-center-27";
-import "./interruption-shift-guard.js?v=command-center-27";
-import "./start-shift-briefing.js?v=command-center-27";
-import "./morning-manager-guidance.js?v=command-center-27";
-import "./loretta-win.js?v=command-center-27";
-import "./loretta-away-mode.js?v=command-center-27";
-import "./loretta-away-mode-guard.js?v=command-center-27";
-import "./proof-of-work-pack.js?v=command-center-27";
-import "./backup-restore.js?v=command-center-27";
-import "./diagnostics.js?v=command-center-27";
+import "./state-polish.js?v=command-center-28";
+import "./production-tools.js?v=command-center-28";
+import "./final-nav.js?v=command-center-28";
+import "./final-task-highlight.js?v=command-center-28";
+import "./review-layer-variety.js?v=command-center-28";
+import "./runtime-clean-bridge.js?v=command-center-28";
+import "./shift-brain.js?v=command-center-28";
+import "./task-state-clarity.js?v=command-center-28";
+import "./feedback-layer.js?v=command-center-28";
+import "./manager-photo-checkin.js?v=command-center-28";
+import "./remove-handoff-task.js?v=command-center-28";
+import "./shift-command-center.js?v=command-center-28";
+import "./delete-custom-task.js?v=command-center-28";
+import "./loretta-inbox.js?v=command-center-28";
+import "./loretta-ui-fix.js?v=command-center-28";
+import "./daily-scratchpad.js?v=command-center-28";
+import "./notes-screen-style.js?v=command-center-28";
+import "./notes-screen-controller.js?v=command-center-28";
+import "./interruption-timer.js?v=command-center-28";
+import "./interruption-shift-guard.js?v=command-center-28";
+import "./start-shift-briefing.js?v=command-center-28";
+import "./morning-manager-guidance.js?v=command-center-28";
+import "./loretta-win.js?v=command-center-28";
+import "./loretta-away-mode.js?v=command-center-28";
+import "./loretta-away-mode-guard.js?v=command-center-28";
+import "./proof-of-work-pack.js?v=command-center-28";
+import "./backup-restore.js?v=command-center-28";
+import "./diagnostics.js?v=command-center-28";
 
 window.StorePilotRuntime = {
-  version: "command-center-27",
+  version: "command-center-28",
   loadedAt: new Date().toISOString(),
   modules: [
     "incident-controller",

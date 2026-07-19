@@ -3,6 +3,6 @@ if (!document.getElementById(id)) {
   const link = document.createElement("link");
   link.id = id;
   link.rel = "stylesheet";
-  link.href = "./css/notes-screen-controller.css?v=command-center-27";
+  link.href = "./css/notes-screen-controller.css?v=command-center-28";
   document.head.appendChild(link);
 }
