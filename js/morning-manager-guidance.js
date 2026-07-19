@@ -1,9 +1,7 @@
-const MORNING_GUIDANCE_RELEASE = "command-center-20";
+const MORNING_GUIDANCE_RELEASE = "command-center-28";
 const MORNING_GUIDANCE_KEYS = {
   shift: "storePilot.shift.v6",
-  context: "storePilot.shiftContext.v2",
-  briefingSeen: "storePilot.shiftBriefings.v1",
-  releaseSeen: `storePilot.managerGuidanceSeen.${MORNING_GUIDANCE_RELEASE}`
+  context: "storePilot.shiftContext.v2"
 };
 
 const MANAGER_WISDOM = {
@@ -63,10 +61,6 @@ let guidanceQueued = false;
 function guidanceRead(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
   catch { return fallback; }
-}
-
-function guidanceWrite(key, value) {
-  localStorage.setItem(key, JSON.stringify(value));
 }
 
 function guidanceEscape(value) {
@@ -186,8 +180,6 @@ function patchMorningDashboard() {
 
   const coming = document.querySelector("#command-center-screen .command-coming-list");
   setHTMLIfChanged(coming, comingRows(analysis.coming || []));
-  setTextIfChanged(document.querySelector(".shift-briefing-lead"), openingLead(bookwork));
-  setTextIfChanged(document.querySelector(".briefing-native-hero h2"), openingLead(bookwork));
 }
 
 function stringHash(value) {
@@ -200,16 +192,6 @@ function wisdomCategory(context) {
   if (context.staffing === "short") return "short";
   if (MANAGER_WISDOM[context.mode]) return context.mode;
   return "normal";
-}
-
-function wisdomForToday() {
-  const context = guidanceContext();
-  const category = wisdomCategory(context);
-  const pool = MANAGER_WISDOM[category] || MANAGER_WISDOM.normal;
-  return {
-    category,
-    text: pool[stringHash(`${guidanceDateKey()}:${category}`) % pool.length]
-  };
 }
 
 function wisdomLabel(category) {
@@ -225,53 +207,20 @@ function wisdomLabel(category) {
   })[category] || "Manager judgment";
 }
 
-function insertMorningWisdom() {
-  const existing = document.querySelector("[data-manager-wisdom]");
-  if (guidanceShift() !== "morning") {
-    existing?.remove();
-    return;
-  }
-  const shell = document.querySelector(".briefing-native-shell");
-  if (!shell) return;
-
-  let analysis = null;
-  try { analysis = window.StorePilotCommandCenter?.analyze?.() || null; }
-  catch {}
-  const bookwork = openingBookwork(analysis);
-  if (bookwork) setTextIfChanged(shell.querySelector(".briefing-native-hero h2"), openingLead(bookwork));
-
-  const wisdom = wisdomForToday();
-  const key = `${guidanceDateKey()}:${wisdom.category}`;
-  if (existing?.dataset.managerWisdom === key) return;
-  existing?.remove();
-
-  const card = document.createElement("section");
-  card.className = "briefing-manager-wisdom";
-  card.dataset.managerWisdom = key;
-  card.innerHTML = `
-    <div class="briefing-manager-wisdom-head">
-      <div><p>YEARS ON THE FLOOR</p><h3>Manager note for today</h3></div>
-      <span>${guidanceEscape(wisdomLabel(wisdom.category))}</span>
-    </div>
-    <p>${guidanceEscape(wisdom.text)}</p>`;
-  const contextCard = shell.querySelector(".briefing-native-context");
-  shell.insertBefore(card, contextCard || shell.querySelector(".briefing-native-actions") || null);
-}
-
-function resetCurrentBriefingOnce() {
-  if (guidanceShift() !== "morning") return;
-  const shiftKey = guidanceShiftKey("morning");
-  if (localStorage.getItem(MORNING_GUIDANCE_KEYS.releaseSeen) === shiftKey) return;
-  const seen = guidanceRead(MORNING_GUIDANCE_KEYS.briefingSeen, {});
-  delete seen[shiftKey];
-  guidanceWrite(MORNING_GUIDANCE_KEYS.briefingSeen, seen);
-  localStorage.setItem(MORNING_GUIDANCE_KEYS.releaseSeen, shiftKey);
+function wisdomForToday() {
+  const context = guidanceContext();
+  const category = wisdomCategory(context);
+  const pool = MANAGER_WISDOM[category] || MANAGER_WISDOM.normal;
+  return {
+    category,
+    label: wisdomLabel(category),
+    text: pool[stringHash(`${guidanceDateKey()}:${category}`) % pool.length]
+  };
 }
 
 function runGuidance() {
   installAnalyzeGuidance();
   patchMorningDashboard();
-  insertMorningWisdom();
 }
 
 function queueGuidance() {
@@ -284,7 +233,6 @@ function queueGuidance() {
 }
 
 function startMorningGuidance() {
-  resetCurrentBriefingOnce();
   runGuidance();
   guidanceObserver = new MutationObserver((mutations) => {
     if (mutations.some((mutation) => mutation.type === "childList")) queueGuidance();
@@ -300,6 +248,10 @@ function startMorningGuidance() {
 window.StorePilotMorningManagerGuidance = {
   version: MORNING_GUIDANCE_RELEASE,
   wisdom: wisdomForToday,
+  lead: (analysis) => {
+    const bookwork = openingBookwork(analysis);
+    return bookwork ? openingLead(bookwork) : "";
+  },
   analyze: () => {
     const original = window.StorePilotCommandCenter?.__morningGuidanceOriginalAnalyze;
     return applyOpeningPriority(original ? original() : window.StorePilotCommandCenter?.analyze?.());

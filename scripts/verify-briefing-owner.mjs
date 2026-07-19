@@ -7,6 +7,7 @@ const read = (path) => fs.readFileSync(path, "utf8");
 
 const runtime = read("js/app-runtime.js");
 const briefing = read("js/start-shift-briefing.js");
+const guidance = read("js/morning-manager-guidance.js");
 const compactPath = "js/start-shift-briefing-compact.js";
 
 if (fs.existsSync(compactPath)) fail("The superseded compact Briefing renderer still exists.");
@@ -25,6 +26,12 @@ if (!briefing.includes("data-manager-wisdom")) fail("The final Briefing markup i
 if (!briefing.includes("data-loretta-win-card")) fail("The final Briefing markup is missing the Loretta Win component.");
 if (!briefing.includes('event.key === "Escape"')) fail("The consolidated Briefing is missing Escape-to-close behavior.");
 
+for (const forbidden of [".shift-briefing-lead", ".briefing-native-hero", "insertMorningWisdom", "data-manager-wisdom"]) {
+  if (guidance.includes(forbidden)) fail(`Morning Guidance still mutates Briefing markup through ${forbidden}.`);
+}
+if (!guidance.includes("wisdom: wisdomForToday")) fail("Morning Guidance no longer exposes wisdom as data.");
+if (!guidance.includes("analyze: () =>")) fail("Morning Guidance no longer exposes ranked analysis as data.");
+
 if (errors.length) {
   console.error("\nStore Pilot Briefing ownership verification failed:\n");
   errors.forEach((error) => console.error(`- ${error}`));
@@ -33,5 +40,6 @@ if (errors.length) {
 
 note("one Shift Briefing renderer is active");
 note("bookwork guidance, wisdom, and Loretta Win are rendered from data APIs");
+note("Morning Guidance no longer edits Briefing DOM");
 note("Briefing versioning and keyboard close behavior are present");
 console.log("\nStore Pilot Briefing ownership verification passed.");
