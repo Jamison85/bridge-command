@@ -29,7 +29,10 @@ import "./diagnostics.js?v=command-center-28";
 window.StorePilotRuntime = {
   version: "command-center-28",
   loadedAt: new Date().toISOString(),
+  eventsVersion: window.StorePilotEvents?.version || "unavailable",
   modules: [
+    "store-pilot-event-map",
+    "store-pilot-events",
     "incident-controller",
     "incident-state-model",
     "task-action-controller",
