@@ -77,6 +77,15 @@ body.store-pilot-dialog-open {
     min-height: 44px;
   }
 
+  .bottom-nav .nav-button,
+  .shift-toggle .shift-button,
+  .hero-actions button,
+  .task-actions .mini-button,
+  .command-context-actions button,
+  .secondary-shell-controls button {
+    min-height: 44px !important;
+  }
+
   :where(summary, .walk-item) {
     min-height: 44px;
   }
