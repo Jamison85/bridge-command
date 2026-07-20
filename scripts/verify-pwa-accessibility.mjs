@@ -51,7 +51,9 @@ for (const asset of [
 
 if (!runtime.startsWith('import "./accessibility-controller.js?v=command-center-28";')) failures.push("Accessibility controller must load before the optional runtime UI modules.");
 if (!runtime.includes('"accessibility-controller"')) failures.push("Accessibility controller is missing from runtime diagnostics.");
-if (!controller.includes("event.key === \"Tab\"") || !controller.includes("event.key === \"Escape\"")) failures.push("Dialog controller must trap Tab and support Escape.");
+const trapsTab = controller.includes('event.key !== "Tab"') && controller.includes("focusableElements(dialog)") && controller.includes("event.preventDefault()");
+const closesOnEscape = controller.includes('event.key === "Escape"') && controller.includes("requestClose(sheet)");
+if (!trapsTab || !closesOnEscape) failures.push("Dialog controller must trap Tab and support Escape.");
 if (!controller.includes('window.addEventListener("popstate"')) failures.push("Dialog controller must support the Android/browser back button.");
 if (!controller.includes("history.pushState") || !controller.includes("history.back()")) failures.push("Dialog controller must create and remove modal history states.");
 if (!controller.includes("returnFocus") || !controller.includes("focus({ preventScroll: true })")) failures.push("Dialog controller must restore and manage focus.");
