@@ -21,7 +21,6 @@
   <link rel="stylesheet" href="./css/pwa.css?v=command-center-28" />
   <link rel="stylesheet" href="./css/production-tools.css?v=command-center-28" />
   <link rel="stylesheet" href="./css/task-states.css?v=command-center-28" />
-  <link rel="stylesheet" href="./css/feedback.css?v=command-center-28" />
   <link rel="stylesheet" href="./css/smart-brain.css?v=command-center-28" />
   <link rel="stylesheet" href="./css/visual-polish.css?v=command-center-28" />
   <link rel="stylesheet" href="./css/shift-command-center.css?v=command-center-28" />
@@ -31,22 +30,16 @@
   <link rel="stylesheet" href="./css/landing-no-scroll.css?v=command-center-28" />
   <link rel="stylesheet" href="./css/interruption-timer.css?v=command-center-28" />
   <link rel="stylesheet" href="./css/interruption-timer-mobile.css?v=command-center-28" />
-  <link rel="stylesheet" href="./css/start-shift-briefing.css?v=command-center-28" />
-  <link rel="stylesheet" href="./css/start-shift-briefing-compact.css?v=command-center-28" />
   <link rel="stylesheet" href="./css/loretta-away-mode.css?v=command-center-28" />
   <link rel="stylesheet" href="./css/landing-coming-up-fix.css?v=command-center-28" />
   <link rel="stylesheet" href="./css/task-completion-fix.css?v=command-center-28" />
   <link rel="stylesheet" href="./css/incident-save-guard.css?v=command-center-28" />
-  <link rel="stylesheet" href="./css/proof-of-work-pack.css?v=command-center-28" />
   <link rel="stylesheet" href="./css/backup-restore.css?v=command-center-28" />
   <link rel="stylesheet" href="./css/diagnostics.css?v=command-center-28" />
-  <link rel="stylesheet" href="./css/manager-photo-checkin.css?v=command-center-28" />
-  <link rel="stylesheet" href="./css/daily-scratchpad.css?v=command-center-28" />
-  <link rel="stylesheet" href="./css/morning-manager-guidance.css?v=command-center-28" />
   <link rel="stylesheet" href="./css/delete-custom-task.css?v=command-center-28" />
-  <link rel="stylesheet" href="./css/loretta-win.css?v=command-center-28" />
   <link rel="stylesheet" href="./css/app-shell-controller.css?v=command-center-28" />
   <link rel="stylesheet" href="./css/final-visual-system.css?v=command-center-28" />
+  <link rel="stylesheet" href="./css/focused-product.css?v=command-center-28" />
   <link rel="stylesheet" href="./css/accessibility.css?v=command-center-28" />
 </head>
 <body>
@@ -105,9 +98,9 @@
       <div id="screen-content" class="screen-content"></div>
     </section>
 
-    <button class="voice-fab" id="voice-fab" type="button" aria-label="Add by voice">+ Voice</button>
+    <button class="voice-fab" id="voice-fab" type="button" aria-label="Legacy quick capture" hidden>+ Voice</button>
 
-    <section class="voice-sheet" id="voice-sheet" aria-hidden="true">
+    <section class="voice-sheet" id="voice-sheet" aria-hidden="true" hidden>
       <div class="voice-sheet-card" role="dialog" aria-modal="true" aria-labelledby="voice-sheet-title">
         <div class="screen-header">
           <div><p class="eyebrow">QUICK CAPTURE</p><h2 id="voice-sheet-title">Add with voice</h2></div>
@@ -124,11 +117,10 @@
     </section>
 
     <nav class="bottom-nav" aria-label="Store Pilot navigation">
-      <button class="nav-button active" type="button" data-screen="next">Next</button>
+      <button class="nav-button active" type="button" data-screen="next">Today</button>
       <button class="nav-button" type="button" data-screen="tasks">Tasks</button>
       <button class="nav-button" type="button" data-screen="report">Incident</button>
       <button class="nav-button" type="button" data-screen="log">Log</button>
-      <button class="nav-button primary" type="button" data-screen="voice">Notes</button>
     </nav>
   </main>
 
