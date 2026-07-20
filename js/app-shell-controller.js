@@ -24,11 +24,11 @@ const ROLE_LABELS = {
   kitchen: "Kitchen / prep"
 };
 
-let shellObserver = null;
 let shellUpdateQueued = false;
 let currentScreen = "next";
 
 function shellRead(key, fallback) {
+  if (window.StorePilotEvents?.read) return window.StorePilotEvents.read(key, fallback);
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
   catch { return fallback; }
 }
@@ -72,6 +72,8 @@ function shellDateLabel() {
 }
 
 function screenFromDOM() {
+  const sharedScreen = window.StorePilotEvents?.screen?.();
+  if (sharedScreen) return normalizeShellScreen(sharedScreen);
   const active = document.querySelector(".nav-button.active[data-screen]")?.dataset.screen;
   if (active) return normalizeShellScreen(active);
   const title = document.querySelector("#screen-title")?.textContent || "";
@@ -155,7 +157,8 @@ function updateShell(forceScreen = "") {
 
   syncPrimaryRegions(policy);
   syncCaptureAccess(policy);
-  window.dispatchEvent(new CustomEvent("storepilot:shell-updated", { detail: policy }));
+  if (window.StorePilotEvents?.emit) window.StorePilotEvents.emit("storepilot:shell-updated", policy);
+  else window.dispatchEvent(new CustomEvent("storepilot:shell-updated", { detail: policy }));
 }
 
 function queueShellUpdate(forceScreen = "") {
@@ -188,7 +191,6 @@ function handleShellClick(event) {
   if (proxyShift) {
     event.preventDefault();
     document.querySelector(`.shift-button[data-shift="${proxyShift.dataset.shellShift}"]`)?.click();
-    setTimeout(() => queueShellUpdate(), 40);
     return;
   }
 
@@ -206,36 +208,21 @@ function handleShellClick(event) {
       queueShellUpdate();
     }, 30);
   }
-
-  if (event.target.closest?.(".nav-button[data-screen], .icon-button, .shift-button, #shift-context-form button, [data-context-reset]")) {
-    setTimeout(() => queueShellUpdate(), 50);
-    setTimeout(() => queueShellUpdate(), 180);
-  }
-}
-
-function startScreenObserver() {
-  if (shellObserver) return;
-  shellObserver = new MutationObserver(() => queueShellUpdate());
-  document.querySelectorAll(".nav-button[data-screen]").forEach((button) => {
-    shellObserver.observe(button, { attributes: true, attributeFilter: ["class"] });
-  });
-  const title = document.querySelector("#screen-title");
-  if (title) shellObserver.observe(title, { childList: true, characterData: true, subtree: true });
 }
 
 function startShellOwner() {
   document.documentElement.dataset.appShellOwner = SHELL_RELEASE;
   ensureSecondaryStrip();
   document.addEventListener("click", handleShellClick, true);
-  window.addEventListener("storage", (event) => {
-    if (!event.key || Object.values(SHELL_KEYS).includes(event.key)) queueShellUpdate();
-  });
-  ["storepilot:tasks-changed", "storepilot:incident-saved", "storepilot:notes-changed", "storepilot:loretta-away-changed"].forEach((name) => {
-    window.addEventListener(name, () => queueShellUpdate());
-  });
+  [
+    "storepilot:screen-changed",
+    "storepilot:shift-changed",
+    "storepilot:context-changed",
+    "storepilot:incidents-changed",
+    "storepilot:app-ready"
+  ].forEach((name) => window.addEventListener(name, () => queueShellUpdate()));
   window.addEventListener("focus", () => queueShellUpdate());
   document.addEventListener("visibilitychange", () => { if (!document.hidden) queueShellUpdate(); });
-  startScreenObserver();
   queueShellUpdate();
 }
 
