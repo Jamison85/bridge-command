@@ -45,6 +45,7 @@ const APP_SHELL = [
   "./css/loretta-win.css",
   "./css/notes-screen-controller.css",
   "./css/app-shell-controller.css",
+  "./css/final-visual-system.css",
   "./css/accessibility.css",
   "./js/store-pilot-event-map.js",
   "./js/store-pilot-events.js",

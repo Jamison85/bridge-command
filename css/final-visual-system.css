@@ -1,0 +1,453 @@
+:root {
+  --cream: #f4f6f5;
+  --cream-2: #edf1ef;
+  --card: #ffffff;
+  --card-solid: #ffffff;
+  --ink: #17211d;
+  --muted: #5f6d66;
+  --soft: #75817b;
+  --forest: #0b4a38;
+  --forest-2: #0d5a43;
+  --forest-soft: rgba(11, 74, 56, 0.08);
+  --copper: #9b5a2a;
+  --copper-2: #bd7540;
+  --line: rgba(23, 42, 33, 0.12);
+  --green: #0b4a38;
+  --command-green: #0b4a38;
+  --command-copper: #9b5a2a;
+  --command-ink: #17211d;
+  --command-muted: #5f6d66;
+  --command-line: #dce3df;
+  --surface-page: #f3f6f4;
+  --surface-card: #ffffff;
+  --surface-soft: #f6f8f7;
+  --surface-muted: #eef3f0;
+  --border-soft: #dce3df;
+  --border-strong: #c9d4ce;
+  --radius-card: 16px;
+  --radius-control: 11px;
+  --radius-row: 12px;
+  --shadow: 0 12px 30px rgba(19, 36, 28, 0.08);
+  --shadow-soft: 0 5px 16px rgba(19, 36, 28, 0.055);
+}
+
+html {
+  background: var(--surface-page);
+}
+
+body {
+  background:
+    radial-gradient(circle at 50% -18%, rgba(11, 74, 56, 0.08), transparent 34%),
+    linear-gradient(180deg, #f8faf9 0%, var(--surface-page) 48%, #edf2ef 100%);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.top-bar {
+  color: var(--ink);
+}
+
+.icon-button {
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-control);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 2px 8px rgba(19, 36, 28, 0.035);
+}
+
+.brand-lockup h1 {
+  color: var(--forest);
+  letter-spacing: -0.015em;
+  text-transform: none;
+}
+
+.eyebrow {
+  color: var(--copper);
+  font-weight: 850;
+  letter-spacing: 0.105em;
+}
+
+.status-pill {
+  border-color: rgba(11, 74, 56, 0.13);
+  background: #edf5f1;
+  color: var(--forest);
+  box-shadow: none;
+}
+
+.shift-card,
+.progress-card,
+.screen-card,
+.secondary-shell-strip {
+  border-color: var(--border-soft);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: none;
+}
+
+.shift-card {
+  border-radius: 14px;
+}
+
+.shift-button,
+.secondary-shell-shifts button,
+.secondary-shell-context-button {
+  border-color: var(--border-soft);
+  border-radius: var(--radius-control);
+  background: var(--surface-soft);
+  color: var(--ink);
+  box-shadow: none;
+}
+
+.shift-button.active,
+.secondary-shell-shifts button.active {
+  border-color: var(--forest);
+  background: var(--forest);
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.hero-card {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 92% 10%, rgba(255, 255, 255, 0.09), transparent 26%),
+    linear-gradient(145deg, #083b2c 0%, var(--forest) 58%, #0d5942 100%);
+  box-shadow: 0 13px 30px rgba(11, 74, 56, 0.18);
+}
+
+.hero-card::after {
+  opacity: 0.18;
+}
+
+.hero-card h2 {
+  letter-spacing: -0.035em;
+  line-height: 1.06;
+}
+
+.hero-card p:not(.eyebrow) {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.hero-card .primary-action {
+  border-color: transparent;
+  background: linear-gradient(180deg, var(--copper-2), var(--copper));
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(76, 40, 14, 0.22);
+}
+
+.hero-card .secondary-action {
+  border-color: rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.progress-card {
+  border-radius: var(--radius-card);
+}
+
+.progress-ring {
+  background: conic-gradient(var(--forest) var(--progress-angle, 0deg), #e2e9e5 0deg);
+  box-shadow: inset 0 0 0 12px #ffffff;
+}
+
+.progress-track {
+  background: #e3e9e6;
+}
+
+#progress-fill {
+  background: linear-gradient(90deg, var(--forest), #2c8064);
+}
+
+.screen-card {
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+}
+
+#screen-card > .screen-header {
+  align-items: center;
+  padding-bottom: 11px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+#screen-card > .screen-header h2 {
+  color: var(--ink);
+  font-weight: 850;
+  letter-spacing: -0.025em;
+}
+
+.screen-content,
+.command-center-screen,
+.notes-owner-screen,
+.log-owner-screen {
+  gap: 11px;
+}
+
+.task-row,
+.walk-card,
+.note-row,
+.report-output,
+.empty-state,
+.template-card,
+.template-row,
+.command-decision-card,
+.command-coming-card,
+.command-incident-form,
+.command-incident-history,
+.shift-command-context,
+.notes-capture-panel,
+.notes-inbox-panel,
+.daily-scratchpad,
+.proof-of-work-card,
+.backup-restore-panel {
+  border-color: var(--border-soft);
+  background: var(--surface-card);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.task-row,
+.walk-card,
+.note-row,
+.template-row,
+.command-coming-row,
+.loretta-note-card {
+  border-radius: var(--radius-row);
+}
+
+.task-row,
+.walk-card {
+  box-shadow: 0 3px 10px rgba(19, 36, 28, 0.035);
+}
+
+.task-row:hover,
+.walk-card:hover {
+  border-color: var(--border-strong);
+}
+
+.task-row.done {
+  background: #f4f7f5;
+  color: #4f5d56;
+}
+
+.task-title,
+.command-coming-row strong,
+.notes-capture-copy h3,
+.notes-inbox-panel h3 {
+  color: var(--ink);
+  font-weight: 850;
+  letter-spacing: -0.012em;
+}
+
+.task-meta,
+.helper-text,
+.notes-capture-copy span,
+.secondary-shell-copy > span {
+  color: var(--muted);
+}
+
+.badge,
+.state-pill,
+.status-tag,
+.log-risk-pill {
+  border-radius: 999px;
+  box-shadow: none;
+}
+
+.walk-item,
+.log-metric,
+.log-smart-read,
+.command-coming-row,
+.loretta-note-card,
+.proof-detail,
+.backup-file-card {
+  background: var(--surface-soft);
+}
+
+input,
+textarea,
+select {
+  border-color: var(--border-strong);
+  border-radius: var(--radius-control);
+  background: #ffffff;
+  color: var(--ink);
+  box-shadow: inset 0 1px 0 rgba(19, 36, 28, 0.025);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #89958f;
+}
+
+.primary-action,
+.log-message-actions .log-share,
+.notes-owner-screen .notes-loretta-action,
+.interruption-start-button,
+.interruption-end-button,
+.loretta-save-button {
+  border: 1px solid var(--forest);
+  border-radius: var(--radius-control);
+  background: var(--forest);
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.secondary-action,
+.text-button,
+.mini-button,
+.log-message-actions .log-copy,
+.log-smart-read button,
+.command-section-head button,
+.shift-briefing-context-button,
+.interruption-context-button {
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-control);
+  background: var(--surface-soft);
+  color: var(--forest);
+  box-shadow: none;
+}
+
+button:not(:disabled) {
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, transform 120ms ease;
+}
+
+button:disabled {
+  opacity: 0.52;
+}
+
+.secondary-shell-strip {
+  border-radius: 14px;
+}
+
+.secondary-shell-copy p,
+.notes-capture-copy p,
+.notes-inbox-panel .loretta-screen-head p,
+.log-summary-head p,
+.log-handoff-head p,
+.proof-of-work-head p,
+.backup-panel-head p {
+  color: var(--copper);
+  font-weight: 850;
+  letter-spacing: 0.105em;
+}
+
+.bottom-nav {
+  border: 1px solid rgba(23, 42, 33, 0.11);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 10px 28px rgba(19, 36, 28, 0.15);
+  backdrop-filter: blur(14px);
+}
+
+.nav-button {
+  border-radius: 12px;
+  color: var(--muted);
+  font-weight: 850;
+}
+
+.nav-button.active,
+.nav-button.primary.active {
+  background: var(--forest);
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.quick-capture-stack button:first-child {
+  background: var(--forest);
+  box-shadow: 0 8px 20px rgba(11, 74, 56, 0.2);
+}
+
+.loretta-capture-sheet,
+.shift-briefing-sheet,
+.proof-of-work-sheet,
+.backup-restore-sheet,
+.interruption-sheet,
+.voice-sheet {
+  background: rgba(8, 18, 13, 0.42);
+  backdrop-filter: blur(5px);
+}
+
+.loretta-capture-card,
+.shift-briefing-card,
+.proof-of-work-sheet-card,
+.backup-restore-card,
+.interruption-card,
+.voice-sheet-card {
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 24px 70px rgba(8, 18, 13, 0.24);
+}
+
+.log-summary-card,
+.log-handoff-card,
+.log-detail-group {
+  border-color: var(--border-soft) !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.log-metric,
+.log-smart-read,
+.log-detail {
+  border-color: var(--border-soft) !important;
+  background: var(--surface-soft) !important;
+}
+
+.log-options select,
+.log-message-label textarea {
+  border-color: var(--border-strong) !important;
+  border-radius: var(--radius-control) !important;
+  background: #ffffff !important;
+}
+
+.log-message-actions button,
+.log-smart-read button {
+  border-radius: var(--radius-control) !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 700px) {
+  .screen-card {
+    border-radius: 15px;
+  }
+
+  .shift-card,
+  .secondary-shell-strip {
+    border-radius: 13px;
+  }
+
+  #screen-card > .screen-header {
+    padding-bottom: 8px;
+  }
+
+  .task-row,
+  .walk-card,
+  .command-decision-card,
+  .command-coming-card,
+  .command-incident-form,
+  .command-incident-history,
+  .notes-capture-panel,
+  .notes-inbox-panel,
+  .log-summary-card,
+  .log-handoff-card,
+  .log-detail-group {
+    box-shadow: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --line: rgba(23, 42, 33, 0.22);
+    --border-soft: #bcc9c2;
+    --border-strong: #9eafa6;
+  }
+
+  .task-row,
+  .walk-card,
+  .screen-card,
+  .secondary-shell-strip {
+    border-width: 2px;
+  }
+}
