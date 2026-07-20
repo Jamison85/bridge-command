@@ -24,7 +24,7 @@ if (/maximum-scale|user-scalable\s*=\s*no/i.test(viewport)) failures.push("Viewp
 if (!index.includes('rel="apple-touch-icon"') || !index.includes("store-pilot-apple-180.png")) failures.push("Apple touch icon is not linked from index.html.");
 if (!index.includes('./css/accessibility.css?v=command-center-28')) failures.push("Accessibility stylesheet is not loaded last by index.html.");
 if (!index.includes('class="skip-link"') || !index.includes('href="#screen-card"')) failures.push("Keyboard skip link is missing.");
-if (!index.includes('role="dialog" aria-modal="true" aria-labelledby="voice-sheet-title"')) failures.push("Quick Voice sheet is not exposed as a labelled modal dialog.");
+if (!index.includes('role="dialog" aria-modal="true" aria-labelledby="voice-sheet-title"')) failures.push("Legacy Quick Voice markup must remain a labelled hidden dialog until its base code is retired.");
 
 const iconByPurpose = (purpose) => manifest.icons.filter((icon) => String(icon.purpose || "any").split(/\s+/).includes(purpose));
 const anyIcons = iconByPurpose("any");
@@ -66,8 +66,6 @@ if (!css.includes("prefers-reduced-motion: reduce")) failures.push("Reduced-moti
 
 for (const file of [
   "js/loretta-inbox.js",
-  "js/start-shift-briefing.js",
-  "js/proof-of-work-pack.js",
   "js/backup-restore.js",
   "js/interruption-timer.js"
 ]) {
@@ -85,4 +83,4 @@ if (failures.length) {
 
 console.log("✓ Install icons include 192, 512, maskable, and Apple PNG assets");
 console.log("✓ Pinch-to-zoom, focus visibility, touch targets, reduced motion, and skip navigation are protected");
-console.log("✓ Modal focus trapping, Escape, focus restoration, and Android back behavior are centrally owned");
+console.log("✓ Active focused dialogs retain focus trapping, Escape, focus restoration, and Android back behavior");

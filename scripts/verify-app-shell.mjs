@@ -21,11 +21,12 @@ assert.deepEqual(shellPolicy("next"), {
 assert.equal(shellPolicy("tasks").showDashboard, false);
 assert.equal(shellPolicy("tasks").showSecondaryStrip, true);
 assert.equal(shellPolicy("tasks").showQuickCapture, true);
-for (const screen of ["report", "log", "voice", "templates"]) {
+for (const screen of ["report", "log", "templates"]) {
   assert.equal(shellPolicy(screen).showDashboard, false, `${screen} must not show the full dashboard`);
   assert.equal(shellPolicy(screen).showSecondaryStrip, true, `${screen} must show the compact strip`);
   assert.equal(shellPolicy(screen).showQuickCapture, false, `${screen} must hide floating capture`);
 }
+assert.equal(shellPolicy("voice").screen, "next", "Retired Notes routes must return to Today");
 assert.equal(screenFromTitle("Templates"), "templates");
 assert.equal(screenFromTitle("End-of-Day"), "log");
 assert.equal(screenFromTitle("Incident Report"), "report");
@@ -50,5 +51,5 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log("✓ Next owns the full dashboard; secondary screens use one compact shift/context strip");
+console.log("✓ Today owns the full dashboard; Tasks, Incident, Log, and Settings use the compact strip");
 console.log("✓ Floating capture is limited to Tasks with explicit safe-area spacing");

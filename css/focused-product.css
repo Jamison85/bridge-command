@@ -1,0 +1,73 @@
+:root {
+  --focused-nav-count: 4;
+}
+
+/* The focused product has four daily destinations. */
+.bottom-nav {
+  grid-template-columns: repeat(var(--focused-nav-count), minmax(0, 1fr)) !important;
+}
+
+.nav-button[data-screen="voice"],
+.voice-fab,
+.feedback-banner,
+.shift-briefing-context-button,
+.shift-briefing-sheet,
+.briefing-manager-wisdom,
+.loretta-win-card,
+.manager-photo-checkin,
+.proof-of-work-card,
+.proof-of-work-sheet,
+.daily-scratchpad,
+.notes-owner-screen {
+  display: none !important;
+}
+
+/* Keep one obvious capture route instead of several competing ones. */
+html[data-store-pilot-screen="tasks"] .quick-capture-stack {
+  width: auto !important;
+  right: max(14px, env(safe-area-inset-right)) !important;
+  bottom: calc(env(safe-area-inset-bottom) + 66px) !important;
+}
+
+html[data-store-pilot-screen="tasks"] .quick-capture-stack button:first-child {
+  width: auto !important;
+  min-width: 104px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  padding: 0 16px !important;
+  color: #ffffff !important;
+  font-size: 0.78rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.01em !important;
+}
+
+html[data-store-pilot-screen="tasks"] .quick-capture-stack button:first-child::after {
+  content: none !important;
+}
+
+/* Retire gimmicky labels while preserving the useful recommendation. */
+.log-smart-read b,
+.log-smart-read button {
+  font-size: 0 !important;
+}
+
+.log-smart-read b::after {
+  content: "Recommended follow-up";
+  font-size: 0.74rem;
+}
+
+.log-smart-read button::after {
+  content: "Build handoff";
+  font-size: 0.68rem;
+}
+
+@media (max-width: 700px) {
+  .bottom-nav {
+    grid-template-columns: repeat(var(--focused-nav-count), minmax(0, 1fr)) !important;
+    gap: 3px !important;
+  }
+
+  .nav-button {
+    font-size: 0.72rem !important;
+  }
+}
