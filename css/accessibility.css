@@ -3,6 +3,24 @@
   --store-pilot-focus-halo: rgba(11, 99, 206, 0.24);
 }
 
+.skip-link {
+  position: fixed;
+  left: 12px;
+  top: calc(env(safe-area-inset-top) + 8px);
+  z-index: 1000;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #073f2f;
+  font-weight: 900;
+  transform: translateY(-180%);
+  transition: transform 120ms ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 :where(button, a[href], input, select, textarea, summary, [role="button"], [tabindex]):focus-visible {
   outline: 3px solid var(--store-pilot-focus) !important;
   outline-offset: 3px !important;
