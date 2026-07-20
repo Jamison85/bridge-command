@@ -1,0 +1,83 @@
+:root {
+  --store-pilot-focus: #0b63ce;
+  --store-pilot-focus-halo: rgba(11, 99, 206, 0.24);
+}
+
+:where(button, a[href], input, select, textarea, summary, [role="button"], [tabindex]):focus-visible {
+  outline: 3px solid var(--store-pilot-focus) !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 5px var(--store-pilot-focus-halo) !important;
+}
+
+:where(button, [role="button"], summary) {
+  touch-action: manipulation;
+}
+
+[role="dialog"][aria-modal="true"] {
+  outline: none;
+}
+
+body.store-pilot-dialog-open {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+@media (pointer: coarse) {
+  :where(
+    .icon-button,
+    .shift-button,
+    .nav-button,
+    .primary-action,
+    .secondary-action,
+    .text-button,
+    .mini-button,
+    [data-shell-shift],
+    [data-shell-context-edit],
+    [data-open-capture],
+    [data-capture-close],
+    [data-capture-mode],
+    [data-capture-mic],
+    [data-capture-save],
+    [data-native-briefing-close],
+    [data-native-briefing-start],
+    [data-native-briefing-tasks],
+    [data-proof-close],
+    [data-proof-open],
+    [data-proof-copy],
+    [data-proof-share],
+    [data-proof-save],
+    [data-proof-back-live],
+    [data-backup-close],
+    [data-choose-store-backup],
+    [data-download-store-backup],
+    [data-restore-mode],
+    [data-interruption-close],
+    [data-interruption-open],
+    [data-interruption-end]
+  ) {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  :where(summary, .walk-item) {
+    min-height: 44px;
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-width: 24px;
+    min-height: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+}
