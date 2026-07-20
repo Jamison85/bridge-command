@@ -1,3 +1,4 @@
+import "./accessibility-controller.js?v=command-center-28";
 import "./state-polish.js?v=command-center-28";
 import "./production-tools.js?v=command-center-28";
 import "./final-nav.js?v=command-center-28";
@@ -30,9 +31,11 @@ window.StorePilotRuntime = {
   version: "command-center-28",
   loadedAt: new Date().toISOString(),
   eventsVersion: window.StorePilotEvents?.version || "unavailable",
+  accessibilityVersion: window.StorePilotAccessibility?.version || "unavailable",
   modules: [
     "store-pilot-event-map",
     "store-pilot-events",
+    "accessibility-controller",
     "incident-controller",
     "incident-state-model",
     "task-action-controller",

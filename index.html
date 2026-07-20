@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0b4a38" />
   <meta name="description" content="A practical mobile Store Pilot for running a retail shift." />
   <meta name="mobile-web-app-capable" content="yes" />
   <title>Store Pilot</title>
   <link rel="manifest" href="./manifest.webmanifest?v=command-center-28" />
   <link rel="icon" href="./icons/store-pilot-icon.svg?v=command-center-28" type="image/svg+xml" />
+  <link rel="icon" href="./icons/store-pilot-192.png?v=command-center-28" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="./icons/store-pilot-apple-180.png?v=command-center-28" sizes="180x180" />
   <link rel="stylesheet" href="./css/style.css?v=command-center-28" />
   <link rel="stylesheet" href="./css/handoff.css?v=command-center-28" />
   <link rel="stylesheet" href="./css/followups.css?v=command-center-28" />
@@ -44,16 +46,18 @@
   <link rel="stylesheet" href="./css/delete-custom-task.css?v=command-center-28" />
   <link rel="stylesheet" href="./css/loretta-win.css?v=command-center-28" />
   <link rel="stylesheet" href="./css/app-shell-controller.css?v=command-center-28" />
+  <link rel="stylesheet" href="./css/accessibility.css?v=command-center-28" />
 </head>
 <body>
-  <main class="app-shell">
+  <a class="skip-link" href="#screen-card">Skip to current screen</a>
+  <main class="app-shell" id="main-content">
     <header class="top-bar">
-      <button class="icon-button" type="button" aria-label="Templates">☰</button>
+      <button class="icon-button" type="button" aria-label="Open Settings">☰</button>
       <div class="brand-lockup">
         <p class="eyebrow">CASEY'S</p>
         <h1>Store Pilot</h1>
       </div>
-      <div class="status-pill" id="system-status">Ready</div>
+      <div class="status-pill" id="system-status" role="status" aria-live="polite">Ready</div>
     </header>
 
     <section class="shift-card" aria-label="Shift selector">
@@ -80,7 +84,7 @@
         </div>
       </section>
 
-      <section class="progress-card">
+      <section class="progress-card" aria-label="Shift progress">
         <p class="eyebrow">SHIFT PROGRESS</p>
         <div class="progress-ring" aria-hidden="true"><span id="progress-ring-text">0%</span></div>
         <strong id="progress-text">0%</strong>
@@ -89,7 +93,7 @@
       </section>
     </section>
 
-    <section class="screen-card" id="screen-card">
+    <section class="screen-card" id="screen-card" tabindex="-1">
       <div class="screen-header">
         <div>
           <p class="eyebrow" id="screen-eyebrow">COMMAND</p>
@@ -103,13 +107,13 @@
     <button class="voice-fab" id="voice-fab" type="button" aria-label="Add by voice">+ Voice</button>
 
     <section class="voice-sheet" id="voice-sheet" aria-hidden="true">
-      <div class="voice-sheet-card">
+      <div class="voice-sheet-card" role="dialog" aria-modal="true" aria-labelledby="voice-sheet-title">
         <div class="screen-header">
-          <div><p class="eyebrow">QUICK CAPTURE</p><h2>Add with voice</h2></div>
+          <div><p class="eyebrow">QUICK CAPTURE</p><h2 id="voice-sheet-title">Add with voice</h2></div>
           <button class="text-button" id="close-voice-sheet" type="button">Close</button>
         </div>
         <p class="helper-text">Speak or type what needs done. It can be saved as a task or note.</p>
-        <textarea id="voice-capture-text" placeholder="Example: mark coffee done or add cooler doors need wiped down"></textarea>
+        <textarea id="voice-capture-text" aria-label="Quick capture text" placeholder="Example: mark coffee done or add cooler doors need wiped down"></textarea>
         <div class="action-row">
           <button class="primary-action" id="start-global-speech" type="button">Start Talking</button>
           <button class="secondary-action" id="save-capture-task" type="button">Save Task</button>
