@@ -46,13 +46,19 @@ html[data-store-pilot-screen="tasks"] .quick-capture-stack button:first-child::a
 }
 
 /* Retire gimmicky labels while preserving the useful recommendation. */
-.log-smart-read b {
+.log-smart-read b,
+.log-smart-read button {
   font-size: 0 !important;
 }
 
 .log-smart-read b::after {
   content: "Recommended follow-up";
   font-size: 0.74rem;
+}
+
+.log-smart-read button::after {
+  content: "Build handoff";
+  font-size: 0.68rem;
 }
 
 @media (max-width: 700px) {
