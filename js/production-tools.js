@@ -85,9 +85,10 @@ function clearInstallHint() {
 function qaChecks() {
   const checks = [
     ["App shell", Boolean(document.querySelector(".app-shell"))],
-    ["Bottom nav", document.querySelectorAll(".nav-button").length >= 5],
+    ["Four core screens", document.querySelectorAll(".nav-button").length === 4],
     ["Shift buttons", document.querySelectorAll(".shift-button").length === 3],
-    ["Voice sheet", Boolean(document.querySelector("#voice-sheet"))],
+    ["Focused runtime", window.StorePilotRuntime?.productMode === "focused-core"],
+    ["Quick capture", Boolean(window.StorePilotLorettaInbox || document.querySelector("#loretta-capture-sheet"))],
     ["Templates saved", Boolean(localStorage.getItem(PROD_KEYS.templates))],
     ["PWA manifest", Boolean(document.querySelector('link[rel="manifest"]'))],
     ["Service worker", "serviceWorker" in navigator]
@@ -116,17 +117,17 @@ function renderProductionTools(force = false) {
   card.innerHTML = `
     <div class="screen-header">
       <div>
-        <p class="eyebrow">PRODUCTION TOOLS</p>
-        <h3>QA & reset</h3>
+        <p class="eyebrow">MAINTENANCE</p>
+        <h3>Reset and app checks</h3>
       </div>
       <span class="badge">${passed}/${checks.length}</span>
     </div>
-    <p class="helper-text">Use these when the app needs a clean shift, a clean day, or a quick sanity check. Dangerous buttons are separated because apparently thumbs are reckless.</p>
+    <p class="helper-text">These controls stay in Settings so the daily shift screens remain focused.</p>
     <div class="qa-list">
       ${checks.map(([label, ok]) => `<div class="qa-row ${ok ? "pass" : "fail"}"><span>${ok ? "✓" : "!"}</span><strong>${label}</strong></div>`).join("")}
     </div>
     <div class="prod-tool-grid">
-      <button class="secondary-action" type="button" data-prod-tool="qa">Run QA</button>
+      <button class="secondary-action" type="button" data-prod-tool="qa">Run checks</button>
       <button class="secondary-action" type="button" data-prod-tool="shift">Reset Shift</button>
       <button class="secondary-action" type="button" data-prod-tool="today">Reset Today</button>
       <button class="secondary-action" type="button" data-prod-tool="install">Reset Install Hint</button>
