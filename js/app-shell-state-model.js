@@ -1,4 +1,4 @@
-const SHELL_SCREENS = new Set(["next", "tasks", "report", "log", "voice", "templates"]);
+const SHELL_SCREENS = new Set(["next", "tasks", "report", "log", "templates"]);
 
 export function normalizeShellScreen(value) {
   const screen = String(value || "").trim().toLowerCase();
@@ -25,6 +25,5 @@ export function screenFromTitle(value) {
   if (/incident|report/.test(title)) return "report";
   if (/task|checklist/.test(title)) return "tasks";
   if (/log|review|end-of-day|history/.test(title)) return "log";
-  if (/note|voice|capture/.test(title)) return "voice";
   return "next";
 }
