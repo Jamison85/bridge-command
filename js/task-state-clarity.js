@@ -1,3 +1,5 @@
+let taskStateUpdateQueued = false;
+
 function getTaskStateInfo(card) {
   const text = (card.textContent || "").toLowerCase();
   const isDone = card.classList.contains("done");
@@ -68,7 +70,20 @@ function enhanceTaskStates() {
   document.querySelectorAll(".task-row, .walk-card").forEach(addStateSummary);
 }
 
-document.addEventListener("click", () => setTimeout(enhanceTaskStates, 80));
-document.addEventListener("change", () => setTimeout(enhanceTaskStates, 80));
-setInterval(enhanceTaskStates, 1000);
-setTimeout(enhanceTaskStates, 120);
+function queueTaskStateUpdate() {
+  if (taskStateUpdateQueued) return;
+  taskStateUpdateQueued = true;
+  requestAnimationFrame(() => {
+    taskStateUpdateQueued = false;
+    enhanceTaskStates();
+  });
+}
+
+[
+  "storepilot:tasks-changed",
+  "storepilot:shift-changed",
+  "storepilot:screen-changed",
+  "storepilot:app-ready"
+].forEach((name) => window.addEventListener(name, queueTaskStateUpdate));
+
+queueTaskStateUpdate();
