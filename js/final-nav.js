@@ -1,3 +1,5 @@
+let navSyncQueued = false;
+
 function syncActiveNavState() {
   document.querySelectorAll(".nav-button").forEach((button) => {
     if (button.classList.contains("active")) button.setAttribute("aria-current", "page");
@@ -5,7 +7,15 @@ function syncActiveNavState() {
   });
 }
 
-document.addEventListener("click", () => setTimeout(syncActiveNavState, 60));
-document.addEventListener("change", () => setTimeout(syncActiveNavState, 60));
-setInterval(syncActiveNavState, 1000);
-setTimeout(syncActiveNavState, 220);
+function queueNavSync() {
+  if (navSyncQueued) return;
+  navSyncQueued = true;
+  requestAnimationFrame(() => {
+    navSyncQueued = false;
+    syncActiveNavState();
+  });
+}
+
+window.addEventListener("storepilot:screen-changed", queueNavSync);
+window.addEventListener("storepilot:app-ready", queueNavSync);
+queueNavSync();
